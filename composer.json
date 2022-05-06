@@ -34,6 +34,9 @@
             "SprykerSdkTest\\Helper\\": "tests/_support/Helper/"
         }
     },
+    "bin": [
+        "bin/syncapi"
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "extra": {
