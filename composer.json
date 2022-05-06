@@ -1,0 +1,66 @@
+{
+    "name": "spryker-sdk/sync-api",
+    "type": "library",
+    "description": "SDK for SyncAPI.",
+    "license": "proprietary",
+    "require": {
+        "php": ">=7.4",
+        "cebe/php-openapi": "^1.6",
+        "doctrine/inflector": "^2.0",
+        "spryker-sdk/spryk": "dev-master",
+        "symfony/console": "^5.3 || ^6.0",
+        "symfony/finder": "^5.3 || ^6.0",
+        "symfony/process": "^5.4"
+    },
+    "require-dev": {
+        "codeception/codeception": "*",
+        "codeception/module-asserts": "*",
+        "mikey179/vfsstream": "^1.6",
+        "sllh/composer-versions-check": "^2.0",
+        "spryker-sdk/architector": "0.1.x-dev",
+        "spryker/code-sniffer": "*",
+        "symfony/filesystem": "^5.3",
+        "symfony/var-dumper": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "SprykerSdk\\SyncApi\\": "src/SprykerSdk/SyncApi",
+            "Generated\\Shared\\Transfer\\": "src/Generated/Shared/Transfer/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SprykerSdkTest\\SyncApi\\": "tests/SprykerSdkTest/SyncApi",
+            "SprykerSdkTest\\Helper\\": "tests/_support/Helper/"
+        }
+    },
+    "bin": [
+        "bin/syncapi"
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "7.4.15"
+        },
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "sllh/composer-versions-check": true
+        }
+    },
+    "scripts": {
+        "cs-check": "phpcs --colors -p -s --extensions=php --standard=vendor/spryker/code-sniffer/Spryker/ruleset.xml src/SprykerSdk/ tests/",
+        "cs-fix": "phpcbf --colors -p --extensions=php --standard=vendor/spryker/code-sniffer/Spryker/ruleset.xml src/SprykerSdk/ tests/",
+        "stan": "phpstan analyze -l 8 src/SprykerSdk/",
+        "test": "codecept build && codecept run",
+        "test-cover": "codecept build && codecept run --coverage-xml",
+        "rector": "vendor/bin/rector process src/SprykerSdk/ --config architector.php --ansi",
+        "rector-diff": "vendor/bin/rector process src/SprykerSdk/ --config architector.php --ansi --dry-run"
+    }
+}

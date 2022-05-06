@@ -1,0 +1,25 @@
+namespace: SprykerSdkTest\SyncApi
+paths:
+    tests: tests
+    output: tests/_output
+    data: tests/_data
+    support: tests/_support
+    envs: tests/_envs
+actor_suffix: Tester
+coverage:
+    enabled: true
+    include:
+        - src/SprykerSdk/SyncApi/*
+suites:
+    AsyncApi:
+        path: SprykerSdkTest/SyncApi
+        class_name: SyncApiTester
+        modules:
+            enabled:
+                - \SprykerSdkTest\Helper\SyncApiHelper
+                - \SprykerSdkTest\Helper\OpenApiHelper
+                - \SprykerSdkTest\Helper\OpenApiValidatorHelper
+                - \SprykerSdkTest\Helper\CommandHelper
+extensions:
+    enabled:
+        - Codeception\Extension\RunFailed
