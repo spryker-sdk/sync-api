@@ -18,17 +18,15 @@ if (!defined('COMPOSER_INSTALL')) {
 require_once COMPOSER_INSTALL;
 
 use Symfony\Component\Console\Application;
-use SprykerSdk\AsyncApi\Console\SchemaCreateConsole;
-use SprykerSdk\AsyncApi\Console\SchemaMessageAddConsole;
-use SprykerSdk\AsyncApi\Console\SchemaValidateConsole;
-use SprykerSdk\AsyncApi\Console\CodeGenerateConsole;
+use SprykerSdk\SyncApi\Console\OpenApiCodeGenerateConsole;
+use SprykerSdk\SyncApi\Console\OpenApiValidateConsole;
+use SprykerSdk\SyncApi\Console\OpenApiCreateConsole;
 
 $application = new Application();
 $application->addCommands([
-    new SchemaCreateConsole(),
-    new SchemaMessageAddConsole(),
-    new SchemaValidateConsole(),
-    new CodeGenerateConsole(),
+    new OpenApiCodeGenerateConsole(),
+    new OpenApiValidateConsole(),
+    new OpenApiCreateConsole(),
 ]);
 
 $application->run();
