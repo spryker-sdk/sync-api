@@ -57,6 +57,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         $this->setSprykerMode($openApiRequestTransfer);
 
         $this->generateTransfers($openApiRequestTransfer, $openApi);
+        $this->generateResourceMethodResponse($openApiRequestTransfer, $openApi);
 
         if ($this->openApiResponseTransfer->getErrors()->count() > 0) {
             $messageTransfer = new MessageTransfer();
@@ -108,6 +109,175 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     }
 
     /**
+     * @param \Generated\Shared\Transfer\OpenApiRequestTransfer $openApiRequestTransfer
+     * @param \cebe\openapi\spec\OpenApi $openApi
+     *
+     * @return void
+     */
+    protected function generateResourceMethodResponse(
+        OpenApiRequestTransfer $openApiRequestTransfer,
+        OpenApi $openApi
+    ): void {
+        $resourceHttpMethodsWithHttpResponseCodes = [];
+
+        if (!isset($openApi->paths) || empty($openApi->paths)) {
+            $messageTransfer = new MessageTransfer();
+            $messageTransfer->setMessage('OpenAPI has does not have path uri.');
+            $this->openApiResponseTransfer->addError($messageTransfer);
+
+            return;
+        }
+
+        /** @var \cebe\openapi\spec\PathItem $pathItem */
+        foreach ($openApi->paths->getPaths() as $path => $pathItem) {
+            $resourceHttpMethodsWithHttpResponseCodes[$path] = $this->getHttpMethodsWithHttpResponseCodes($pathItem);
+        }
+
+        $this->runResourceMethodResponseCodeSpryk($resourceHttpMethodsWithHttpResponseCodes, $openApiRequestTransfer->getOrganizationOrFail(), $openApiRequestTransfer->getProjectRootOrFail());
+    }
+
+    /**
+     * @param \cebe\openapi\spec\PathItem $pathItem
+     *
+     * @return array<string, array<int, int>>
+     */
+    protected function getHttpMethodsWithHttpResponseCodes(PathItem $pathItem): array
+    {
+        $httpMethods = $pathItem->getOperations();
+        $httpMethodsHttpResponses = [];
+
+        /** @var \cebe\openapi\spec\Operation $operation */
+        foreach ($httpMethods as $httpMethod => $operation) {
+            $httpMethodsHttpResponses[$httpMethod] = $this->getHttpResponseCodesForOperation($operation);
+        }
+
+        return $httpMethodsHttpResponses;
+    }
+
+    /**
+     * @param \cebe\openapi\spec\Operation $operation
+     *
+     * @return array<int, int>
+     */
+    protected function getHttpResponseCodesForOperation(Operation $operation): array
+    {
+        $httpResponseCodes = [];
+
+        if (!is_iterable($operation->responses)) {
+            return $httpResponseCodes;
+        }
+
+        /** @var \cebe\openapi\spec\Response $response */
+        foreach ($operation->responses as $httpResponseCode => $response) {
+            if (!is_int($httpResponseCode)) {
+                continue;
+            }
+
+            $httpResponseCodes[$httpResponseCode] = $httpResponseCode;
+        }
+
+        return $httpResponseCodes;
+    }
+
+    /**
+     * @param array<string, array<string, array<int, int>>> $resourceHttpMethodsWithHttpResponseCodes
+     * @param string $organization
+     * @param string $projectRootPath
+     *
+     * @return void
+     */
+    protected function runResourceMethodResponseCodeSpryk(array $resourceHttpMethodsWithHttpResponseCodes, string $organization, string $projectRootPath): void
+    {
+        $commands = [];
+
+        foreach ($resourceHttpMethodsWithHttpResponseCodes as $resource => $httpMethodsWithHttpResponseCodes) {
+            if (strpos($resource, '{') !== false) {
+                $messageTransfer = new MessageTransfer();
+                $messageTransfer->setMessage(sprintf('Can\'t handle resources with placeholder at the moment. Resource "%s" can\'t be used to auto generate code.', $resource));
+                $this->openApiResponseTransfer->addMessage($messageTransfer);
+
+                continue;
+            }
+            $commands = $this->createCommandsForResourceHttpMethodsWithHttpResponseCodes($resource, $httpMethodsWithHttpResponseCodes, $organization, $commands);
+        }
+
+        $this->runCommands($commands, $projectRootPath);
+    }
+
+    /**
+     * @param string $resource
+     * @param array<string, array<int, int>> $httpMethodsWithHttpResponseCodes
+     * @param string $organization
+     * @param array<array> $commands
+     *
+     * @return array<array>
+     */
+    protected function createCommandsForResourceHttpMethodsWithHttpResponseCodes(
+        string $resource,
+        array $httpMethodsWithHttpResponseCodes,
+        string $organization,
+        array $commands
+    ): array {
+        foreach ($httpMethodsWithHttpResponseCodes as $httpMethod => $httpResponseCodes) {
+            $commands = $this->createCommandsForResourceHttpMethodAndHttpResponseCodes($resource, $httpMethod, $httpResponseCodes, $organization, $commands);
+        }
+
+        return $commands;
+    }
+
+    /**
+     * @param string $resource
+     * @param string $httpMethod
+     * @param array<int, int> $httpResponseCodes
+     * @param string $organization
+     * @param array<array> $commands
+     *
+     * @return array<array>
+     */
+    protected function createCommandsForResourceHttpMethodAndHttpResponseCodes(
+        string $resource,
+        string $httpMethod,
+        array $httpResponseCodes,
+        string $organization,
+        array $commands
+    ): array {
+        foreach ($httpResponseCodes as $httpResponseCode) {
+            $commands = $this->createCommandsForResourceHttpMethodAndHttpResponseCode($resource, $httpMethod, $httpResponseCode, $organization, $commands);
+        }
+
+        return $commands;
+    }
+
+    /**
+     * @param string $resource
+     * @param string $httpMethod
+     * @param int $httpResponseCode
+     * @param string $organization
+     * @param array<array> $commands
+     *
+     * @return array<array>
+     */
+    protected function createCommandsForResourceHttpMethodAndHttpResponseCode(
+        string $resource,
+        string $httpMethod,
+        int $httpResponseCode,
+        string $organization,
+        array $commands
+    ): array {
+        $commands[] = [
+            'vendor/bin/spryk-run',
+            'AddGlueResourceMethodResponse',
+            '--mode', $this->sprykMode,
+            '--organization', $organization,
+            '--resource', $resource,
+            '--httpMethod', $httpMethod,
+            '--httpResponseCode', $httpResponseCode,
+        ];
+
+        return $commands;
+    }
+
+    /**
      * @param \cebe\openapi\spec\OpenApi $openApi
      *
      * @return array
@@ -115,6 +285,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     protected function getTransferDefinitions(OpenApi $openApi): array
     {
         $transferDefinitions = [];
+
         if (isset($openApi->paths) && !empty($openApi->paths)) {
             /** @var \cebe\openapi\spec\PathItem $pathItem */
             foreach ($openApi->paths->getPaths() as $path => $pathItem) {
@@ -152,7 +323,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
                     $transferDefinitions[$method]['requestBody'] = $this->getRequestBodyPropertiesFromOperation($operation);
                 }
 
-                $transferDefinitions[$method]['responses'] = $this->getReponsePropertiesFromOperation($operation);
+                $transferDefinitions[$method]['responses'] = $this->getResponsePropertiesFromOperation($operation);
             }
         }
 
@@ -320,7 +491,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
      *
      * @return array <string, string>
      */
-    protected function getReponsePropertiesFromOperation(Operation $operation): array
+    protected function getResponsePropertiesFromOperation(Operation $operation): array
     {
         $responses = [];
 
@@ -354,7 +525,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     {
         foreach ($contents as $response) {
             if (isset($response->schema)) {
-                $responses[$this->getTransferNameFromSchemaOrReference($response->schema)] = $this->getReponsePropertiesFromSchemaOrReference($response->schema, []);
+                $responses[$this->getTransferNameFromSchemaOrReference($response->schema)] = $this->getResponsePropertiesFromSchemaOrReference($response->schema, []);
             }
         }
 
@@ -367,19 +538,19 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
      *
      * @return array
      */
-    protected function getReponsePropertiesFromSchemaOrReference($schemaOrReference, array $rootType): array
+    protected function getResponsePropertiesFromSchemaOrReference($schemaOrReference, array $rootType): array
     {
         foreach ($this->getPropertiesFromSchemaOrReference($schemaOrReference) as $schemaOrReferenceObject) {
             if (isset($schemaOrReferenceObject->properties) && !empty($schemaOrReferenceObject->properties) && ($schemaOrReferenceObject instanceof Schema || $schemaOrReferenceObject instanceof Reference)) {
                 $rootType[] = false;
 
-                return $this->getReponsePropertiesFromSchemaOrReference($schemaOrReferenceObject, $rootType);
+                return $this->getResponsePropertiesFromSchemaOrReference($schemaOrReferenceObject, $rootType);
             }
 
             if (isset($schemaOrReferenceObject->items->properties) && !empty($schemaOrReferenceObject->items->properties) && ($schemaOrReferenceObject->items instanceof Schema || $schemaOrReferenceObject->items instanceof Reference)) {
                 $rootType[] = true;
 
-                return $this->getReponsePropertiesFromSchemaOrReference($schemaOrReferenceObject->items, $rootType);
+                return $this->getResponsePropertiesFromSchemaOrReference($schemaOrReferenceObject->items, $rootType);
             }
         }
         if (current($rootType) === true) {
@@ -419,6 +590,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     protected function prepareResponseProperties(iterable $properties): array
     {
         $response = [];
+
         foreach ($properties as $key => $schemaOrReferenceObject) {
             if (isset($schemaOrReferenceObject->type) && $schemaOrReferenceObject->type !== 'array') {
                 $response[$key] = $schemaOrReferenceObject->type;
@@ -444,6 +616,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     protected function getTransferDefinitionSprykCommands(string $organization, array $transferDefinitions): array
     {
         $commandLines = [];
+
         foreach ($transferDefinitions as $transferDefinition) {
             foreach ($transferDefinition as $data) {
                 $this->generateTransferCommands($organization, ($data['requestBody'] ?? []), $data['moduleName'], $commandLines);

@@ -60,7 +60,7 @@ class OpenApiCodeGenerateConsole extends AbstractConsole
      */
     protected function configure(): void
     {
-        $this->setName('openapi:code:generate')
+        $this->setName('code:openapi:generate')
             ->setDescription('Generates code from an OpenAPI file definition.')
             ->addOption(static::OPTION_PROJECT_ROOT, static::OPTION_PROJECT_ROOT_SHORT, InputOption::VALUE_REQUIRED, '', getcwd())
             ->addOption(static::OPTION_OPEN_API_FILE, static::OPTION_OPEN_API_FILE_SHORT, InputOption::VALUE_REQUIRED, '', $this->getConfig()->getDefaultRelativePathToOpenApiFile())

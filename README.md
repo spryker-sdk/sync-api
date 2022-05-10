@@ -23,21 +23,21 @@ Documentation
 
 The following console commands are available:
 
-- `vendor/bin/asyncapi openapi:schema:create`
-- `vendor/bin/asyncapi openapi:schema:validate`
-- `vendor/bin/asyncapi openapi:code:generate`
+- `vendor/bin/syncapi schema:openapi:create`
+- `vendor/bin/syncapi schema:openapi:validate`
+- `vendor/bin/syncapi code:openapi:generate`
 
 ## Adding an OpenAPI file
 
-The `vendor/bin/syncapi openapi:schema:create` adds a minimal OpenAPI file.
+The `vendor/bin/syncapi schema:openapi:create` adds a minimal OpenAPI file.
 
 ## Validating an OpenAPI file
 
-The `vendor/bin/syncapi openapi:schema:validate` validates an OpenAPI file.
+The `vendor/bin/syncapi schema:openapi:validate` validates an OpenAPI file.
 
 
 ## Create code from an existing OpenAPI
 
-The `vendor/bin/asyncapi openapi:code:generate` reads an existing OpenAPI file and creates code out of it.
+The `vendor/bin/syncapi code:openapi:generate` reads an existing OpenAPI file and creates code out of it.
 
 

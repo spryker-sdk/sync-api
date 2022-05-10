@@ -51,7 +51,7 @@ class OpenApiCreateConsole extends AbstractConsole
      */
     protected function configure(): void
     {
-        $this->setName('openapi:schema:create')
+        $this->setName('schema:openapi:create')
             ->setDescription('Adds an OpenAPI file to the specified Open API schema file path.')
             ->addArgument(static::ARGUMENT_TITLE, InputArgument::REQUIRED, 'The name of the App.')
             ->addOption(static::OPTION_PROJECT_ROOT, static::OPTION_PROJECT_ROOT_SHORT, InputOption::VALUE_REQUIRED, '', getcwd())
