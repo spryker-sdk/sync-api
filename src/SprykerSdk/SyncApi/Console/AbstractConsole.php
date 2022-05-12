@@ -7,10 +7,12 @@
 
 namespace SprykerSdk\SyncApi\Console;
 
+use ArrayObject;
 use SprykerSdk\SyncApi\SyncApiConfig;
 use SprykerSdk\SyncApi\SyncApiFacade;
 use SprykerSdk\SyncApi\SyncApiFacadeInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class AbstractConsole extends Command
 {
@@ -66,5 +68,20 @@ class AbstractConsole extends Command
         }
 
         return $this->facade;
+    }
+
+    /**
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \ArrayObject<int, \Generated\Shared\Transfer\MessageTransfer> $messageTransfers
+     *
+     * @return void
+     */
+    protected function printMessages(OutputInterface $output, ArrayObject $messageTransfers): void
+    {
+        if ($output->isVerbose()) {
+            foreach ($messageTransfers as $messageTransfer) {
+                $output->writeln($messageTransfer->getMessageOrFail());
+            }
+        }
     }
 }

@@ -60,14 +60,12 @@ class OpenApiValidateConsole extends AbstractConsole
         $validateResponseTransfer = $this->getFacade()->validateOpenApi($validateRequestTransfer);
 
         if ($validateResponseTransfer->getErrors()->count() === 0) {
+            $this->printMessages($output, $validateResponseTransfer->getMessages());
+
             return static::CODE_SUCCESS;
         }
 
-        if ($output->isVerbose()) {
-            foreach ($validateResponseTransfer->getErrors() as $error) {
-                $output->writeln($error->getMessageOrFail());
-            }
-        }
+        $this->printMessages($output, $validateResponseTransfer->getErrors());
 
         return static::CODE_ERROR;
     }

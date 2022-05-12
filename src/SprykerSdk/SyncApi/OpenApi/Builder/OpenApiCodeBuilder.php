@@ -17,6 +17,7 @@ use Doctrine\Inflector\Inflector;
 use Generated\Shared\Transfer\MessageTransfer;
 use Generated\Shared\Transfer\OpenApiRequestTransfer;
 use Generated\Shared\Transfer\OpenApiResponseTransfer;
+use SprykerSdk\SyncApi\Messages\SyncApiMessages;
 use Symfony\Component\Process\Process;
 
 class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
@@ -60,9 +61,11 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         $this->generateResourceMethodResponse($openApiRequestTransfer, $openApi);
 
         if ($this->openApiResponseTransfer->getErrors()->count() > 0) {
-            $messageTransfer = new MessageTransfer();
-            $messageTransfer->setMessage('OpenAPI has invalid schema.');
-            $this->openApiResponseTransfer->addError($messageTransfer);
+            $this->openApiResponseTransfer->addError((new MessageTransfer())->setMessage(SyncApiMessages::ERROR_MESSAGE_COULD_NOT_GENERATE_FROM_OPEN_API_SCHEMA));
+        }
+
+        if ($this->openApiResponseTransfer->getErrors()->count() === 0) {
+            $this->openApiResponseTransfer->addMessage((new MessageTransfer())->setMessage(SyncApiMessages::SUCCESS_MESSAGE_GENERATED_CODE_FROM_OPEN_API_SCHEMA));
         }
 
         return $this->openApiResponseTransfer;
@@ -163,12 +166,11 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     {
         $httpResponseCodes = [];
 
-        if (!is_iterable($operation->responses)) {
-            return $httpResponseCodes;
-        }
+        /** @var iterable $responses */
+        $responses = $operation->responses;
 
         /** @var \cebe\openapi\spec\Response $response */
-        foreach ($operation->responses as $httpResponseCode => $response) {
+        foreach ($responses as $httpResponseCode => $response) {
             if (!is_int($httpResponseCode)) {
                 continue;
             }

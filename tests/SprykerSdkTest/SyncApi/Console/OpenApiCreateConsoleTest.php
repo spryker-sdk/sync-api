@@ -10,6 +10,7 @@ namespace SprykerSdkTest\SyncApi\Console;
 use Codeception\Test\Unit;
 use SprykerSdk\SyncApi\Console\AbstractConsole;
 use SprykerSdk\SyncApi\Console\OpenApiCreateConsole;
+use SprykerSdk\SyncApi\Messages\SyncApiMessages;
 use SprykerSdkTest\SyncApi\SyncApiTester;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -71,6 +72,6 @@ class OpenApiCreateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
-        $this->assertStringContainsString('File "vfs://root/config/api/openapi/openapi.yml" already exists.', $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiMessages::errorMessageOpenApiFileAlreadyExists('vfs://root/config/api/openapi/openapi.yml'), $commandTester->getDisplay());
     }
 }

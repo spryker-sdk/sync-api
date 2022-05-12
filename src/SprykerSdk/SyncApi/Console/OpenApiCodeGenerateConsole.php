@@ -8,7 +8,6 @@
 namespace SprykerSdk\SyncApi\Console;
 
 use Generated\Shared\Transfer\OpenApiRequestTransfer;
-use Generated\Shared\Transfer\OpenApiResponseTransfer;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -86,43 +85,13 @@ class OpenApiCodeGenerateConsole extends AbstractConsole
         $openApiResponseTransfer = $this->getFacade()->buildFromOpenApi($openApiRequestTransfer);
 
         if ($openApiResponseTransfer->getErrors()->count() === 0) {
-            $this->printMessages($openApiResponseTransfer, $output);
+            $this->printMessages($output, $openApiResponseTransfer->getMessages());
 
             return static::CODE_SUCCESS;
         }
 
-        $this->printErrors($openApiResponseTransfer, $output);
+        $this->printMessages($output, $openApiResponseTransfer->getErrors());
 
         return static::CODE_ERROR;
-    }
-
-    /**
-     * @param \Generated\Shared\Transfer\OpenApiResponseTransfer $openApiResponseTransfer
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     *
-     * @return void
-     */
-    protected function printMessages(OpenApiResponseTransfer $openApiResponseTransfer, OutputInterface $output): void
-    {
-        if ($output->isVerbose()) {
-            foreach ($openApiResponseTransfer->getMessages() as $message) {
-                $output->writeln($message->getMessageOrFail());
-            }
-        }
-    }
-
-    /**
-     * @param \Generated\Shared\Transfer\OpenApiResponseTransfer $openApiResponseTransfer
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     *
-     * @return void
-     */
-    protected function printErrors(OpenApiResponseTransfer $openApiResponseTransfer, OutputInterface $output): void
-    {
-        if ($output->isVerbose()) {
-            foreach ($openApiResponseTransfer->getErrors() as $error) {
-                $output->writeln($error->getMessageOrFail());
-            }
-        }
     }
 }

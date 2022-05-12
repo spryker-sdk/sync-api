@@ -38,6 +38,30 @@ class OpenApiValidatorHelper extends Module
     }
 
     /**
+     * @return void
+     */
+    public function haveDefaultOpenApiFile(): void
+    {
+        $files = [
+            'openapi.yml' => file_get_contents(codecept_data_dir('api/openapi/invalid/empty_openapi.yml')),
+        ];
+
+        $this->prepareOpenApiSchema($files);
+    }
+
+    /**
+     * @return void
+     */
+    public function haveOpenApiFileWithPathButInvalidHttpMethod(): void
+    {
+        $files = [
+            'openapi.yml' => file_get_contents(codecept_data_dir('api/openapi/invalid/openapi_without_http_methods_in_path.yml')),
+        ];
+
+        $this->prepareOpenApiSchema($files);
+    }
+
+    /**
      * @param array $files
      *
      * @return void

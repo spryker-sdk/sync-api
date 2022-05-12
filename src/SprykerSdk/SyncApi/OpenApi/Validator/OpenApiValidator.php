@@ -11,6 +11,7 @@ use Exception;
 use Generated\Shared\Transfer\MessageTransfer;
 use Generated\Shared\Transfer\ValidateRequestTransfer;
 use Generated\Shared\Transfer\ValidateResponseTransfer;
+use SprykerSdk\SyncApi\Messages\SyncApiMessages;
 use SprykerSdk\SyncApi\Validator\AbstractValidator;
 use Symfony\Component\Yaml\Yaml;
 
@@ -29,9 +30,7 @@ class OpenApiValidator extends AbstractValidator
         $validateResponseTransfer ??= new ValidateResponseTransfer();
         $openApiFile = $validateRequestTransfer->getOpenApiFileOrFail();
         if (!$this->finder->hasFiles($openApiFile)) {
-            $messageTransfer = new MessageTransfer();
-            $messageTransfer->setMessage('No OpenAPI file given, you need to pass a valid filename.');
-            $validateResponseTransfer->addError($messageTransfer);
+            $validateResponseTransfer->addError((new MessageTransfer())->setMessage(SyncApiMessages::errorMessageOpenApiFileDoesNotExist($openApiFile)));
 
             return $validateResponseTransfer;
         }
@@ -39,13 +38,17 @@ class OpenApiValidator extends AbstractValidator
         try {
             $openApi = Yaml::parseFile($openApiFile);
         } catch (Exception $e) {
-            $messageTransfer = new MessageTransfer();
-            $messageTransfer->setMessage('Could not parse OpenApi file.');
-            $validateResponseTransfer->addError($messageTransfer);
+            $validateResponseTransfer->addError((new MessageTransfer())->setMessage(SyncApiMessages::errorMessageCouldNotParseOpenApiFile($openApiFile)));
 
             return $validateResponseTransfer;
         }
 
-        return $this->validateFileData($openApi, $this->finder->getFile($openApiFile)->getFilename(), $validateResponseTransfer);
+        $validateResponseTransfer = $this->validateFileData($openApi, $this->finder->getFile($openApiFile)->getFilename(), $validateResponseTransfer);
+
+        if ($validateResponseTransfer->getErrors()->count() === 0) {
+            $validateResponseTransfer->addMessage((new MessageTransfer())->setMessage(SyncApiMessages::VALIDATOR_MESSAGE_OPEN_API_SUCCESS));
+        }
+
+        return $validateResponseTransfer;
     }
 }

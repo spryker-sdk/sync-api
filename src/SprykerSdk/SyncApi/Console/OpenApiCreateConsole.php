@@ -83,14 +83,12 @@ class OpenApiCreateConsole extends AbstractConsole
         $openApiResponseTransfer = $this->getFacade()->createOpenApi($openApiRequestTransfer);
 
         if ($openApiResponseTransfer->getErrors()->count() === 0) {
+            $this->printMessages($output, $openApiResponseTransfer->getMessages());
+
             return static::CODE_SUCCESS;
         }
 
-        if ($output->isVerbose()) {
-            foreach ($openApiResponseTransfer->getErrors() as $error) {
-                $output->writeln($error->getMessageOrFail());
-            }
-        }
+        $this->printMessages($output, $openApiResponseTransfer->getErrors());
 
         return static::CODE_ERROR;
     }

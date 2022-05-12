@@ -1,0 +1,10 @@
+openapi: 3.0.0
+info:
+    title: 'App Tenant Registry Service (ATRS)'
+    description: 'The App Tenant Registry Service is capable of managing Apps, Tenants and connection and configureation between them.'
+    version: 0.2.3
+
+paths:
+    /foo:
+        bar:
+            baz: bat

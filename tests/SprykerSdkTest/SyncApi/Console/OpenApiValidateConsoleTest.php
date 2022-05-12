@@ -10,6 +10,7 @@ namespace SprykerSdkTest\SyncApi\Console;
 use Codeception\Test\Unit;
 use SprykerSdk\SyncApi\Console\AbstractConsole;
 use SprykerSdk\SyncApi\Console\OpenApiValidateConsole;
+use SprykerSdk\SyncApi\Messages\SyncApiMessages;
 use SprykerSdkTest\SyncApi\SyncApiTester;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -79,6 +80,63 @@ class OpenApiValidateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
-        $this->assertStringContainsString('Could not parse OpenApi file', $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiMessages::errorMessageCouldNotParseOpenApiFile('vfs://root/config/api/openapi/openapi.yml'), $commandTester->getDisplay());
+    }
+
+    /**
+     * @return void
+     */
+    public function testValidateOpenApiReturnsErrorCodeAndPrintsErrorMessagesWhenFileDoesNotContainAnyPaths(): void
+    {
+        // Arrange
+        $this->tester->haveDefaultOpenApiFile();
+        $commandTester = $this->tester->getConsoleTester(OpenApiValidateConsole::class);
+
+        // Act
+        $commandTester->execute([
+            '--' . OpenApiValidateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
+        ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
+
+        // Assert
+        $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
+        $this->assertStringContainsString(SyncApiMessages::VALIDATOR_ERROR_NO_PATHS_DEFINED, $commandTester->getDisplay());
+    }
+
+    /**
+     * @return void
+     */
+    public function testValidateOpenApiReturnsErrorCodeAndPrintsErrorMessagesWhenFileDoesNotContainAnyComponents(): void
+    {
+        // Arrange
+        $this->tester->haveDefaultOpenApiFile();
+        $commandTester = $this->tester->getConsoleTester(OpenApiValidateConsole::class);
+
+        // Act
+        $commandTester->execute([
+            '--' . OpenApiValidateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
+        ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
+
+        // Assert
+        $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
+        $this->assertStringContainsString(SyncApiMessages::VALIDATOR_ERROR_NO_COMPONENTS_DEFINED, $commandTester->getDisplay());
+    }
+
+    /**
+     * @return void
+     */
+    public function testValidateOpenApiReturnsErrorCodeAndPrintsErrorMessagesWhenFileDoesNotContainValidHttpMethodsInPathDefinition(): void
+    {
+        // Arrange
+        $this->tester->haveOpenApiFileWithPathButInvalidHttpMethod();
+        $commandTester = $this->tester->getConsoleTester(OpenApiValidateConsole::class);
+
+        // Act
+        $commandTester->execute([
+            '--' . OpenApiValidateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
+        ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
+
+        // Assert
+        $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
+        $this->assertStringContainsString(SyncApiMessages::validationErrorInvalidHttpMethodInPath('/foo', 'bar'), $commandTester->getDisplay());
     }
 }

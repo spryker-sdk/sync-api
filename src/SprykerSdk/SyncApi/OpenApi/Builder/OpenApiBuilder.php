@@ -10,6 +10,7 @@ namespace SprykerSdk\SyncApi\OpenApi\Builder;
 use Generated\Shared\Transfer\MessageTransfer;
 use Generated\Shared\Transfer\OpenApiRequestTransfer;
 use Generated\Shared\Transfer\OpenApiResponseTransfer;
+use SprykerSdk\SyncApi\Messages\SyncApiMessages;
 use Symfony\Component\Yaml\Yaml;
 
 class OpenApiBuilder implements OpenApiBuilderInterface
@@ -31,15 +32,19 @@ class OpenApiBuilder implements OpenApiBuilderInterface
             ],
         ];
 
-        $targetFilePath = $openApiRequestTransfer->getTargetFileOrFail();
+        $targetFile = $openApiRequestTransfer->getTargetFileOrFail();
 
-        if (file_exists($targetFilePath)) {
-            $openApiResponseTransfer->addError((new MessageTransfer())->setMessage(sprintf('File "%s" already exists.', $targetFilePath)));
+        if (file_exists($targetFile)) {
+            $openApiResponseTransfer->addError((new MessageTransfer())->setMessage(SyncApiMessages::errorMessageOpenApiFileAlreadyExists($targetFile)));
 
             return $openApiResponseTransfer;
         }
 
-        $this->writeToFile($targetFilePath, $openApi);
+        $result = $this->writeToFile($targetFile, $openApi);
+
+        if ($result) {
+            $openApiResponseTransfer->addMessage((new MessageTransfer())->setMessage(SyncApiMessages::successMessageOpenApiFileCreated($targetFile)));
+        }
 
         return $openApiResponseTransfer;
     }
@@ -48,9 +53,9 @@ class OpenApiBuilder implements OpenApiBuilderInterface
      * @param string $targetFile
      * @param array $openApi
      *
-     * @return void
+     * @return bool
      */
-    protected function writeToFile(string $targetFile, array $openApi): void
+    protected function writeToFile(string $targetFile, array $openApi): bool
     {
         $openApiSchemaYaml = Yaml::dump($openApi, 100);
 
@@ -60,6 +65,6 @@ class OpenApiBuilder implements OpenApiBuilderInterface
             mkdir($dirname, 0770, true);
         }
 
-        file_put_contents($targetFile, $openApiSchemaYaml);
+        return (bool)file_put_contents($targetFile, $openApiSchemaYaml);
     }
 }
