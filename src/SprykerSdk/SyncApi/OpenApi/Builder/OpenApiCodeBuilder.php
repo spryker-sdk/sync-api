@@ -272,6 +272,8 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
             '--resource', $resource,
             '--httpMethod', $httpMethod,
             '--httpResponseCode', $httpResponseCode,
+            '-n',
+            '-v',
         ];
 
         return $commands;
@@ -798,7 +800,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
      */
     protected function runProcess(array $command, string $projectRootPath): void
     {
-        $process = new Process($command, $projectRootPath);
+        $process = new Process($command, $projectRootPath, null, null, 300);
         $process->run(function ($a, $buffer) {
             echo $buffer;
             // For debugging purposes, set a breakpoint here to see issues.
