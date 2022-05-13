@@ -14,6 +14,7 @@ use Doctrine\Inflector\InflectorFactory;
 use Generated\Shared\Transfer\OpenApiRequestTransfer;
 use Generated\Shared\Transfer\OpenApiTransfer;
 use SprykerSdk\SyncApi\Console\OpenApiCodeGenerateConsole;
+use SprykerSdk\SyncApi\Message\MessageBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
 use SprykerSdk\SyncApi\SyncApiFacade;
 use SprykerSdk\SyncApi\SyncApiFactory;
@@ -76,6 +77,7 @@ class OpenApiHelper extends Module
         $openApiCodeBuilderStub = Stub::construct(
             OpenApiCodeBuilder::class,
             [
+                new MessageBuilder(),
                 InflectorFactory::create()->build(),
             ],
             [

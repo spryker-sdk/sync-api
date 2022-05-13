@@ -9,6 +9,8 @@ namespace SprykerSdk\SyncApi;
 
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
+use SprykerSdk\SyncApi\Message\MessageBuilder;
+use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
@@ -17,8 +19,6 @@ use SprykerSdk\SyncApi\OpenApi\Validator\OpenApiValidator;
 use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiComponentsValidatorRule;
 use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiHttpMethodInPathValidatorRule;
 use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiPathValidatorRule;
-use SprykerSdk\SyncApi\Validator\Finder\Finder;
-use SprykerSdk\SyncApi\Validator\Finder\FinderInterface;
 use SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface;
 
 class SyncApiFactory
@@ -57,7 +57,7 @@ class SyncApiFactory
      */
     public function createOpenApiCodeBuilder(): OpenApiCodeBuilderInterface
     {
-        return new OpenApiCodeBuilder($this->getInflector());
+        return new OpenApiCodeBuilder($this->createMessageBuilder(), $this->getInflector());
     }
 
     /**
@@ -75,6 +75,7 @@ class SyncApiFactory
     {
         return new OpenApiValidator(
             $this->getConfig(),
+            $this->createMessageBuilder(),
             $this->getValidatorRules(),
         );
     }
@@ -96,7 +97,7 @@ class SyncApiFactory
      */
     public function createOpenApiPathValidator(): ValidatorRuleInterface
     {
-        return new OpenApiPathValidatorRule($this->getConfig());
+        return new OpenApiPathValidatorRule($this->createMessageBuilder());
     }
 
     /**
@@ -104,7 +105,7 @@ class SyncApiFactory
      */
     public function createOpenApiComponentsValidator(): ValidatorRuleInterface
     {
-        return new OpenApiComponentsValidatorRule($this->getConfig());
+        return new OpenApiComponentsValidatorRule($this->createMessageBuilder());
     }
 
     /**
@@ -112,7 +113,7 @@ class SyncApiFactory
      */
     public function createOpenApiHttpMethodInPathValidator(): ValidatorRuleInterface
     {
-        return new OpenApiHttpMethodInPathValidatorRule($this->getConfig());
+        return new OpenApiHttpMethodInPathValidatorRule($this->createMessageBuilder());
     }
 
     /**
@@ -120,6 +121,14 @@ class SyncApiFactory
      */
     public function createOpenApiBuilder(): OpenApiBuilderInterface
     {
-        return new OpenApiBuilder();
+        return new OpenApiBuilder($this->createMessageBuilder());
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\Message\MessageBuilderInterface
+     */
+    public function createMessageBuilder(): MessageBuilderInterface
+    {
+        return new MessageBuilder();
     }
 }

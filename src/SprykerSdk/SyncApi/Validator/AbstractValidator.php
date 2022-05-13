@@ -8,6 +8,7 @@
 namespace SprykerSdk\SyncApi\Validator;
 
 use Generated\Shared\Transfer\ValidateResponseTransfer;
+use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\SyncApiConfig;
 
 abstract class AbstractValidator implements ValidatorInterface
@@ -18,17 +19,24 @@ abstract class AbstractValidator implements ValidatorInterface
     protected SyncApiConfig $config;
 
     /**
+     * @var \SprykerSdk\SyncApi\Message\MessageBuilderInterface
+     */
+    protected MessageBuilderInterface $messageBuilder;
+
+    /**
      * @var array<\SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface>
      */
     protected array $validatorRules;
 
     /**
      * @param \SprykerSdk\SyncApi\SyncApiConfig $config
+     * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
      * @param array $fileValidators
      */
-    public function __construct(SyncApiConfig $config, array $fileValidators = [])
+    public function __construct(SyncApiConfig $config, MessageBuilderInterface $messageBuilder, array $fileValidators = [])
     {
         $this->config = $config;
+        $this->messageBuilder = $messageBuilder;
         $this->validatorRules = $fileValidators;
     }
 

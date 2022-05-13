@@ -7,10 +7,9 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Validator\Rules;
 
-use Generated\Shared\Transfer\MessageTransfer;
 use Generated\Shared\Transfer\ValidateResponseTransfer;
-use SprykerSdk\SyncApi\Messages\SyncApiMessages;
-use SprykerSdk\SyncApi\SyncApiConfig;
+use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
+use SprykerSdk\SyncApi\Message\SyncApiError;
 use SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface;
 
 class OpenApiHttpMethodInPathValidatorRule implements ValidatorRuleInterface
@@ -26,16 +25,16 @@ class OpenApiHttpMethodInPathValidatorRule implements ValidatorRuleInterface
     ];
 
     /**
-     * @var \SprykerSdk\SyncApi\SyncApiConfig
+     * @var \SprykerSdk\SyncApi\Message\MessageBuilderInterface
      */
-    protected SyncApiConfig $config;
+    protected MessageBuilderInterface $messageBuilder;
 
     /**
-     * @param \SprykerSdk\SyncApi\SyncApiConfig $config
+     * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
      */
-    public function __construct(SyncApiConfig $config)
+    public function __construct(MessageBuilderInterface $messageBuilder)
     {
-        $this->config = $config;
+        $this->messageBuilder = $messageBuilder;
     }
 
     /**
@@ -72,7 +71,7 @@ class OpenApiHttpMethodInPathValidatorRule implements ValidatorRuleInterface
         foreach ($openApi['paths'] as $path => $pathDefinition) {
             foreach ($pathDefinition as $httpMethod => $methodDefinition) {
                 if (!in_array($httpMethod, static::HTTP_METHODS)) {
-                    $validateResponseTransfer->addError((new MessageTransfer())->setMessage(SyncApiMessages::validationErrorInvalidHttpMethodInPath($path, $httpMethod)));
+                    $validateResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::openApiContainsInvalidHttpMethodForPath($httpMethod, $path)));
                 }
             }
         }

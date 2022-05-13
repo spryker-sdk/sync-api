@@ -14,10 +14,11 @@ use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Doctrine\Inflector\Inflector;
-use Generated\Shared\Transfer\MessageTransfer;
 use Generated\Shared\Transfer\OpenApiRequestTransfer;
 use Generated\Shared\Transfer\OpenApiResponseTransfer;
-use SprykerSdk\SyncApi\Messages\SyncApiMessages;
+use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
+use SprykerSdk\SyncApi\Message\SyncApiError;
+use SprykerSdk\SyncApi\Message\SyncApiInfo;
 use Symfony\Component\Process\Process;
 
 class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
@@ -26,6 +27,11 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
      * @var \Generated\Shared\Transfer\OpenApiResponseTransfer
      */
     protected OpenApiResponseTransfer $openApiResponseTransfer;
+
+    /**
+     * @var \SprykerSdk\SyncApi\Message\MessageBuilderInterface
+     */
+    protected MessageBuilderInterface $messageBuilder;
 
     /**
      * @var \Doctrine\Inflector\Inflector
@@ -38,11 +44,13 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     protected string $sprykMode = 'project';
 
     /**
+     * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
      * @param \Doctrine\Inflector\Inflector $inflector
      */
-    public function __construct(Inflector $inflector)
+    public function __construct(MessageBuilderInterface $messageBuilder, Inflector $inflector)
     {
         $this->inflector = $inflector;
+        $this->messageBuilder = $messageBuilder;
         $this->openApiResponseTransfer = new OpenApiResponseTransfer();
     }
 
@@ -61,11 +69,11 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         $this->generateResourceMethodResponse($openApiRequestTransfer, $openApi);
 
         if ($this->openApiResponseTransfer->getErrors()->count() > 0) {
-            $this->openApiResponseTransfer->addError((new MessageTransfer())->setMessage(SyncApiMessages::ERROR_MESSAGE_COULD_NOT_GENERATE_FROM_OPEN_API_SCHEMA));
+            $this->openApiResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::couldNotGenerateCodeFromOpenApi()));
         }
 
         if ($this->openApiResponseTransfer->getErrors()->count() === 0) {
-            $this->openApiResponseTransfer->addMessage((new MessageTransfer())->setMessage(SyncApiMessages::SUCCESS_MESSAGE_GENERATED_CODE_FROM_OPEN_API_SCHEMA));
+            $this->openApiResponseTransfer->addMessage($this->messageBuilder->buildMessage(SyncApiInfo::generatedCodeFromOpenApiSchema()));
         }
 
         return $this->openApiResponseTransfer;
@@ -89,7 +97,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     protected function setSprykerMode(OpenApiRequestTransfer $openApiRequestTransfer): void
     {
         if ($openApiRequestTransfer->getOrganizationOrFail() === 'Spryker') {
-            $this->sprykMode = 'core'; //Set sprykMode based on organization
+            $this->sprykMode = 'core'; // Set sprykMode based on organization
         }
     }
 
@@ -124,9 +132,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         $resourceHttpMethodsWithHttpResponseCodes = [];
 
         if (!isset($openApi->paths) || empty($openApi->paths)) {
-            $messageTransfer = new MessageTransfer();
-            $messageTransfer->setMessage('OpenAPI has does not have path uri.');
-            $this->openApiResponseTransfer->addError($messageTransfer);
+            $this->openApiResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::openApiDoesNotDefineAnyPath()));
 
             return;
         }
@@ -142,7 +148,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     /**
      * @param \cebe\openapi\spec\PathItem $pathItem
      *
-     * @return array<string, array<int, int>>
+     * @return array<string, array<int, string>>
      */
     protected function getHttpMethodsWithHttpResponseCodes(PathItem $pathItem): array
     {
@@ -151,7 +157,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
 
         /** @var \cebe\openapi\spec\Operation $operation */
         foreach ($httpMethods as $httpMethod => $operation) {
-            $httpMethodsHttpResponses[$httpMethod] = $this->getHttpResponseCodesForOperation($operation);
+            $httpMethodsHttpResponses[$httpMethod] = $this->getHttpResponseCodesForOperationWithApiType($operation);
         }
 
         return $httpMethodsHttpResponses;
@@ -160,9 +166,9 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     /**
      * @param \cebe\openapi\spec\Operation $operation
      *
-     * @return array<int, int>
+     * @return array<int, string>
      */
-    protected function getHttpResponseCodesForOperation(Operation $operation): array
+    protected function getHttpResponseCodesForOperationWithApiType(Operation $operation): array
     {
         $httpResponseCodes = [];
 
@@ -175,14 +181,18 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
                 continue;
             }
 
-            $httpResponseCodes[$httpResponseCode] = $httpResponseCode;
+            $contentType = array_key_first($response->content);
+
+            $apiType = $contentType === 'application/vnd.api+json' ? 'JSON' : 'REST';
+
+            $httpResponseCodes[$httpResponseCode] = $apiType;
         }
 
         return $httpResponseCodes;
     }
 
     /**
-     * @param array<string, array<string, array<int, int>>> $resourceHttpMethodsWithHttpResponseCodes
+     * @param array<string, array<string, array<int, string>>> $resourceHttpMethodsWithHttpResponseCodes
      * @param string $organization
      * @param string $projectRootPath
      *
@@ -194,9 +204,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
 
         foreach ($resourceHttpMethodsWithHttpResponseCodes as $resource => $httpMethodsWithHttpResponseCodes) {
             if (strpos($resource, '{') !== false) {
-                $messageTransfer = new MessageTransfer();
-                $messageTransfer->setMessage(sprintf('Can\'t handle resources with placeholder at the moment. Resource "%s" can\'t be used to auto generate code.', $resource));
-                $this->openApiResponseTransfer->addMessage($messageTransfer);
+                $this->openApiResponseTransfer->addMessage($this->messageBuilder->buildMessage(SyncApiError::canNotHandleResourcesWithPlaceholder($resource)));
 
                 continue;
             }
@@ -208,7 +216,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
 
     /**
      * @param string $resource
-     * @param array<string, array<int, int>> $httpMethodsWithHttpResponseCodes
+     * @param array<string, array<int, string>> $httpMethodsWithHttpResponseCodes
      * @param string $organization
      * @param array<array> $commands
      *
@@ -230,7 +238,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     /**
      * @param string $resource
      * @param string $httpMethod
-     * @param array<int, int> $httpResponseCodes
+     * @param array<int, string> $httpResponseCodes
      * @param string $organization
      * @param array<array> $commands
      *
@@ -243,14 +251,15 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         string $organization,
         array $commands
     ): array {
-        foreach ($httpResponseCodes as $httpResponseCode) {
-            $commands = $this->createCommandsForResourceHttpMethodAndHttpResponseCode($resource, $httpMethod, $httpResponseCode, $organization, $commands);
+        foreach ($httpResponseCodes as $httpResponseCode => $apiType) {
+            $commands = $this->createCommandsForResourceHttpMethodAndHttpResponseCode($apiType, $resource, $httpMethod, $httpResponseCode, $organization, $commands);
         }
 
         return $commands;
     }
 
     /**
+     * @param string $apiType
      * @param string $resource
      * @param string $httpMethod
      * @param int $httpResponseCode
@@ -260,6 +269,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
      * @return array<array>
      */
     protected function createCommandsForResourceHttpMethodAndHttpResponseCode(
+        string $apiType,
         string $resource,
         string $httpMethod,
         int $httpResponseCode,
@@ -274,6 +284,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
             '--resource', $resource,
             '--httpMethod', $httpMethod,
             '--httpResponseCode', $httpResponseCode,
+            '--apiType', $apiType,
             '-n',
             '-v',
         ];
@@ -296,9 +307,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
                 $transferDefinitions[$path] = $this->getTransferDefinitionFromPathItem($path, $pathItem);
             }
         } else {
-            $messageTransfer = new MessageTransfer();
-            $messageTransfer->setMessage('OpenAPI has does not have path uri.');
-            $this->openApiResponseTransfer->addError($messageTransfer);
+            $this->openApiResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::openApiDoesNotDefineAnyPath()));
         }
 
         return $transferDefinitions;
@@ -364,9 +373,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
             }
         }
 
-        $messageTransfer = new MessageTransfer();
-        $messageTransfer->setMessage('Controller name not found for path');
-        $this->openApiResponseTransfer->addError($messageTransfer);
+        $this->openApiResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::canNotExtractAControllerNameForPath($path)));
 
         return '';
     }
@@ -388,9 +395,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         $path = trim($path, '/');
 
         if ($path === '') {
-            $messageTransfer = new MessageTransfer();
-            $messageTransfer->setMessage('Module name not found for path');
-            $this->openApiResponseTransfer->addError($messageTransfer);
+            $this->openApiResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::canNotExtractAModuleNameForPath($path)));
 
             return '';
         }
@@ -407,6 +412,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     protected function getRequestBodyPropertiesFromOperation(Operation $operation): array
     {
         $requestBodyProperties = [];
+
         /** @var \cebe\openapi\spec\RequestBody $mediaType */
         foreach ($this->getRequestBodyFromOperation($operation) as $mediaType) {
             if (isset($mediaType->schema)) {
@@ -461,6 +467,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     protected function prepareRequestBodyProperties(iterable $properties): array
     {
         $requestBodyProperties = [];
+
         foreach ($properties as $key => $schemaOrReferenceObject) {
             if (isset($schemaOrReferenceObject->type) && $schemaOrReferenceObject->type !== 'array') {
                 $requestBodyProperties[$key] = $schemaOrReferenceObject->type;
@@ -482,6 +489,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     protected function getTransferNameFromSchemaOrReference($schemaOrReference): string
     {
         $referencePathName = '';
+
         if ($schemaOrReference->getDocumentPosition()) {
             $referencePath = $schemaOrReference->getDocumentPosition()->getPath();
             $referencePathName = end($referencePath);
@@ -691,6 +699,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     protected function preparePropertyNameForCommand(array $parameters): array
     {
         $parsedProperties = [];
+
         foreach ($parameters as $key => $value) {
             $parsedProperties[] = "{$key}:{$value}";
         }
@@ -723,6 +732,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     {
         $propertyName = array_key_first($parameters);
         $propertyTypes = explode(':', $parameters[$propertyName]);
+
         if (count($parameters) !== 1 || count($propertyTypes) !== 1) {
             return end($propertyTypes);
         }
@@ -789,7 +799,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
             $this->runProcess($command, $projectRootPath);
         }
 
-        $this->openApiResponseTransfer->addMessage((new MessageTransfer())->setMessage('Executed commands.'));
+        $this->openApiResponseTransfer->addMessage($this->messageBuilder->buildMessage(SyncApiInfo::generatedCodeFromOpenApiSchema()));
     }
 
     /**

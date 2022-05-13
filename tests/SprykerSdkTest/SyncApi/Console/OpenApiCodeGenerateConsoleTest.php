@@ -10,6 +10,7 @@ namespace SprykerSdkTest\SyncApi\Console;
 use Codeception\Test\Unit;
 use SprykerSdk\SyncApi\Console\AbstractConsole;
 use SprykerSdk\SyncApi\Console\OpenApiCodeGenerateConsole;
+use SprykerSdk\SyncApi\Message\SyncApiInfo;
 use SprykerSdkTest\SyncApi\SyncApiTester;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -58,7 +59,7 @@ class OpenApiCodeGenerateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
-        $this->assertStringContainsString('Executed commands.', $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiInfo::generatedCodeFromOpenApiSchema(), $commandTester->getDisplay());
     }
 
     /**

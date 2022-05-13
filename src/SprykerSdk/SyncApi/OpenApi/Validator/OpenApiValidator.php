@@ -8,10 +8,10 @@
 namespace SprykerSdk\SyncApi\OpenApi\Validator;
 
 use Exception;
-use Generated\Shared\Transfer\MessageTransfer;
 use Generated\Shared\Transfer\ValidateRequestTransfer;
 use Generated\Shared\Transfer\ValidateResponseTransfer;
-use SprykerSdk\SyncApi\Messages\SyncApiMessages;
+use SprykerSdk\SyncApi\Message\SyncApiError;
+use SprykerSdk\SyncApi\Message\SyncApiInfo;
 use SprykerSdk\SyncApi\Validator\AbstractValidator;
 use Symfony\Component\Yaml\Yaml;
 
@@ -31,7 +31,7 @@ class OpenApiValidator extends AbstractValidator
         $openApiFile = $validateRequestTransfer->getOpenApiFileOrFail();
 
         if (!is_file($openApiFile)) {
-            $validateResponseTransfer->addError((new MessageTransfer())->setMessage(SyncApiMessages::errorMessageOpenApiFileDoesNotExist($openApiFile)));
+            $validateResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::couldNotFinOpenApi($openApiFile)));
 
             return $validateResponseTransfer;
         }
@@ -39,7 +39,7 @@ class OpenApiValidator extends AbstractValidator
         try {
             $openApi = Yaml::parseFile($openApiFile);
         } catch (Exception $e) {
-            $validateResponseTransfer->addError((new MessageTransfer())->setMessage(SyncApiMessages::errorMessageCouldNotParseOpenApiFile($openApiFile)));
+            $validateResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::couldNotParseOpenApi($openApiFile)));
 
             return $validateResponseTransfer;
         }
@@ -47,7 +47,7 @@ class OpenApiValidator extends AbstractValidator
         $validateResponseTransfer = $this->executeValidatorRules($openApi, $openApiFile, $validateResponseTransfer);
 
         if ($validateResponseTransfer->getErrors()->count() === 0) {
-            $validateResponseTransfer->addMessage((new MessageTransfer())->setMessage(SyncApiMessages::VALIDATOR_MESSAGE_OPEN_API_SUCCESS));
+            $validateResponseTransfer->addMessage($this->messageBuilder->buildMessage(SyncApiInfo::openApiSchemaFileIsValid()));
         }
 
         return $validateResponseTransfer;

@@ -20,26 +20,26 @@ paths:
                 description: 'Contains all required data to register an App within the Registry service.'
                 required: true
                 content:
-                    application/json:
+                    application/vnd.api+json:
                         schema:
                             $ref: '#/components/schemas/AppRegistrationApiRequest'
             responses:
                 201:
                     description: 'App is registered.'
                     content:
-                        application/json:
+                        application/vnd.api+json:
                             schema:
                                 $ref: '#/components/schemas/AppRegistrationApiResponse'
                 400:
                     description: 'Invalid request.'
                     content:
-                        application/json:
+                        application/vnd.api+json:
                             schema:
                                 $ref: '#/components/schemas/ApiErrorMessage'
                 default:
                     description: 'Expected response to a bad request.'
                     content:
-                        application/json:
+                        application/vnd.api+json:
                             schema:
                                 $ref: '#/components/schemas/ApiErrorMessage'
 

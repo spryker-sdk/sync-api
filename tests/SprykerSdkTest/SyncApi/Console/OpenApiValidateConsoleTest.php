@@ -10,7 +10,7 @@ namespace SprykerSdkTest\SyncApi\Console;
 use Codeception\Test\Unit;
 use SprykerSdk\SyncApi\Console\AbstractConsole;
 use SprykerSdk\SyncApi\Console\OpenApiValidateConsole;
-use SprykerSdk\SyncApi\Messages\SyncApiMessages;
+use SprykerSdk\SyncApi\Message\SyncApiError;
 use SprykerSdkTest\SyncApi\SyncApiTester;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -80,7 +80,7 @@ class OpenApiValidateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
-        $this->assertStringContainsString(SyncApiMessages::errorMessageCouldNotParseOpenApiFile('vfs://root/config/api/openapi/openapi.yml'), $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiError::couldNotParseOpenApi('vfs://root/config/api/openapi/openapi.yml'), $commandTester->getDisplay());
     }
 
     /**
@@ -99,7 +99,7 @@ class OpenApiValidateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
-        $this->assertStringContainsString(SyncApiMessages::VALIDATOR_ERROR_NO_PATHS_DEFINED, $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiError::openApiDoesNotDefineAnyPath(), $commandTester->getDisplay());
     }
 
     /**
@@ -118,7 +118,7 @@ class OpenApiValidateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
-        $this->assertStringContainsString(SyncApiMessages::VALIDATOR_ERROR_NO_COMPONENTS_DEFINED, $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiError::openApiDoesNotDefineAnyComponents(), $commandTester->getDisplay());
     }
 
     /**
@@ -137,6 +137,6 @@ class OpenApiValidateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
-        $this->assertStringContainsString(SyncApiMessages::validationErrorInvalidHttpMethodInPath('/foo', 'bar'), $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiError::openApiContainsInvalidHttpMethodForPath('bar', '/foo'), $commandTester->getDisplay());
     }
 }

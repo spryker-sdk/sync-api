@@ -7,14 +7,28 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Builder;
 
-use Generated\Shared\Transfer\MessageTransfer;
 use Generated\Shared\Transfer\OpenApiRequestTransfer;
 use Generated\Shared\Transfer\OpenApiResponseTransfer;
-use SprykerSdk\SyncApi\Messages\SyncApiMessages;
+use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
+use SprykerSdk\SyncApi\Message\SyncApiError;
+use SprykerSdk\SyncApi\Message\SyncApiInfo;
 use Symfony\Component\Yaml\Yaml;
 
 class OpenApiBuilder implements OpenApiBuilderInterface
 {
+    /**
+     * @var \SprykerSdk\SyncApi\Message\MessageBuilderInterface
+     */
+    protected MessageBuilderInterface $messageBuilder;
+
+    /**
+     * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
+     */
+    public function __construct(MessageBuilderInterface $messageBuilder)
+    {
+        $this->messageBuilder = $messageBuilder;
+    }
+
     /**
      * @param \Generated\Shared\Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      *
@@ -35,7 +49,7 @@ class OpenApiBuilder implements OpenApiBuilderInterface
         $targetFile = $openApiRequestTransfer->getTargetFileOrFail();
 
         if (file_exists($targetFile)) {
-            $openApiResponseTransfer->addError((new MessageTransfer())->setMessage(SyncApiMessages::errorMessageOpenApiFileAlreadyExists($targetFile)));
+            $openApiResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::openApiFileAlreadyExists($targetFile)));
 
             return $openApiResponseTransfer;
         }
@@ -43,7 +57,7 @@ class OpenApiBuilder implements OpenApiBuilderInterface
         $result = $this->writeToFile($targetFile, $openApi);
 
         if ($result) {
-            $openApiResponseTransfer->addMessage((new MessageTransfer())->setMessage(SyncApiMessages::successMessageOpenApiFileCreated($targetFile)));
+            $openApiResponseTransfer->addMessage($this->messageBuilder->buildMessage(SyncApiInfo::openApiFileCreated($targetFile)));
         }
 
         return $openApiResponseTransfer;

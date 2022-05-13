@@ -7,25 +7,24 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Validator\Rules;
 
-use Generated\Shared\Transfer\MessageTransfer;
 use Generated\Shared\Transfer\ValidateResponseTransfer;
-use SprykerSdk\SyncApi\Messages\SyncApiMessages;
-use SprykerSdk\SyncApi\SyncApiConfig;
+use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
+use SprykerSdk\SyncApi\Message\SyncApiError;
 use SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface;
 
 class OpenApiPathValidatorRule implements ValidatorRuleInterface
 {
     /**
-     * @var \SprykerSdk\SyncApi\SyncApiConfig
+     * @var \SprykerSdk\SyncApi\Message\MessageBuilderInterface
      */
-    protected SyncApiConfig $config;
+    protected MessageBuilderInterface $messageBuilder;
 
     /**
-     * @param \SprykerSdk\SyncApi\SyncApiConfig $config
+     * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
      */
-    public function __construct(SyncApiConfig $config)
+    public function __construct(MessageBuilderInterface $messageBuilder)
     {
-        $this->config = $config;
+        $this->messageBuilder = $messageBuilder;
     }
 
     /**
@@ -56,9 +55,7 @@ class OpenApiPathValidatorRule implements ValidatorRuleInterface
     protected function validateAtLeastOnePathExists(array $openApi, ValidateResponseTransfer $validateResponseTransfer): ValidateResponseTransfer
     {
         if (!isset($openApi['paths'])) {
-            $messageTransfer = new MessageTransfer();
-            $messageTransfer->setMessage(SyncApiMessages::VALIDATOR_ERROR_NO_PATHS_DEFINED);
-            $validateResponseTransfer->addError($messageTransfer);
+            $validateResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::openApiDoesNotDefineAnyPath()));
         }
 
         return $validateResponseTransfer;
