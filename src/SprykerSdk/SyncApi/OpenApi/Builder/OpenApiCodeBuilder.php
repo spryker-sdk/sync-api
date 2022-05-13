@@ -401,7 +401,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         }
         $pathFragments = explode('/', trim($path, '/'));
 
-        return sprintf(ucwords(current($pathFragments)) . '%s', 'Api');
+        return ucwords(current($pathFragments)) . 'BackendApi';
     }
 
     /**
@@ -798,8 +798,6 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         foreach ($commands as $command) {
             $this->runProcess($command, $projectRootPath);
         }
-
-        $this->openApiResponseTransfer->addMessage($this->messageBuilder->buildMessage(SyncApiInfo::generatedCodeFromOpenApiSchema()));
     }
 
     /**
