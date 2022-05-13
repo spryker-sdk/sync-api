@@ -11,9 +11,9 @@ use Generated\Shared\Transfer\MessageTransfer;
 use Generated\Shared\Transfer\ValidateResponseTransfer;
 use SprykerSdk\SyncApi\Messages\SyncApiMessages;
 use SprykerSdk\SyncApi\SyncApiConfig;
-use SprykerSdk\SyncApi\Validator\FileValidatorInterface;
+use SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface;
 
-class OpenApiPathValidator implements FileValidatorInterface
+class OpenApiPathValidatorRule implements ValidatorRuleInterface
 {
     /**
      * @var \SprykerSdk\SyncApi\SyncApiConfig

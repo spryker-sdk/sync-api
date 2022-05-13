@@ -9,7 +9,6 @@ namespace SprykerSdk\SyncApi\Validator;
 
 use Generated\Shared\Transfer\ValidateResponseTransfer;
 use SprykerSdk\SyncApi\SyncApiConfig;
-use SprykerSdk\SyncApi\Validator\Finder\FinderInterface;
 
 abstract class AbstractValidator implements ValidatorInterface
 {
@@ -19,25 +18,18 @@ abstract class AbstractValidator implements ValidatorInterface
     protected SyncApiConfig $config;
 
     /**
-     * @var \SprykerSdk\SyncApi\Validator\Finder\FinderInterface
+     * @var array<\SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface>
      */
-    protected FinderInterface $finder;
-
-    /**
-     * @var array<\SprykerSdk\SyncApi\Validator\FileValidatorInterface>
-     */
-    protected array $fileValidators;
+    protected array $validatorRules;
 
     /**
      * @param \SprykerSdk\SyncApi\SyncApiConfig $config
-     * @param \SprykerSdk\SyncApi\Validator\Finder\FinderInterface $finder
      * @param array $fileValidators
      */
-    public function __construct(SyncApiConfig $config, FinderInterface $finder, array $fileValidators = [])
+    public function __construct(SyncApiConfig $config, array $fileValidators = [])
     {
         $this->config = $config;
-        $this->finder = $finder;
-        $this->fileValidators = $fileValidators;
+        $this->validatorRules = $fileValidators;
     }
 
     /**
@@ -48,14 +40,14 @@ abstract class AbstractValidator implements ValidatorInterface
      *
      * @return \Generated\Shared\Transfer\ValidateResponseTransfer
      */
-    protected function validateFileData(
+    protected function executeValidatorRules(
         array $fileData,
         string $fileName,
         ValidateResponseTransfer $validateResponseTransfer,
         ?array $context = null
     ): ValidateResponseTransfer {
-        foreach ($this->fileValidators as $fileValidator) {
-            $validateResponseTransfer = $fileValidator->validate($fileData, $fileName, $validateResponseTransfer, $context);
+        foreach ($this->validatorRules as $validatorRule) {
+            $validateResponseTransfer = $validatorRule->validate($fileData, $fileName, $validateResponseTransfer, $context);
         }
 
         return $validateResponseTransfer;

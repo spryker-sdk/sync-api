@@ -29,7 +29,8 @@ class OpenApiValidator extends AbstractValidator
     ): ValidateResponseTransfer {
         $validateResponseTransfer ??= new ValidateResponseTransfer();
         $openApiFile = $validateRequestTransfer->getOpenApiFileOrFail();
-        if (!$this->finder->hasFiles($openApiFile)) {
+
+        if (!is_file($openApiFile)) {
             $validateResponseTransfer->addError((new MessageTransfer())->setMessage(SyncApiMessages::errorMessageOpenApiFileDoesNotExist($openApiFile)));
 
             return $validateResponseTransfer;
@@ -43,7 +44,7 @@ class OpenApiValidator extends AbstractValidator
             return $validateResponseTransfer;
         }
 
-        $validateResponseTransfer = $this->validateFileData($openApi, $this->finder->getFile($openApiFile)->getFilename(), $validateResponseTransfer);
+        $validateResponseTransfer = $this->executeValidatorRules($openApi, $openApiFile, $validateResponseTransfer);
 
         if ($validateResponseTransfer->getErrors()->count() === 0) {
             $validateResponseTransfer->addMessage((new MessageTransfer())->setMessage(SyncApiMessages::VALIDATOR_MESSAGE_OPEN_API_SUCCESS));

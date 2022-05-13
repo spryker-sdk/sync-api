@@ -14,12 +14,12 @@ use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Validator\OpenApiValidator;
-use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiComponentsValidator;
-use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiHttpMethodInPathValidator;
-use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiPathValidator;
-use SprykerSdk\SyncApi\Validator\FileValidatorInterface;
+use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiComponentsValidatorRule;
+use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiHttpMethodInPathValidatorRule;
+use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiPathValidatorRule;
 use SprykerSdk\SyncApi\Validator\Finder\Finder;
 use SprykerSdk\SyncApi\Validator\Finder\FinderInterface;
+use SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface;
 
 class SyncApiFactory
 {
@@ -75,7 +75,6 @@ class SyncApiFactory
     {
         return new OpenApiValidator(
             $this->getConfig(),
-            $this->createFinder(),
             $this->getValidatorRules(),
         );
     }
@@ -93,27 +92,27 @@ class SyncApiFactory
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\Validator\FileValidatorInterface
+     * @return \SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface
      */
-    public function createOpenApiPathValidator(): FileValidatorInterface
+    public function createOpenApiPathValidator(): ValidatorRuleInterface
     {
-        return new OpenApiPathValidator($this->getConfig());
+        return new OpenApiPathValidatorRule($this->getConfig());
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\Validator\FileValidatorInterface
+     * @return \SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface
      */
-    public function createOpenApiComponentsValidator(): FileValidatorInterface
+    public function createOpenApiComponentsValidator(): ValidatorRuleInterface
     {
-        return new OpenApiComponentsValidator($this->getConfig());
+        return new OpenApiComponentsValidatorRule($this->getConfig());
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\Validator\FileValidatorInterface
+     * @return \SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface
      */
-    public function createOpenApiHttpMethodInPathValidator(): FileValidatorInterface
+    public function createOpenApiHttpMethodInPathValidator(): ValidatorRuleInterface
     {
-        return new OpenApiHttpMethodInPathValidator($this->getConfig());
+        return new OpenApiHttpMethodInPathValidatorRule($this->getConfig());
     }
 
     /**
@@ -122,13 +121,5 @@ class SyncApiFactory
     public function createOpenApiBuilder(): OpenApiBuilderInterface
     {
         return new OpenApiBuilder();
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\Validator\Finder\FinderInterface
-     */
-    protected function createFinder(): FinderInterface
-    {
-        return new Finder();
     }
 }

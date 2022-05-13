@@ -5,11 +5,11 @@
  * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  */
 
-namespace SprykerSdk\SyncApi\Validator;
+namespace SprykerSdk\SyncApi\Validator\Rule;
 
 use Generated\Shared\Transfer\ValidateResponseTransfer;
 
-interface FileValidatorInterface
+interface ValidatorRuleInterface
 {
     /**
      * @param array $data
