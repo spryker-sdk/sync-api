@@ -19,6 +19,7 @@ use Generated\Shared\Transfer\OpenApiResponseTransfer;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\Message\SyncApiError;
 use SprykerSdk\SyncApi\Message\SyncApiInfo;
+use SprykerSdk\SyncApi\SyncApiConfig;
 use Symfony\Component\Process\Process;
 
 class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
@@ -27,6 +28,11 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
      * @var \Generated\Shared\Transfer\OpenApiResponseTransfer
      */
     protected OpenApiResponseTransfer $openApiResponseTransfer;
+
+    /**
+     * @var \SprykerSdk\SyncApi\SyncApiConfig
+     */
+    protected SyncApiConfig $config;
 
     /**
      * @var \SprykerSdk\SyncApi\Message\MessageBuilderInterface
@@ -44,13 +50,15 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     protected string $sprykMode = 'project';
 
     /**
+     * @param \SprykerSdk\SyncApi\SyncApiConfig $config
      * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
      * @param \Doctrine\Inflector\Inflector $inflector
      */
-    public function __construct(MessageBuilderInterface $messageBuilder, Inflector $inflector)
+    public function __construct(SyncApiConfig $config, MessageBuilderInterface $messageBuilder, Inflector $inflector)
     {
-        $this->inflector = $inflector;
+        $this->config = $config;
         $this->messageBuilder = $messageBuilder;
+        $this->inflector = $inflector;
         $this->openApiResponseTransfer = new OpenApiResponseTransfer();
     }
 
@@ -115,7 +123,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
 
         if ($this->openApiResponseTransfer->getErrors()->count() === 0) {
             $transferBuildSprykCommands = $this->getTransferDefinitionSprykCommands($openApiRequestTransfer->getOrganizationOrFail(), $transferDefinitions);
-            $this->runCommands($transferBuildSprykCommands, $openApiRequestTransfer->getProjectRootOrFail());
+            $this->runCommands($transferBuildSprykCommands);
         }
     }
 
@@ -142,7 +150,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
             $resourceHttpMethodsWithHttpResponseCodes[$path] = $this->getHttpMethodsWithHttpResponseCodes($pathItem);
         }
 
-        $this->runResourceMethodResponseCodeSpryk($resourceHttpMethodsWithHttpResponseCodes, $openApiRequestTransfer->getOrganizationOrFail(), $openApiRequestTransfer->getProjectRootOrFail());
+        $this->runResourceMethodResponseCodeSpryk($resourceHttpMethodsWithHttpResponseCodes, $openApiRequestTransfer->getOrganizationOrFail());
     }
 
     /**
@@ -194,11 +202,10 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     /**
      * @param array<string, array<string, array<int, string>>> $resourceHttpMethodsWithHttpResponseCodes
      * @param string $organization
-     * @param string $projectRootPath
      *
      * @return void
      */
-    protected function runResourceMethodResponseCodeSpryk(array $resourceHttpMethodsWithHttpResponseCodes, string $organization, string $projectRootPath): void
+    protected function runResourceMethodResponseCodeSpryk(array $resourceHttpMethodsWithHttpResponseCodes, string $organization): void
     {
         $commands = [];
 
@@ -211,7 +218,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
             $commands = $this->createCommandsForResourceHttpMethodsWithHttpResponseCodes($resource, $httpMethodsWithHttpResponseCodes, $organization, $commands);
         }
 
-        $this->runCommands($commands, $projectRootPath);
+        $this->runCommands($commands);
     }
 
     /**
@@ -277,7 +284,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         array $commands
     ): array {
         $commands[] = [
-            'vendor/bin/spryk-run',
+            'spryk-run',
             'AddGlueResourceMethodResponse',
             '--mode', $this->sprykMode,
             '--organization', $organization,
@@ -762,7 +769,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         ?string $singular
     ): array {
         $commandData = [
-            'vendor/bin/spryk-run',
+            'spryk-run',
             'AddSharedTransferProperty',
             '--mode', $this->sprykMode,
             '--organization', $organization,
@@ -789,14 +796,13 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
 
     /**
      * @param array<array> $commands
-     * @param string $projectRootPath
      *
      * @return void
      */
-    protected function runCommands(array $commands, string $projectRootPath): void
+    protected function runCommands(array $commands): void
     {
         foreach ($commands as $command) {
-            $this->runProcess($command, $projectRootPath);
+            $this->runProcess($command);
         }
     }
 
@@ -804,13 +810,13 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
      * @codeCoverageIgnore
      *
      * @param array $command
-     * @param string $projectRootPath
      *
      * @return void
      */
-    protected function runProcess(array $command, string $projectRootPath): void
+    protected function runProcess(array $command): void
     {
-        $process = new Process($command, $projectRootPath, null, null, 300);
+        $process = new Process($command, $this->config->getSprykRunExecutablePath(), null, null, 300);
+
         $process->run(function ($a, $buffer) {
             echo $buffer;
             // For debugging purposes, set a breakpoint here to see issues.

@@ -16,6 +16,7 @@ use Generated\Shared\Transfer\OpenApiTransfer;
 use SprykerSdk\SyncApi\Console\OpenApiCodeGenerateConsole;
 use SprykerSdk\SyncApi\Message\MessageBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
+use SprykerSdk\SyncApi\SyncApiConfig;
 use SprykerSdk\SyncApi\SyncApiFacade;
 use SprykerSdk\SyncApi\SyncApiFactory;
 
@@ -77,6 +78,7 @@ class OpenApiHelper extends Module
         $openApiCodeBuilderStub = Stub::construct(
             OpenApiCodeBuilder::class,
             [
+                new SyncApiConfig(),
                 new MessageBuilder(),
                 InflectorFactory::create()->build(),
             ],
