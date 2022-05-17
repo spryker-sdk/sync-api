@@ -769,7 +769,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         ?string $singular
     ): array {
         $commandData = [
-            $this->config->getSprykRunExecutablePath() . '/vendo/bin/spryk-run',
+            $this->config->getSprykRunExecutablePath() . '/vendor/bin/spryk-run',
             'AddSharedTransferProperty',
             '--mode', $this->sprykMode,
             '--organization', $organization,
