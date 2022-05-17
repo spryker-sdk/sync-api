@@ -284,7 +284,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         array $commands
     ): array {
         $commands[] = [
-            'spryk-run',
+            $this->config->getSprykRunExecutablePath() . '/vendor/bin/spryk-run',
             'AddGlueResourceMethodResponse',
             '--mode', $this->sprykMode,
             '--organization', $organization,
@@ -769,7 +769,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         ?string $singular
     ): array {
         $commandData = [
-            'spryk-run',
+            $this->config->getSprykRunExecutablePath() . '/vendo/bin/spryk-run',
             'AddSharedTransferProperty',
             '--mode', $this->sprykMode,
             '--organization', $organization,
@@ -815,7 +815,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
      */
     protected function runProcess(array $command): void
     {
-        $process = new Process($command, $this->config->getSprykRunExecutablePath(), null, null, 300);
+        $process = new Process($command, $this->config->getProjectRootPath(), null, null, 300);
 
         $process->run(function ($a, $buffer) {
             echo $buffer;

@@ -27,6 +27,16 @@ class SyncApiConfig
     }
 
     /**
+     * @api
+     *
+     * @return string
+     */
+    public function getProjectRootPath(): string
+    {
+        return (string)getcwd();
+    }
+
+    /**
      * Returns the current working directory or `INSTALLED_ROOT_DIRECTORY` (when INSTALLED_ROOT_DIRECTORY is defined).
      * This is needed to be able to execute this tool within the SprykerSdk and not inside of a project directly.
      *
