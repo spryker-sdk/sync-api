@@ -30,7 +30,7 @@ class SyncApiConfigTest extends Unit
     public function testGetSprykRunExecutableReturnsDefaultExecutable(): void
     {
         // Arrange
-        $expectedExecutable = getcwd() . '/vendor/bin/';
+        $expectedExecutable = getcwd();
         $config = new SyncApiConfig();
 
         // Act
@@ -49,7 +49,7 @@ class SyncApiConfigTest extends Unit
     {
         putenv('INSTALLED_ROOT_DIRECTORY=foo-bar');
         // Arrange
-        $expectedExecutable = 'foo-bar/vendor/bin/';
+        $expectedExecutable = 'foo-bar';
         $config = new SyncApiConfig();
 
         // Act
