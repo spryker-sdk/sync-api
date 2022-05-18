@@ -25,7 +25,7 @@
     "autoload": {
         "psr-4": {
             "SprykerSdk\\SyncApi\\": "src/SprykerSdk/SyncApi",
-            "Generated\\Shared\\Transfer\\": "src/Generated/Shared/Transfer/"
+            "Transfer\\": "src/Transfer"
         }
     },
     "autoload-dev": {

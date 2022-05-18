@@ -7,23 +7,23 @@
 
 namespace SprykerSdk\SyncApi;
 
-use Generated\Shared\Transfer\OpenApiRequestTransfer;
-use Generated\Shared\Transfer\OpenApiResponseTransfer;
-use Generated\Shared\Transfer\ValidateRequestTransfer;
-use Generated\Shared\Transfer\ValidateResponseTransfer;
+use Transfer\OpenApiRequestTransfer;
+use Transfer\OpenApiResponseTransfer;
+use Transfer\ValidateRequestTransfer;
+use Transfer\ValidateResponseTransfer;
 
 interface SyncApiFacadeInterface
 {
- /**
-  * Specification:
-  * - Reads an OpenAPI file and builds code that is required.
-  *
-  * @api
-  *
-  * @param \Generated\Shared\Transfer\OpenApiRequestTransfer $openApiRequestTransfer
-  *
-  * @return \Generated\Shared\Transfer\OpenApiResponseTransfer
-  */
+    /**
+     * Specification:
+     * - Reads an OpenAPI file and builds code that is required.
+     *
+     * @api
+     *
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
+     *
+     * @return \Transfer\OpenApiResponseTransfer
+     */
     public function buildFromOpenApi(OpenApiRequestTransfer $openApiRequestTransfer): OpenApiResponseTransfer;
 
     /**
@@ -32,9 +32,9 @@ interface SyncApiFacadeInterface
      *
      * @api
      *
-     * @param \Generated\Shared\Transfer\ValidateRequestTransfer $openApiRequestTransfer
+     * @param \Transfer\ValidateRequestTransfer $openApiRequestTransfer
      *
-     * @return \Generated\Shared\Transfer\ValidateResponseTransfer
+     * @return \Transfer\ValidateResponseTransfer
      */
     public function validateOpenApi(ValidateRequestTransfer $openApiRequestTransfer): ValidateResponseTransfer;
 
@@ -44,9 +44,9 @@ interface SyncApiFacadeInterface
      *
      * @api
      *
-     * @param \Generated\Shared\Transfer\OpenApiRequestTransfer $openApiRequestTransfer
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      *
-     * @return \Generated\Shared\Transfer\OpenApiResponseTransfer
+     * @return \Transfer\OpenApiResponseTransfer
      */
     public function createOpenApi(OpenApiRequestTransfer $openApiRequestTransfer): OpenApiResponseTransfer;
 }

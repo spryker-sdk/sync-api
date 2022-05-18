@@ -8,20 +8,20 @@
 namespace SprykerSdk\SyncApi\OpenApi\Validator;
 
 use Exception;
-use Generated\Shared\Transfer\ValidateRequestTransfer;
-use Generated\Shared\Transfer\ValidateResponseTransfer;
 use SprykerSdk\SyncApi\Message\SyncApiError;
 use SprykerSdk\SyncApi\Message\SyncApiInfo;
 use SprykerSdk\SyncApi\Validator\AbstractValidator;
 use Symfony\Component\Yaml\Yaml;
+use Transfer\ValidateRequestTransfer;
+use Transfer\ValidateResponseTransfer;
 
 class OpenApiValidator extends AbstractValidator
 {
     /**
-     * @param \Generated\Shared\Transfer\ValidateRequestTransfer $validateRequestTransfer
-     * @param \Generated\Shared\Transfer\ValidateResponseTransfer|null $validateResponseTransfer
+     * @param \Transfer\ValidateRequestTransfer $validateRequestTransfer
+     * @param \Transfer\ValidateResponseTransfer|null $validateResponseTransfer
      *
-     * @return \Generated\Shared\Transfer\ValidateResponseTransfer
+     * @return \Transfer\ValidateResponseTransfer
      */
     public function validate(
         ValidateRequestTransfer $validateRequestTransfer,

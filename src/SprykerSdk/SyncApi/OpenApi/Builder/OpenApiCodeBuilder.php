@@ -14,18 +14,18 @@ use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Doctrine\Inflector\Inflector;
-use Generated\Shared\Transfer\OpenApiRequestTransfer;
-use Generated\Shared\Transfer\OpenApiResponseTransfer;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\Message\SyncApiError;
 use SprykerSdk\SyncApi\Message\SyncApiInfo;
 use SprykerSdk\SyncApi\SyncApiConfig;
 use Symfony\Component\Process\Process;
+use Transfer\OpenApiRequestTransfer;
+use Transfer\OpenApiResponseTransfer;
 
 class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
 {
     /**
-     * @var \Generated\Shared\Transfer\OpenApiResponseTransfer
+     * @var \Transfer\OpenApiResponseTransfer
      */
     protected OpenApiResponseTransfer $openApiResponseTransfer;
 
@@ -63,9 +63,9 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     }
 
     /**
-     * @param \Generated\Shared\Transfer\OpenApiRequestTransfer $openApiRequestTransfer
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      *
-     * @return \Generated\Shared\Transfer\OpenApiResponseTransfer
+     * @return \Transfer\OpenApiResponseTransfer
      */
     public function build(OpenApiRequestTransfer $openApiRequestTransfer): OpenApiResponseTransfer
     {
@@ -98,7 +98,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     }
 
     /**
-     * @param \Generated\Shared\Transfer\OpenApiRequestTransfer $openApiRequestTransfer
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      *
      * @return void
      */
@@ -110,7 +110,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     }
 
     /**
-     * @param \Generated\Shared\Transfer\OpenApiRequestTransfer $openApiRequestTransfer
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      * @param \cebe\openapi\spec\OpenApi $openApi
      *
      * @return void
@@ -128,7 +128,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     }
 
     /**
-     * @param \Generated\Shared\Transfer\OpenApiRequestTransfer $openApiRequestTransfer
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      * @param \cebe\openapi\spec\OpenApi $openApi
      *
      * @return void

@@ -4,7 +4,7 @@
  * (c) Spryker Systems GmbH copyright protected
  */
 
-namespace Generated\Shared\Transfer;
+namespace Transfer;
 
 use ArrayObject;
 
@@ -12,7 +12,7 @@ use ArrayObject;
  * !!! THIS FILE IS AUTO-GENERATED, EVERY CHANGE WILL BE LOST WITH THE NEXT RUN OF TRANSFER GENERATOR
  * !!! DO NOT CHANGE ANYTHING IN THIS FILE
  */
-class OpenApiResponseTransfer extends AbstractTransfer
+class ValidateResponseTransfer extends AbstractTransfer
 {
     /**
      * @var string
@@ -25,12 +25,12 @@ class OpenApiResponseTransfer extends AbstractTransfer
     public const MESSAGES = 'messages';
 
     /**
-     * @var \ArrayObject|\Generated\Shared\Transfer\MessageTransfer[]
+     * @var \ArrayObject|\Transfer\MessageTransfer[]
      */
     protected $errors;
 
     /**
-     * @var \ArrayObject|\Generated\Shared\Transfer\MessageTransfer[]
+     * @var \ArrayObject|\Transfer\MessageTransfer[]
      */
     protected $messages;
 
@@ -75,9 +75,9 @@ class OpenApiResponseTransfer extends AbstractTransfer
     ];
 
     /**
-     * @module SyncApi
+     * @module AopSdk
      *
-     * @param \ArrayObject|\Generated\Shared\Transfer\MessageTransfer[] $errors
+     * @param \ArrayObject|\Transfer\MessageTransfer[] $errors
      *
      * @return $this
      */
@@ -90,9 +90,9 @@ class OpenApiResponseTransfer extends AbstractTransfer
     }
 
     /**
-     * @module SyncApi
+     * @module AopSdk
      *
-     * @return \ArrayObject|\Generated\Shared\Transfer\MessageTransfer[]
+     * @return \ArrayObject|\Transfer\MessageTransfer[]
      */
     public function getErrors()
     {
@@ -100,9 +100,9 @@ class OpenApiResponseTransfer extends AbstractTransfer
     }
 
     /**
-     * @module SyncApi
+     * @module AopSdk
      *
-     * @param \Generated\Shared\Transfer\MessageTransfer $error
+     * @param \Transfer\MessageTransfer $error
      *
      * @return $this
      */
@@ -115,7 +115,7 @@ class OpenApiResponseTransfer extends AbstractTransfer
     }
 
     /**
-     * @module SyncApi
+     * @module AopSdk
      *
      * @throws \Spryker\Shared\Kernel\Transfer\Exception\RequiredTransferPropertyException
      *
@@ -129,9 +129,9 @@ class OpenApiResponseTransfer extends AbstractTransfer
     }
 
     /**
-     * @module SyncApi
+     * @module AopSdk
      *
-     * @param \ArrayObject|\Generated\Shared\Transfer\MessageTransfer[] $messages
+     * @param \ArrayObject|\Transfer\MessageTransfer[] $messages
      *
      * @return $this
      */
@@ -144,9 +144,9 @@ class OpenApiResponseTransfer extends AbstractTransfer
     }
 
     /**
-     * @module SyncApi
+     * @module AopSdk
      *
-     * @return \ArrayObject|\Generated\Shared\Transfer\MessageTransfer[]
+     * @return \ArrayObject|\Transfer\MessageTransfer[]
      */
     public function getMessages()
     {
@@ -154,9 +154,9 @@ class OpenApiResponseTransfer extends AbstractTransfer
     }
 
     /**
-     * @module SyncApi
+     * @module AopSdk
      *
-     * @param \Generated\Shared\Transfer\MessageTransfer $message
+     * @param \Transfer\MessageTransfer $message
      *
      * @return $this
      */
@@ -169,7 +169,7 @@ class OpenApiResponseTransfer extends AbstractTransfer
     }
 
     /**
-     * @module SyncApi
+     * @module AopSdk
      *
      * @throws \Spryker\Shared\Kernel\Transfer\Exception\RequiredTransferPropertyException
      *

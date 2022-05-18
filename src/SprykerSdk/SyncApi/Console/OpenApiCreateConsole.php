@@ -7,12 +7,12 @@
 
 namespace SprykerSdk\SyncApi\Console;
 
-use Generated\Shared\Transfer\OpenApiRequestTransfer;
-use Generated\Shared\Transfer\OpenApiTransfer;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Transfer\OpenApiRequestTransfer;
+use Transfer\OpenApiTransfer;
 
 class OpenApiCreateConsole extends AbstractConsole
 {

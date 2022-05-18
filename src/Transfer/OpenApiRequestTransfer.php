@@ -5,7 +5,7 @@
  * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  */
 
-namespace Generated\Shared\Transfer;
+namespace Transfer;
 
 use InvalidArgumentException;
 
@@ -46,7 +46,7 @@ class OpenApiRequestTransfer extends AbstractTransfer
     protected $targetFile;
 
     /**
-     * @var \Generated\Shared\Transfer\OpenApiTransfer|null
+     * @var \Transfer\OpenApiTransfer|null
      */
     protected $openApi;
 
@@ -221,7 +221,7 @@ class OpenApiRequestTransfer extends AbstractTransfer
     /**
      * @module SyncApi
      *
-     * @param \Generated\Shared\Transfer\OpenApiTransfer|null $openApi
+     * @param \Transfer\OpenApiTransfer|null $openApi
      *
      * @return $this
      */
@@ -236,7 +236,7 @@ class OpenApiRequestTransfer extends AbstractTransfer
     /**
      * @module SyncApi
      *
-     * @return \Generated\Shared\Transfer\OpenApiTransfer|null
+     * @return \Transfer\OpenApiTransfer|null
      */
     public function getOpenApi()
     {
@@ -246,7 +246,7 @@ class OpenApiRequestTransfer extends AbstractTransfer
     /**
      * @module SyncApi
      *
-     * @param \Generated\Shared\Transfer\OpenApiTransfer $openApi
+     * @param \Transfer\OpenApiTransfer $openApi
      *
      * @return $this
      */
@@ -258,7 +258,7 @@ class OpenApiRequestTransfer extends AbstractTransfer
     /**
      * @module SyncApi
      *
-     * @return \Generated\Shared\Transfer\OpenApiTransfer
+     * @return \Transfer\OpenApiTransfer
      */
     public function getOpenApiOrFail()
     {
