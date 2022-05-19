@@ -4,3 +4,9 @@ parameters:
 
     bootstrapFiles:
         - phpstan-bootstrap.php
+
+    ignoreErrors:
+        - '#Binary operation "\." between array<string>\|bool\|string\|null and .+ results in an error.#'
+        - '#Parameter .+ of method .+Transfer::.+\(\).+ given.#'
+
+    reportUnmatchedIgnoredErrors: false
