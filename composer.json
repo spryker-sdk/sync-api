@@ -24,13 +24,13 @@
     },
     "autoload": {
         "psr-4": {
-            "SprykerSdk\\SyncApi\\": "src/SprykerSdk/SyncApi",
-            "Transfer\\": "src/Transfer"
+            "SprykerSdk\\SyncApi\\": "src/SprykerSdk/SyncApi/",
+            "Transfer\\": "src/Transfer/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "SprykerSdkTest\\SyncApi\\": "tests/SprykerSdkTest/SyncApi",
+            "SprykerSdkTest\\SyncApi\\": "tests/SprykerSdkTest/SyncApi/",
             "SprykerSdkTest\\Helper\\": "tests/_support/Helper/"
         }
     },

@@ -102,7 +102,7 @@ class OpenApiRequestTransfer extends AbstractTransfer
             'is_strict' => false,
         ],
         self::OPEN_API => [
-            'type' => 'Generated\Shared\Transfer\OpenApiTransfer',
+            'type' => 'Transfer\OpenApiTransfer',
             'type_shim' => null,
             'name_underscore' => 'open_api',
             'is_collection' => false,
@@ -507,7 +507,7 @@ class OpenApiRequestTransfer extends AbstractTransfer
                 case 'openApi':
                     if (is_array($value)) {
                         $type = $this->transferMetadata[$normalizedPropertyName]['type'];
-                        /** @var \Spryker\Shared\Kernel\Transfer\TransferInterface $value */
+                        /** @var \Transfer\TransferInterface $value */
                         $value = (new $type())->fromArray($value, $ignoreMissingProperty);
                     }
 
