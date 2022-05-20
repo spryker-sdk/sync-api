@@ -1,98 +1,96 @@
 <?php
 
 /**
- * Copyright © 2019-present Spryker Systems GmbH. All rights reserved.
- * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ * (c) Spryker Systems GmbH copyright protected
  */
 
-namespace Generated\Shared\Transfer;
-
-use InvalidArgumentException;
+namespace Transfer;
 
 /**
  * !!! THIS FILE IS AUTO-GENERATED, EVERY CHANGE WILL BE LOST WITH THE NEXT RUN OF TRANSFER GENERATOR
  * !!! DO NOT CHANGE ANYTHING IN THIS FILE
  */
-class OpenApiRequestTransfer extends AbstractTransfer
+class ValidateRequestTransfer extends AbstractTransfer
 {
     /**
      * @var string
      */
-    public const TARGET_FILE = 'targetFile';
+    public const MANIFEST_PATH = 'manifestPath';
 
     /**
      * @var string
      */
-    public const OPEN_API = 'openApi';
+    public const CONFIGURATION_FILE = 'configurationFile';
 
     /**
      * @var string
      */
-    public const ORGANIZATION = 'organization';
+    public const TRANSLATION_FILE = 'translationFile';
 
     /**
      * @var string
      */
-    public const APPLICATION_TYPE = 'applicationType';
+    public const ASYNC_API_FILE = 'asyncApiFile';
 
     /**
      * @var string
      */
-    public const PROJECT_ROOT = 'projectRoot';
+    public const OPEN_API_FILE = 'openApiFile';
 
     /**
      * @var string|null
      */
-    protected $targetFile;
-
-    /**
-     * @var \Generated\Shared\Transfer\OpenApiTransfer|null
-     */
-    protected $openApi;
+    protected $manifestPath;
 
     /**
      * @var string|null
      */
-    protected $organization;
+    protected $configurationFile;
 
     /**
      * @var string|null
      */
-    protected $applicationType;
+    protected $translationFile;
 
     /**
      * @var string|null
      */
-    protected $projectRoot;
+    protected $asyncApiFile;
+
+    /**
+     * @var string|null
+     */
+    protected $openApiFile;
 
     /**
      * @var array<string, string>
      */
     protected $transferPropertyNameMap = [
-        'target_file' => 'targetFile',
-        'targetFile' => 'targetFile',
-        'TargetFile' => 'targetFile',
-        'open_api' => 'openApi',
-        'openApi' => 'openApi',
-        'OpenApi' => 'openApi',
-        'organization' => 'organization',
-        'Organization' => 'organization',
-        'application_type' => 'applicationType',
-        'applicationType' => 'applicationType',
-        'ApplicationType' => 'applicationType',
-        'project_root' => 'projectRoot',
-        'projectRoot' => 'projectRoot',
-        'ProjectRoot' => 'projectRoot',
+        'manifest_path' => 'manifestPath',
+        'manifestPath' => 'manifestPath',
+        'ManifestPath' => 'manifestPath',
+        'configuration_file' => 'configurationFile',
+        'configurationFile' => 'configurationFile',
+        'ConfigurationFile' => 'configurationFile',
+        'translation_file' => 'translationFile',
+        'translationFile' => 'translationFile',
+        'TranslationFile' => 'translationFile',
+        'async_api_file' => 'asyncApiFile',
+        'asyncApiFile' => 'asyncApiFile',
+        'AsyncApiFile' => 'asyncApiFile',
+        'open_api_file' => 'openApiFile',
+        'openApiFile' => 'openApiFile',
+        'OpenApiFile' => 'openApiFile',
     ];
 
     /**
      * @var array<string, array<string, mixed>>
      */
     protected $transferMetadata = [
-        self::TARGET_FILE => [
+        self::MANIFEST_PATH => [
             'type' => 'string',
             'type_shim' => null,
-            'name_underscore' => 'target_file',
+            'name_underscore' => 'manifest_path',
             'is_collection' => false,
             'is_transfer' => false,
             'is_value_object' => false,
@@ -101,22 +99,10 @@ class OpenApiRequestTransfer extends AbstractTransfer
             'is_nullable' => false,
             'is_strict' => false,
         ],
-        self::OPEN_API => [
-            'type' => 'Generated\Shared\Transfer\OpenApiTransfer',
-            'type_shim' => null,
-            'name_underscore' => 'open_api',
-            'is_collection' => false,
-            'is_transfer' => true,
-            'is_value_object' => false,
-            'rest_request_parameter' => 'no',
-            'is_associative' => false,
-            'is_nullable' => false,
-            'is_strict' => false,
-        ],
-        self::ORGANIZATION => [
+        self::CONFIGURATION_FILE => [
             'type' => 'string',
             'type_shim' => null,
-            'name_underscore' => 'organization',
+            'name_underscore' => 'configuration_file',
             'is_collection' => false,
             'is_transfer' => false,
             'is_value_object' => false,
@@ -125,10 +111,10 @@ class OpenApiRequestTransfer extends AbstractTransfer
             'is_nullable' => false,
             'is_strict' => false,
         ],
-        self::APPLICATION_TYPE => [
+        self::TRANSLATION_FILE => [
             'type' => 'string',
             'type_shim' => null,
-            'name_underscore' => 'application_type',
+            'name_underscore' => 'translation_file',
             'is_collection' => false,
             'is_transfer' => false,
             'is_value_object' => false,
@@ -137,10 +123,22 @@ class OpenApiRequestTransfer extends AbstractTransfer
             'is_nullable' => false,
             'is_strict' => false,
         ],
-        self::PROJECT_ROOT => [
+        self::ASYNC_API_FILE => [
             'type' => 'string',
             'type_shim' => null,
-            'name_underscore' => 'project_root',
+            'name_underscore' => 'async_api_file',
+            'is_collection' => false,
+            'is_transfer' => false,
+            'is_value_object' => false,
+            'rest_request_parameter' => 'no',
+            'is_associative' => false,
+            'is_nullable' => false,
+            'is_strict' => false,
+        ],
+        self::OPEN_API_FILE => [
+            'type' => 'string',
+            'type_shim' => null,
+            'name_underscore' => 'open_api_file',
             'is_collection' => false,
             'is_transfer' => false,
             'is_value_object' => false,
@@ -154,14 +152,14 @@ class OpenApiRequestTransfer extends AbstractTransfer
     /**
      * @module SyncApi
      *
-     * @param string|null $targetFile
+     * @param string|null $manifestPath
      *
      * @return $this
      */
-    public function setTargetFile($targetFile)
+    public function setManifestPath($manifestPath)
     {
-        $this->targetFile = $targetFile;
-        $this->modifiedProperties[self::TARGET_FILE] = true;
+        $this->manifestPath = $manifestPath;
+        $this->modifiedProperties[self::MANIFEST_PATH] = true;
 
         return $this;
     }
@@ -171,49 +169,55 @@ class OpenApiRequestTransfer extends AbstractTransfer
      *
      * @return string|null
      */
-    public function getTargetFile()
+    public function getManifestPath()
     {
-        return $this->targetFile;
+        return $this->manifestPath;
     }
 
     /**
      * @module SyncApi
      *
-     * @param string|null $targetFile
+     * @param string|null $manifestPath
+     *
+     * @throws \Exception
      *
      * @return $this
      */
-    public function setTargetFileOrFail($targetFile)
+    public function setManifestPathOrFail($manifestPath)
     {
-        if ($targetFile === null) {
-            $this->throwNullValueException(static::TARGET_FILE);
+        if ($manifestPath === null) {
+            $this->throwNullValueException(static::MANIFEST_PATH);
         }
 
-        return $this->setTargetFile($targetFile);
+        return $this->setManifestPath($manifestPath);
     }
 
     /**
      * @module SyncApi
+     *
+     * @throws \Exception
      *
      * @return string
      */
-    public function getTargetFileOrFail()
+    public function getManifestPathOrFail()
     {
-        if ($this->targetFile === null) {
-            $this->throwNullValueException(static::TARGET_FILE);
+        if ($this->manifestPath === null) {
+            $this->throwNullValueException(static::MANIFEST_PATH);
         }
 
-        return $this->targetFile;
+        return $this->manifestPath;
     }
 
     /**
      * @module SyncApi
      *
+     * @throws \Exception
+     *
      * @return $this
      */
-    public function requireTargetFile()
+    public function requireManifestPath()
     {
-        $this->assertPropertyIsSet(self::TARGET_FILE);
+        $this->assertPropertyIsSet(self::MANIFEST_PATH);
 
         return $this;
     }
@@ -221,77 +225,14 @@ class OpenApiRequestTransfer extends AbstractTransfer
     /**
      * @module SyncApi
      *
-     * @param \Generated\Shared\Transfer\OpenApiTransfer|null $openApi
+     * @param string|null $configurationFile
      *
      * @return $this
      */
-    public function setOpenApi(?OpenApiTransfer $openApi = null)
+    public function setConfigurationFile($configurationFile)
     {
-        $this->openApi = $openApi;
-        $this->modifiedProperties[self::OPEN_API] = true;
-
-        return $this;
-    }
-
-    /**
-     * @module SyncApi
-     *
-     * @return \Generated\Shared\Transfer\OpenApiTransfer|null
-     */
-    public function getOpenApi()
-    {
-        return $this->openApi;
-    }
-
-    /**
-     * @module SyncApi
-     *
-     * @param \Generated\Shared\Transfer\OpenApiTransfer $openApi
-     *
-     * @return $this
-     */
-    public function setOpenApiOrFail(OpenApiTransfer $openApi)
-    {
-        return $this->setOpenApi($openApi);
-    }
-
-    /**
-     * @module SyncApi
-     *
-     * @return \Generated\Shared\Transfer\OpenApiTransfer
-     */
-    public function getOpenApiOrFail()
-    {
-        if ($this->openApi === null) {
-            $this->throwNullValueException(static::OPEN_API);
-        }
-
-        return $this->openApi;
-    }
-
-    /**
-     * @module SyncApi
-     *
-     * @return $this
-     */
-    public function requireOpenApi()
-    {
-        $this->assertPropertyIsSet(self::OPEN_API);
-
-        return $this;
-    }
-
-    /**
-     * @module SyncApi
-     *
-     * @param string|null $organization
-     *
-     * @return $this
-     */
-    public function setOrganization($organization)
-    {
-        $this->organization = $organization;
-        $this->modifiedProperties[self::ORGANIZATION] = true;
+        $this->configurationFile = $configurationFile;
+        $this->modifiedProperties[self::CONFIGURATION_FILE] = true;
 
         return $this;
     }
@@ -301,49 +242,55 @@ class OpenApiRequestTransfer extends AbstractTransfer
      *
      * @return string|null
      */
-    public function getOrganization()
+    public function getConfigurationFile()
     {
-        return $this->organization;
+        return $this->configurationFile;
     }
 
     /**
      * @module SyncApi
      *
-     * @param string|null $organization
+     * @param string|null $configurationFile
+     *
+     * @throws \Exception
      *
      * @return $this
      */
-    public function setOrganizationOrFail($organization)
+    public function setConfigurationFileOrFail($configurationFile)
     {
-        if ($organization === null) {
-            $this->throwNullValueException(static::ORGANIZATION);
+        if ($configurationFile === null) {
+            $this->throwNullValueException(static::CONFIGURATION_FILE);
         }
 
-        return $this->setOrganization($organization);
+        return $this->setConfigurationFile($configurationFile);
     }
 
     /**
      * @module SyncApi
+     *
+     * @throws \Exception
      *
      * @return string
      */
-    public function getOrganizationOrFail()
+    public function getConfigurationFileOrFail()
     {
-        if ($this->organization === null) {
-            $this->throwNullValueException(static::ORGANIZATION);
+        if ($this->configurationFile === null) {
+            $this->throwNullValueException(static::CONFIGURATION_FILE);
         }
 
-        return $this->organization;
+        return $this->configurationFile;
     }
 
     /**
      * @module SyncApi
      *
+     * @throws \Exception
+     *
      * @return $this
      */
-    public function requireOrganization()
+    public function requireConfigurationFile()
     {
-        $this->assertPropertyIsSet(self::ORGANIZATION);
+        $this->assertPropertyIsSet(self::CONFIGURATION_FILE);
 
         return $this;
     }
@@ -351,14 +298,14 @@ class OpenApiRequestTransfer extends AbstractTransfer
     /**
      * @module SyncApi
      *
-     * @param string|null $applicationType
+     * @param string|null $translationFile
      *
      * @return $this
      */
-    public function setApplicationType($applicationType)
+    public function setTranslationFile($translationFile)
     {
-        $this->applicationType = $applicationType;
-        $this->modifiedProperties[self::APPLICATION_TYPE] = true;
+        $this->translationFile = $translationFile;
+        $this->modifiedProperties[self::TRANSLATION_FILE] = true;
 
         return $this;
     }
@@ -368,49 +315,55 @@ class OpenApiRequestTransfer extends AbstractTransfer
      *
      * @return string|null
      */
-    public function getApplicationType()
+    public function getTranslationFile()
     {
-        return $this->applicationType;
+        return $this->translationFile;
     }
 
     /**
      * @module SyncApi
      *
-     * @param string|null $applicationType
+     * @param string|null $translationFile
+     *
+     * @throws \Exception
      *
      * @return $this
      */
-    public function setApplicationTypeOrFail($applicationType)
+    public function setTranslationFileOrFail($translationFile)
     {
-        if ($applicationType === null) {
-            $this->throwNullValueException(static::APPLICATION_TYPE);
+        if ($translationFile === null) {
+            $this->throwNullValueException(static::TRANSLATION_FILE);
         }
 
-        return $this->setApplicationType($applicationType);
+        return $this->setTranslationFile($translationFile);
     }
 
     /**
      * @module SyncApi
+     *
+     * @throws \Exception
      *
      * @return string
      */
-    public function getApplicationTypeOrFail()
+    public function getTranslationFileOrFail()
     {
-        if ($this->applicationType === null) {
-            $this->throwNullValueException(static::APPLICATION_TYPE);
+        if ($this->translationFile === null) {
+            $this->throwNullValueException(static::TRANSLATION_FILE);
         }
 
-        return $this->applicationType;
+        return $this->translationFile;
     }
 
     /**
      * @module SyncApi
      *
+     * @throws \Exception
+     *
      * @return $this
      */
-    public function requireApplicationType()
+    public function requireTranslationFile()
     {
-        $this->assertPropertyIsSet(self::APPLICATION_TYPE);
+        $this->assertPropertyIsSet(self::TRANSLATION_FILE);
 
         return $this;
     }
@@ -418,14 +371,14 @@ class OpenApiRequestTransfer extends AbstractTransfer
     /**
      * @module SyncApi
      *
-     * @param string|null $projectRoot
+     * @param string|null $asyncApiFile
      *
      * @return $this
      */
-    public function setProjectRoot($projectRoot)
+    public function setAsyncApiFile($asyncApiFile)
     {
-        $this->projectRoot = $projectRoot;
-        $this->modifiedProperties[self::PROJECT_ROOT] = true;
+        $this->asyncApiFile = $asyncApiFile;
+        $this->modifiedProperties[self::ASYNC_API_FILE] = true;
 
         return $this;
     }
@@ -435,49 +388,128 @@ class OpenApiRequestTransfer extends AbstractTransfer
      *
      * @return string|null
      */
-    public function getProjectRoot()
+    public function getAsyncApiFile()
     {
-        return $this->projectRoot;
+        return $this->asyncApiFile;
     }
 
     /**
      * @module SyncApi
      *
-     * @param string|null $projectRoot
+     * @param string|null $asyncApiFile
+     *
+     * @throws \Exception
      *
      * @return $this
      */
-    public function setProjectRootOrFail($projectRoot)
+    public function setAsyncApiFileOrFail($asyncApiFile)
     {
-        if ($projectRoot === null) {
-            $this->throwNullValueException(static::PROJECT_ROOT);
+        if ($asyncApiFile === null) {
+            $this->throwNullValueException(static::ASYNC_API_FILE);
         }
 
-        return $this->setProjectRootOrFail($projectRoot);
+        return $this->setAsyncApiFile($asyncApiFile);
     }
 
     /**
      * @module SyncApi
+     *
+     * @throws \Exception
      *
      * @return string
      */
-    public function getProjectRootOrFail()
+    public function getAsyncApiFileOrFail()
     {
-        if ($this->projectRoot === null) {
-            $this->throwNullValueException(static::PROJECT_ROOT);
+        if ($this->asyncApiFile === null) {
+            $this->throwNullValueException(static::ASYNC_API_FILE);
         }
 
-        return $this->projectRoot;
+        return $this->asyncApiFile;
     }
 
     /**
      * @module SyncApi
      *
+     * @throws \Exception
+     *
      * @return $this
      */
-    public function requireProjectRoot()
+    public function requireAsyncApiFile()
     {
-        $this->assertPropertyIsSet(self::PROJECT_ROOT);
+        $this->assertPropertyIsSet(self::ASYNC_API_FILE);
+
+        return $this;
+    }
+
+    /**
+     * @module SyncApi
+     *
+     * @param string|null $openApiFile
+     *
+     * @return $this
+     */
+    public function setOpenApiFile($openApiFile)
+    {
+        $this->openApiFile = $openApiFile;
+        $this->modifiedProperties[self::OPEN_API_FILE] = true;
+
+        return $this;
+    }
+
+    /**
+     * @module SyncApi
+     *
+     * @return string|null
+     */
+    public function getOpenApiFile()
+    {
+        return $this->openApiFile;
+    }
+
+    /**
+     * @module SyncApi
+     *
+     * @param string|null $openApiFile
+     *
+     * @throws \Exception
+     *
+     * @return $this
+     */
+    public function setOpenApiFileOrFail($openApiFile)
+    {
+        if ($openApiFile === null) {
+            $this->throwNullValueException(static::OPEN_API_FILE);
+        }
+
+        return $this->setOpenApiFile($openApiFile);
+    }
+
+    /**
+     * @module SyncApi
+     *
+     * @throws \Exception
+     *
+     * @return string
+     */
+    public function getOpenApiFileOrFail()
+    {
+        if ($this->openApiFile === null) {
+            $this->throwNullValueException(static::OPEN_API_FILE);
+        }
+
+        return $this->openApiFile;
+    }
+
+    /**
+     * @module SyncApi
+     *
+     * @throws \Exception
+     *
+     * @return $this
+     */
+    public function requireOpenApiFile()
+    {
+        $this->assertPropertyIsSet(self::OPEN_API_FILE);
 
         return $this;
     }
@@ -496,31 +528,18 @@ class OpenApiRequestTransfer extends AbstractTransfer
             $normalizedPropertyName = $this->transferPropertyNameMap[$property] ?? null;
 
             switch ($normalizedPropertyName) {
-                case 'targetFile':
-                case 'organization':
-                case 'applicationType':
-                case 'projectRoot':
-                    $this->$normalizedPropertyName = $value;
-                    $this->modifiedProperties[$normalizedPropertyName] = true;
-
-                    break;
-                case 'openApi':
-                    if (is_array($value)) {
-                        $type = $this->transferMetadata[$normalizedPropertyName]['type'];
-                        /** @var \Spryker\Shared\Kernel\Transfer\TransferInterface $value */
-                        $value = (new $type())->fromArray($value, $ignoreMissingProperty);
-                    }
-
-                    if ($value !== null && $this->isPropertyStrict($normalizedPropertyName)) {
-                        $this->assertInstanceOfTransfer($normalizedPropertyName, $value);
-                    }
+                case 'manifestPath':
+                case 'configurationFile':
+                case 'translationFile':
+                case 'asyncApiFile':
+                case 'openApiFile':
                     $this->$normalizedPropertyName = $value;
                     $this->modifiedProperties[$normalizedPropertyName] = true;
 
                     break;
                 default:
                     if (!$ignoreMissingProperty) {
-                        throw new InvalidArgumentException(sprintf('Missing property `%s` in `%s`', $property, static::class));
+                        throw new \InvalidArgumentException(sprintf('Missing property `%s` in `%s`', $property, static::class));
                     }
             }
         }
@@ -573,7 +592,7 @@ class OpenApiRequestTransfer extends AbstractTransfer
     }
 
     /**
-     * @param \ArrayObject<string, mixed>|array<string, mixed> $value
+     * @param array<string, mixed>|\ArrayObject<string, mixed> $value
      * @param bool $isRecursive
      * @param bool $camelCasedKeys
      *
@@ -595,7 +614,7 @@ class OpenApiRequestTransfer extends AbstractTransfer
     }
 
     /**
-     * @param \ArrayObject<string, mixed>|array<string, mixed> $value
+     * @param array<string, mixed>|\ArrayObject<string, mixed> $value
      * @param bool $isRecursive
      * @param bool $camelCasedKeys
      *
@@ -633,14 +652,12 @@ class OpenApiRequestTransfer extends AbstractTransfer
                 continue;
             }
             switch ($property) {
-                case 'targetFile':
-                case 'organization':
-                case 'applicationType':
+                case 'manifestPath':
+                case 'configurationFile':
+                case 'translationFile':
+                case 'asyncApiFile':
+                case 'openApiFile':
                     $values[$arrayKey] = $value;
-
-                    break;
-                case 'openApi':
-                    $values[$arrayKey] = $value instanceof AbstractTransfer ? $value->modifiedToArray(true, true) : $value;
 
                     break;
             }
@@ -666,14 +683,12 @@ class OpenApiRequestTransfer extends AbstractTransfer
                 continue;
             }
             switch ($property) {
-                case 'targetFile':
-                case 'organization':
-                case 'applicationType':
+                case 'manifestPath':
+                case 'configurationFile':
+                case 'translationFile':
+                case 'asyncApiFile':
+                case 'openApiFile':
                     $values[$arrayKey] = $value;
-
-                    break;
-                case 'openApi':
-                    $values[$arrayKey] = $value instanceof AbstractTransfer ? $value->modifiedToArray(true, false) : $value;
 
                     break;
             }
@@ -729,10 +744,11 @@ class OpenApiRequestTransfer extends AbstractTransfer
     public function toArrayNotRecursiveCamelCased(): array
     {
         return [
-            'targetFile' => $this->targetFile,
-            'organization' => $this->organization,
-            'applicationType' => $this->applicationType,
-            'openApi' => $this->openApi,
+            'manifestPath' => $this->manifestPath,
+            'configurationFile' => $this->configurationFile,
+            'translationFile' => $this->translationFile,
+            'asyncApiFile' => $this->asyncApiFile,
+            'openApiFile' => $this->openApiFile,
         ];
     }
 
@@ -742,10 +758,11 @@ class OpenApiRequestTransfer extends AbstractTransfer
     public function toArrayNotRecursiveNotCamelCased(): array
     {
         return [
-            'target_file' => $this->targetFile,
-            'organization' => $this->organization,
-            'application_type' => $this->applicationType,
-            'open_api' => $this->openApi,
+            'manifest_path' => $this->manifestPath,
+            'configuration_file' => $this->configurationFile,
+            'translation_file' => $this->translationFile,
+            'async_api_file' => $this->asyncApiFile,
+            'open_api_file' => $this->openApiFile,
         ];
     }
 
@@ -755,10 +772,11 @@ class OpenApiRequestTransfer extends AbstractTransfer
     public function toArrayRecursiveNotCamelCased(): array
     {
         return [
-            'target_file' => $this->targetFile instanceof AbstractTransfer ? $this->targetFile->toArray(true, false) : $this->targetFile,
-            'organization' => $this->organization instanceof AbstractTransfer ? $this->organization->toArray(true, false) : $this->organization,
-            'application_type' => $this->applicationType instanceof AbstractTransfer ? $this->applicationType->toArray(true, false) : $this->applicationType,
-            'open_api' => $this->openApi instanceof AbstractTransfer ? $this->openApi->toArray(true, false) : $this->openApi,
+            'manifest_path' => $this->manifestPath instanceof AbstractTransfer ? $this->manifestPath->toArray(true, false) : $this->manifestPath,
+            'configuration_file' => $this->configurationFile instanceof AbstractTransfer ? $this->configurationFile->toArray(true, false) : $this->configurationFile,
+            'translation_file' => $this->translationFile instanceof AbstractTransfer ? $this->translationFile->toArray(true, false) : $this->translationFile,
+            'async_api_file' => $this->asyncApiFile instanceof AbstractTransfer ? $this->asyncApiFile->toArray(true, false) : $this->asyncApiFile,
+            'open_api_file' => $this->openApiFile instanceof AbstractTransfer ? $this->openApiFile->toArray(true, false) : $this->openApiFile,
         ];
     }
 
@@ -768,10 +786,11 @@ class OpenApiRequestTransfer extends AbstractTransfer
     public function toArrayRecursiveCamelCased(): array
     {
         return [
-            'targetFile' => $this->targetFile instanceof AbstractTransfer ? $this->targetFile->toArray(true, true) : $this->targetFile,
-            'organization' => $this->organization instanceof AbstractTransfer ? $this->organization->toArray(true, true) : $this->organization,
-            'applicationType' => $this->applicationType instanceof AbstractTransfer ? $this->applicationType->toArray(true, true) : $this->applicationType,
-            'openApi' => $this->openApi instanceof AbstractTransfer ? $this->openApi->toArray(true, true) : $this->openApi,
+            'manifestPath' => $this->manifestPath instanceof AbstractTransfer ? $this->manifestPath->toArray(true, true) : $this->manifestPath,
+            'configurationFile' => $this->configurationFile instanceof AbstractTransfer ? $this->configurationFile->toArray(true, true) : $this->configurationFile,
+            'translationFile' => $this->translationFile instanceof AbstractTransfer ? $this->translationFile->toArray(true, true) : $this->translationFile,
+            'asyncApiFile' => $this->asyncApiFile instanceof AbstractTransfer ? $this->asyncApiFile->toArray(true, true) : $this->asyncApiFile,
+            'openApiFile' => $this->openApiFile instanceof AbstractTransfer ? $this->openApiFile->toArray(true, true) : $this->openApiFile,
         ];
     }
 }

@@ -7,10 +7,10 @@
 
 namespace SprykerSdk\SyncApi\Console;
 
-use Generated\Shared\Transfer\OpenApiRequestTransfer;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Transfer\OpenApiRequestTransfer;
 
 class OpenApiCodeGenerateConsole extends AbstractConsole
 {
@@ -45,23 +45,12 @@ class OpenApiCodeGenerateConsole extends AbstractConsole
     public const OPTION_ORGANIZATION_SHORT = 'o';
 
     /**
-     * @var string
-     */
-    public const OPTION_PROJECT_ROOT = 'project-root';
-
-    /**
-     * @var string
-     */
-    public const OPTION_PROJECT_ROOT_SHORT = 'r';
-
-    /**
      * @return void
      */
     protected function configure(): void
     {
         $this->setName('code:openapi:generate')
             ->setDescription('Generates code from an OpenAPI file definition.')
-            ->addOption(static::OPTION_PROJECT_ROOT, static::OPTION_PROJECT_ROOT_SHORT, InputOption::VALUE_REQUIRED, '', getcwd())
             ->addOption(static::OPTION_OPEN_API_FILE, static::OPTION_OPEN_API_FILE_SHORT, InputOption::VALUE_REQUIRED, '', $this->getConfig()->getDefaultRelativePathToOpenApiFile())
             ->addOption(static::APPLICATION_TYPE, static::APPLICATION_TYPE_SHORT, InputOption::VALUE_REQUIRED, '', 'backend')
             ->addOption(static::OPTION_ORGANIZATION, static::OPTION_ORGANIZATION_SHORT, InputOption::VALUE_REQUIRED, 'Namespace that should be used for the code builder. When set to Spryker code will be generated in the core modules.', 'App');
@@ -78,7 +67,6 @@ class OpenApiCodeGenerateConsole extends AbstractConsole
         $openApiRequestTransfer = new OpenApiRequestTransfer();
         $openApiRequestTransfer
             ->setTargetFile($input->getOption(static::OPTION_OPEN_API_FILE))
-            ->setProjectRoot($input->getOption(static::OPTION_PROJECT_ROOT))
             ->setApplicationType($input->getOption(static::APPLICATION_TYPE))
             ->setOrganization($input->getOption(static::OPTION_ORGANIZATION));
 

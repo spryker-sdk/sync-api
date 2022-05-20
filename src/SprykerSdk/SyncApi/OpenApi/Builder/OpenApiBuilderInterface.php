@@ -7,15 +7,15 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Builder;
 
-use Generated\Shared\Transfer\OpenApiRequestTransfer;
-use Generated\Shared\Transfer\OpenApiResponseTransfer;
+use Transfer\OpenApiRequestTransfer;
+use Transfer\OpenApiResponseTransfer;
 
 interface OpenApiBuilderInterface
 {
     /**
-     * @param \Generated\Shared\Transfer\OpenApiRequestTransfer $openApiRequestTransfer
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      *
-     * @return \Generated\Shared\Transfer\OpenApiResponseTransfer
+     * @return \Transfer\OpenApiResponseTransfer
      */
     public function createOpenApi(OpenApiRequestTransfer $openApiRequestTransfer): OpenApiResponseTransfer;
 }

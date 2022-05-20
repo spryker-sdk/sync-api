@@ -4,7 +4,7 @@
  * (c) Spryker Systems GmbH copyright protected
  */
 
-namespace Generated\Shared\Transfer;
+namespace Transfer;
 
 use ArrayObject;
 
@@ -25,12 +25,12 @@ class ValidateResponseTransfer extends AbstractTransfer
     public const MESSAGES = 'messages';
 
     /**
-     * @var \ArrayObject|\Generated\Shared\Transfer\MessageTransfer[]
+     * @var \ArrayObject|\Transfer\MessageTransfer[]
      */
     protected $errors;
 
     /**
-     * @var \ArrayObject|\Generated\Shared\Transfer\MessageTransfer[]
+     * @var \ArrayObject|\Transfer\MessageTransfer[]
      */
     protected $messages;
 
@@ -49,7 +49,7 @@ class ValidateResponseTransfer extends AbstractTransfer
      */
     protected $transferMetadata = [
         self::ERRORS => [
-            'type' => 'Generated\Shared\Transfer\MessageTransfer',
+            'type' => 'Transfer\MessageTransfer',
             'type_shim' => null,
             'name_underscore' => 'errors',
             'is_collection' => true,
@@ -61,7 +61,7 @@ class ValidateResponseTransfer extends AbstractTransfer
             'is_strict' => false,
         ],
         self::MESSAGES => [
-            'type' => 'Generated\Shared\Transfer\MessageTransfer',
+            'type' => 'Transfer\MessageTransfer',
             'type_shim' => null,
             'name_underscore' => 'messages',
             'is_collection' => true,
@@ -77,7 +77,7 @@ class ValidateResponseTransfer extends AbstractTransfer
     /**
      * @module AopSdk
      *
-     * @param \ArrayObject|\Generated\Shared\Transfer\MessageTransfer[] $errors
+     * @param \ArrayObject|\Transfer\MessageTransfer[] $errors
      *
      * @return $this
      */
@@ -92,7 +92,7 @@ class ValidateResponseTransfer extends AbstractTransfer
     /**
      * @module AopSdk
      *
-     * @return \ArrayObject|\Generated\Shared\Transfer\MessageTransfer[]
+     * @return \ArrayObject|\Transfer\MessageTransfer[]
      */
     public function getErrors()
     {
@@ -102,7 +102,7 @@ class ValidateResponseTransfer extends AbstractTransfer
     /**
      * @module AopSdk
      *
-     * @param \Generated\Shared\Transfer\MessageTransfer $error
+     * @param \Transfer\MessageTransfer $error
      *
      * @return $this
      */
@@ -117,7 +117,7 @@ class ValidateResponseTransfer extends AbstractTransfer
     /**
      * @module AopSdk
      *
-     * @throws \Spryker\Shared\Kernel\Transfer\Exception\RequiredTransferPropertyException
+     * @throws \Exception
      *
      * @return $this
      */
@@ -131,7 +131,7 @@ class ValidateResponseTransfer extends AbstractTransfer
     /**
      * @module AopSdk
      *
-     * @param \ArrayObject|\Generated\Shared\Transfer\MessageTransfer[] $messages
+     * @param \ArrayObject|\Transfer\MessageTransfer[] $messages
      *
      * @return $this
      */
@@ -146,7 +146,7 @@ class ValidateResponseTransfer extends AbstractTransfer
     /**
      * @module AopSdk
      *
-     * @return \ArrayObject|\Generated\Shared\Transfer\MessageTransfer[]
+     * @return \ArrayObject|\Transfer\MessageTransfer[]
      */
     public function getMessages()
     {
@@ -156,7 +156,7 @@ class ValidateResponseTransfer extends AbstractTransfer
     /**
      * @module AopSdk
      *
-     * @param \Generated\Shared\Transfer\MessageTransfer $message
+     * @param \Transfer\MessageTransfer $message
      *
      * @return $this
      */
@@ -171,7 +171,7 @@ class ValidateResponseTransfer extends AbstractTransfer
     /**
      * @module AopSdk
      *
-     * @throws \Spryker\Shared\Kernel\Transfer\Exception\RequiredTransferPropertyException
+     * @throws \Exception
      *
      * @return $this
      */

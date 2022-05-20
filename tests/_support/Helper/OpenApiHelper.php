@@ -11,20 +11,21 @@ use Codeception\Module;
 use Codeception\Stub;
 use Codeception\Stub\Expected;
 use Doctrine\Inflector\InflectorFactory;
-use Generated\Shared\Transfer\OpenApiRequestTransfer;
-use Generated\Shared\Transfer\OpenApiTransfer;
 use SprykerSdk\SyncApi\Console\OpenApiCodeGenerateConsole;
 use SprykerSdk\SyncApi\Message\MessageBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
+use SprykerSdk\SyncApi\SyncApiConfig;
 use SprykerSdk\SyncApi\SyncApiFacade;
 use SprykerSdk\SyncApi\SyncApiFactory;
+use Transfer\OpenApiRequestTransfer;
+use Transfer\OpenApiTransfer;
 
 class OpenApiHelper extends Module
 {
     use SyncApiHelperTrait;
 
     /**
-     * @return \Generated\Shared\Transfer\OpenApiRequestTransfer
+     * @return \Transfer\OpenApiRequestTransfer
      */
     public function haveOpenApiAddRequest(): OpenApiRequestTransfer
     {
@@ -77,6 +78,7 @@ class OpenApiHelper extends Module
         $openApiCodeBuilderStub = Stub::construct(
             OpenApiCodeBuilder::class,
             [
+                new SyncApiConfig(),
                 new MessageBuilder(),
                 InflectorFactory::create()->build(),
             ],

@@ -7,10 +7,10 @@
 
 namespace SprykerSdk\SyncApi;
 
-use Generated\Shared\Transfer\OpenApiRequestTransfer;
-use Generated\Shared\Transfer\OpenApiResponseTransfer;
-use Generated\Shared\Transfer\ValidateRequestTransfer;
-use Generated\Shared\Transfer\ValidateResponseTransfer;
+use Transfer\OpenApiRequestTransfer;
+use Transfer\OpenApiResponseTransfer;
+use Transfer\ValidateRequestTransfer;
+use Transfer\ValidateResponseTransfer;
 
 class SyncApiFacade implements SyncApiFacadeInterface
 {
@@ -46,9 +46,9 @@ class SyncApiFacade implements SyncApiFacadeInterface
      *
      * @api
      *
-     * @param \Generated\Shared\Transfer\OpenApiRequestTransfer $openApiRequestTransfer
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      *
-     * @return \Generated\Shared\Transfer\OpenApiResponseTransfer
+     * @return \Transfer\OpenApiResponseTransfer
      */
     public function buildFromOpenApi(OpenApiRequestTransfer $openApiRequestTransfer): OpenApiResponseTransfer
     {
@@ -60,9 +60,9 @@ class SyncApiFacade implements SyncApiFacadeInterface
      *
      * @api
      *
-     * @param \Generated\Shared\Transfer\ValidateRequestTransfer $validateRequestTransfer
+     * @param \Transfer\ValidateRequestTransfer $validateRequestTransfer
      *
-     * @return \Generated\Shared\Transfer\ValidateResponseTransfer
+     * @return \Transfer\ValidateResponseTransfer
      */
     public function validateOpenApi(ValidateRequestTransfer $validateRequestTransfer): ValidateResponseTransfer
     {
@@ -74,9 +74,9 @@ class SyncApiFacade implements SyncApiFacadeInterface
      *
      * @api
      *
-     * @param \Generated\Shared\Transfer\OpenApiRequestTransfer $openApiRequestTransfer
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      *
-     * @return \Generated\Shared\Transfer\OpenApiResponseTransfer
+     * @return \Transfer\OpenApiResponseTransfer
      */
     public function createOpenApi(OpenApiRequestTransfer $openApiRequestTransfer): OpenApiResponseTransfer
     {

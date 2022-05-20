@@ -7,10 +7,10 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Validator\Rules;
 
-use Generated\Shared\Transfer\ValidateResponseTransfer;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\Message\SyncApiError;
 use SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface;
+use Transfer\ValidateResponseTransfer;
 
 class OpenApiComponentsValidatorRule implements ValidatorRuleInterface
 {
@@ -32,10 +32,10 @@ class OpenApiComponentsValidatorRule implements ValidatorRuleInterface
      *
      * @param array $openApi
      * @param string $openApiFileName
-     * @param \Generated\Shared\Transfer\ValidateResponseTransfer $validateResponseTransfer
+     * @param \Transfer\ValidateResponseTransfer $validateResponseTransfer
      * @param array|null $context
      *
-     * @return \Generated\Shared\Transfer\ValidateResponseTransfer
+     * @return \Transfer\ValidateResponseTransfer
      */
     public function validate(
         array $openApi,
@@ -48,9 +48,9 @@ class OpenApiComponentsValidatorRule implements ValidatorRuleInterface
 
     /**
      * @param array $openApi
-     * @param \Generated\Shared\Transfer\ValidateResponseTransfer $validateResponseTransfer
+     * @param \Transfer\ValidateResponseTransfer $validateResponseTransfer
      *
-     * @return \Generated\Shared\Transfer\ValidateResponseTransfer
+     * @return \Transfer\ValidateResponseTransfer
      */
     protected function validateAtLeastOneComponentExists(array $openApi, ValidateResponseTransfer $validateResponseTransfer): ValidateResponseTransfer
     {

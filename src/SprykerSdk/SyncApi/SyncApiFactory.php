@@ -57,7 +57,7 @@ class SyncApiFactory
      */
     public function createOpenApiCodeBuilder(): OpenApiCodeBuilderInterface
     {
-        return new OpenApiCodeBuilder($this->createMessageBuilder(), $this->getInflector());
+        return new OpenApiCodeBuilder($this->getConfig(), $this->createMessageBuilder(), $this->getInflector());
     }
 
     /**

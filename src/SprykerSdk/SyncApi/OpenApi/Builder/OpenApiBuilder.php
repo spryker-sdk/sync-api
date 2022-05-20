@@ -7,12 +7,12 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Builder;
 
-use Generated\Shared\Transfer\OpenApiRequestTransfer;
-use Generated\Shared\Transfer\OpenApiResponseTransfer;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\Message\SyncApiError;
 use SprykerSdk\SyncApi\Message\SyncApiInfo;
 use Symfony\Component\Yaml\Yaml;
+use Transfer\OpenApiRequestTransfer;
+use Transfer\OpenApiResponseTransfer;
 
 class OpenApiBuilder implements OpenApiBuilderInterface
 {
@@ -30,9 +30,9 @@ class OpenApiBuilder implements OpenApiBuilderInterface
     }
 
     /**
-     * @param \Generated\Shared\Transfer\OpenApiRequestTransfer $openApiRequestTransfer
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      *
-     * @return \Generated\Shared\Transfer\OpenApiResponseTransfer
+     * @return \Transfer\OpenApiResponseTransfer
      */
     public function createOpenApi(OpenApiRequestTransfer $openApiRequestTransfer): OpenApiResponseTransfer
     {

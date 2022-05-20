@@ -7,9 +7,9 @@
 
 namespace SprykerSdk\SyncApi\Validator;
 
-use Generated\Shared\Transfer\ValidateResponseTransfer;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\SyncApiConfig;
+use Transfer\ValidateResponseTransfer;
 
 abstract class AbstractValidator implements ValidatorInterface
 {
@@ -43,10 +43,10 @@ abstract class AbstractValidator implements ValidatorInterface
     /**
      * @param array $fileData
      * @param string $fileName
-     * @param \Generated\Shared\Transfer\ValidateResponseTransfer $validateResponseTransfer
+     * @param \Transfer\ValidateResponseTransfer $validateResponseTransfer
      * @param array|null $context
      *
-     * @return \Generated\Shared\Transfer\ValidateResponseTransfer
+     * @return \Transfer\ValidateResponseTransfer
      */
     protected function executeValidatorRules(
         array $fileData,
