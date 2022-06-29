@@ -37,7 +37,7 @@ class OpenApiCodeGenerateConsoleTest extends Unit
 
         // Act
         $commandTester->execute([
-            '--' . OpenApiCodeGenerateConsole::OPTION_OPEN_API_FILE => codecept_data_dir('api/openapi/valid/valid_openapi.yml'),
+            '--' . OpenApiCodeGenerateConsole::OPTION_OPEN_API_FILE => codecept_data_dir('api/valid/valid_openapi.yml'),
         ]);
 
         // Assert
@@ -54,7 +54,7 @@ class OpenApiCodeGenerateConsoleTest extends Unit
 
         // Act
         $commandTester->execute([
-            '--' . OpenApiCodeGenerateConsole::OPTION_OPEN_API_FILE => codecept_data_dir('api/openapi/valid/valid_openapi.yml'),
+            '--' . OpenApiCodeGenerateConsole::OPTION_OPEN_API_FILE => codecept_data_dir('api/valid/valid_openapi.yml'),
         ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
 
         // Assert
@@ -73,7 +73,7 @@ class OpenApiCodeGenerateConsoleTest extends Unit
 
         // Act
         $commandTester->execute([
-            '--' . OpenApiCodeGenerateConsole::OPTION_OPEN_API_FILE => codecept_data_dir('api/openapi/invalid/invalid_openapi.yml'),
+            '--' . OpenApiCodeGenerateConsole::OPTION_OPEN_API_FILE => codecept_data_dir('api/invalid/invalid_openapi.yml'),
             '--' . OpenApiCodeGenerateConsole::APPLICATION_TYPE => 'backend',
             '--' . OpenApiCodeGenerateConsole::OPTION_ORGANIZATION => 'Spryker',
         ]);
@@ -93,7 +93,7 @@ class OpenApiCodeGenerateConsoleTest extends Unit
 
         // Act
         $commandTester->execute([
-            '--' . OpenApiCodeGenerateConsole::OPTION_OPEN_API_FILE => codecept_data_dir('api/openapi/invalid/empty_openapi.yml'),
+            '--' . OpenApiCodeGenerateConsole::OPTION_OPEN_API_FILE => codecept_data_dir('api/invalid/empty_openapi.yml'),
             '--' . OpenApiCodeGenerateConsole::APPLICATION_TYPE => 'backend',
             '--' . OpenApiCodeGenerateConsole::OPTION_ORGANIZATION => 'Spryker',
         ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
@@ -114,7 +114,7 @@ class OpenApiCodeGenerateConsoleTest extends Unit
         // Act
         $commandTester->execute(
             [
-                '--' . OpenApiCodeGenerateConsole::OPTION_OPEN_API_FILE => codecept_data_dir('api/openapi/invalid/invalid_openapi.yml'),
+                '--' . OpenApiCodeGenerateConsole::OPTION_OPEN_API_FILE => codecept_data_dir('api/invalid/invalid_openapi.yml'),
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
