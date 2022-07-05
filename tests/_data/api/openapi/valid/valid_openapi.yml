@@ -171,6 +171,34 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ApiErrorMessage'
 
+        put:
+            summary: 'Upload an image for app'
+            requestBody:
+                description: 'Contains all required data to add image to app.'
+                required: true
+                content:
+                    image/png:
+                        schema:
+                            $ref: '#/components/schemas/AppAddImageRequest'
+            responses:
+                201:
+                    description: 'Image is added.'
+                    content:
+                        application/vnd.api+json:
+                            schema:
+                                $ref: '#/components/schemas/AppAddImageResponse'
+                400:
+                    description: 'Invalid request.'
+                    content:
+                        application/vnd.api+json:
+                            schema:
+                                $ref: '#/components/schemas/ApiErrorMessage'
+                default:
+                    description: 'Expected response to a bad request.'
+                    content:
+                        application/vnd.api+json:
+                            schema:
+                                $ref: '#/components/schemas/ApiErrorMessage'
 
     /apps/{appId}/connect:
         post:
@@ -616,6 +644,24 @@ components:
                     type: string
                 status:
                     type: integer
+
+        ################################################
+        # Add Image to App Request
+        ################################################
+        AppAddImageRequest:
+            properties:
+                type:
+                    type: string
+                    format: binary
+
+        ################################################
+        # Add Image to App Response
+        ################################################
+        AppAddImageResponse:
+            properties:
+                id:
+                    type: string
+                    example: 'UUID_image123'
 
     parameters:
         IncludeTenantApp:
