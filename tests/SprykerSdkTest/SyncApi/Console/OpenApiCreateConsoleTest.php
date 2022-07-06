@@ -72,6 +72,6 @@ class OpenApiCreateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
-        $this->assertStringContainsString(SyncApiError::openApiFileAlreadyExists('vfs://root/config/api/openapi/openapi.yml'), $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiError::openApiFileAlreadyExists('vfs://root/resources/api/openapi.yml'), $commandTester->getDisplay());
     }
 }
