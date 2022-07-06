@@ -68,13 +68,37 @@ class OpenApiValidatorHelper extends Module
      */
     protected function prepareOpenApiSchema(array $files): void
     {
-        $structure = [
-            'config' => [
-                'api' => [
-                    'openapi' => $files,
-                ],
-            ],
-        ];
-        $this->getSyncApiHelper()->mockDirectoryStructure($structure);
+        $this->getSyncApiHelper()->mockDirectoryStructure(
+            $this->buildStructureByPath($this->getOpenApiSchemaPath(), $files),
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getOpenApiSchemaPath(): string
+    {
+        return 'config/api/openapi';
+    }
+
+    /**
+     * @param string $path
+     * @param array $files
+     *
+     * @return array
+     */
+    protected function buildStructureByPath(string $path, array $files): array
+    {
+        $pathFragments = explode('/', trim($path, '/'));
+
+        $structure = [];
+        $current = &$structure;
+        foreach ($pathFragments as $fragment) {
+            $current[$fragment] = [];
+            $current = &$current[$fragment];
+        }
+        $current = $files;
+
+        return $structure;
     }
 }

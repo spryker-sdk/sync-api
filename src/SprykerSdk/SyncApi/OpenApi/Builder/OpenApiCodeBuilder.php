@@ -119,7 +119,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         OpenApiRequestTransfer $openApiRequestTransfer,
         OpenApi $openApi
     ): void {
-        $transferDefinitions = $this->getTransferDefinitions($openApi);
+        $transferDefinitions = $this->getTransferDefinitions($openApiRequestTransfer, $openApi);
 
         if ($this->openApiResponseTransfer->getErrors()->count() === 0) {
             $transferBuildSprykCommands = $this->getTransferDefinitionSprykCommands($openApiRequestTransfer->getOrganizationOrFail(), $transferDefinitions);
@@ -140,7 +140,11 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         $resourceHttpMethodsWithHttpResponseCodes = [];
 
         if (!isset($openApi->paths) || empty($openApi->paths)) {
-            $this->openApiResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::openApiDoesNotDefineAnyPath()));
+            $this->openApiResponseTransfer->addError(
+                $this->messageBuilder->buildMessage(
+                    SyncApiError::openApiDoesNotDefineAnyPath($openApiRequestTransfer->getTargetFile()),
+                ),
+            );
 
             return;
         }
@@ -150,7 +154,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
             $resourceHttpMethodsWithHttpResponseCodes[$path] = $this->getHttpMethodsWithHttpResponseCodes($pathItem);
         }
 
-        $this->runResourceMethodResponseCodeSpryk($resourceHttpMethodsWithHttpResponseCodes, $openApiRequestTransfer->getOrganizationOrFail());
+        $this->runResourceMethodResponseCodeSpryk($resourceHttpMethodsWithHttpResponseCodes, $openApiRequestTransfer);
     }
 
     /**
@@ -201,17 +205,24 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
 
     /**
      * @param array<string, array<string, array<int, string>>> $resourceHttpMethodsWithHttpResponseCodes
-     * @param string $organization
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      *
      * @return void
      */
-    protected function runResourceMethodResponseCodeSpryk(array $resourceHttpMethodsWithHttpResponseCodes, string $organization): void
-    {
+    protected function runResourceMethodResponseCodeSpryk(
+        array $resourceHttpMethodsWithHttpResponseCodes,
+        OpenApiRequestTransfer $openApiRequestTransfer
+    ): void {
+        $organization = $openApiRequestTransfer->getOrganizationOrFail();
         $commands = [];
 
         foreach ($resourceHttpMethodsWithHttpResponseCodes as $resource => $httpMethodsWithHttpResponseCodes) {
             if (strpos($resource, '{') !== false) {
-                $this->openApiResponseTransfer->addMessage($this->messageBuilder->buildMessage(SyncApiError::canNotHandleResourcesWithPlaceholder($resource)));
+                $this->openApiResponseTransfer->addMessage(
+                    $this->messageBuilder->buildMessage(
+                        SyncApiError::canNotHandleResourcesWithPlaceholder($resource, $openApiRequestTransfer->getTargetFile()),
+                    ),
+                );
 
                 continue;
             }
@@ -300,11 +311,12 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     }
 
     /**
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      * @param \cebe\openapi\spec\OpenApi $openApi
      *
      * @return array
      */
-    protected function getTransferDefinitions(OpenApi $openApi): array
+    protected function getTransferDefinitions(OpenApiRequestTransfer $openApiRequestTransfer, OpenApi $openApi): array
     {
         $transferDefinitions = [];
 
@@ -314,7 +326,11 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
                 $transferDefinitions[$path] = $this->getTransferDefinitionFromPathItem($path, $pathItem);
             }
         } else {
-            $this->openApiResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::openApiDoesNotDefineAnyPath()));
+            $this->openApiResponseTransfer->addError(
+                $this->messageBuilder->buildMessage(
+                    SyncApiError::openApiDoesNotDefineAnyPath($openApiRequestTransfer->getTargetFile()),
+                ),
+            );
         }
 
         return $transferDefinitions;

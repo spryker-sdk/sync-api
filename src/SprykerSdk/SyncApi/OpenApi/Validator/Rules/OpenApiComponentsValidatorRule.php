@@ -43,19 +43,25 @@ class OpenApiComponentsValidatorRule implements ValidatorRuleInterface
         ValidateResponseTransfer $validateResponseTransfer,
         ?array $context = null
     ): ValidateResponseTransfer {
-        return $this->validateAtLeastOneComponentExists($openApi, $validateResponseTransfer);
+        return $this->validateAtLeastOneComponentExists($openApi, $openApiFileName, $validateResponseTransfer);
     }
 
     /**
      * @param array $openApi
+     * @param string $openApiFileName
      * @param \Transfer\ValidateResponseTransfer $validateResponseTransfer
      *
      * @return \Transfer\ValidateResponseTransfer
      */
-    protected function validateAtLeastOneComponentExists(array $openApi, ValidateResponseTransfer $validateResponseTransfer): ValidateResponseTransfer
-    {
+    protected function validateAtLeastOneComponentExists(
+        array $openApi,
+        string $openApiFileName,
+        ValidateResponseTransfer $validateResponseTransfer
+    ): ValidateResponseTransfer {
         if (!isset($openApi['components'])) {
-            $validateResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::openApiDoesNotDefineAnyComponents()));
+            $validateResponseTransfer->addError(
+                $this->messageBuilder->buildMessage(SyncApiError::openApiDoesNotDefineAnyComponents($openApiFileName)),
+            );
         }
 
         return $validateResponseTransfer;
