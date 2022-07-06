@@ -51,7 +51,7 @@ class OpenApiHelper extends Module
      */
     public function haveOpenApiFile(): void
     {
-        $this->prepareOpenApiFile(codecept_data_dir('api/openapi/valid/valid_openapi.yml'));
+        $this->prepareOpenApiFile(codecept_data_dir('api/valid/valid_openapi.yml'));
     }
 
     /**
@@ -61,7 +61,7 @@ class OpenApiHelper extends Module
      */
     protected function prepareOpenApiFile(string $pathToOpenApi): void
     {
-        $filePath = sprintf('%s/config/api/openapi/openapi.yml', $this->getSyncApiHelper()->getRootPath());
+        $filePath = sprintf('%s/resources/api/openapi.yml', $this->getSyncApiHelper()->getRootPath());
 
         if (!is_dir(dirname($filePath))) {
             mkdir(dirname($filePath), 0770, true);
