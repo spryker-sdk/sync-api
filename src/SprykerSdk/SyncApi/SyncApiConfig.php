@@ -17,9 +17,8 @@ class SyncApiConfig
     public function getDefaultRelativePathToOpenApiFile(): string
     {
         $pathFragments = [
-            'config',
+            'resources',
             'api',
-            'openapi',
             'openapi.yml',
         ];
 

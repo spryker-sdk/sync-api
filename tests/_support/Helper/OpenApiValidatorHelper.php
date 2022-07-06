@@ -19,7 +19,7 @@ class OpenApiValidatorHelper extends Module
     public function haveValidOpenApiFile(): void
     {
         $files = [
-            'openapi.yml' => file_get_contents(codecept_data_dir('api/openapi/valid/valid_openapi.yml')),
+            'openapi.yml' => file_get_contents(codecept_data_dir('api/valid/valid_openapi.yml')),
         ];
 
         $this->prepareOpenApiSchema($files);
@@ -31,7 +31,7 @@ class OpenApiValidatorHelper extends Module
     public function haveOpenApiFileThatCouldNotBeParsed(): void
     {
         $files = [
-            'openapi.yml' => file_get_contents(codecept_data_dir('api/openapi/invalid/not_parsable_file.yml')),
+            'openapi.yml' => file_get_contents(codecept_data_dir('api/invalid/not_parsable_file.yml')),
         ];
 
         $this->prepareOpenApiSchema($files);
@@ -43,7 +43,7 @@ class OpenApiValidatorHelper extends Module
     public function haveDefaultOpenApiFile(): void
     {
         $files = [
-            'openapi.yml' => file_get_contents(codecept_data_dir('api/openapi/invalid/empty_openapi.yml')),
+            'openapi.yml' => file_get_contents(codecept_data_dir('api/invalid/empty_openapi.yml')),
         ];
 
         $this->prepareOpenApiSchema($files);
@@ -55,7 +55,7 @@ class OpenApiValidatorHelper extends Module
     public function haveOpenApiFileWithPathButInvalidHttpMethod(): void
     {
         $files = [
-            'openapi.yml' => file_get_contents(codecept_data_dir('api/openapi/invalid/openapi_without_http_methods_in_path.yml')),
+            'openapi.yml' => file_get_contents(codecept_data_dir('api/invalid/openapi_without_http_methods_in_path.yml')),
         ];
 
         $this->prepareOpenApiSchema($files);
@@ -78,7 +78,7 @@ class OpenApiValidatorHelper extends Module
      */
     public function getOpenApiSchemaPath(): string
     {
-        return 'config/api/openapi';
+        return 'resources/api';
     }
 
     /**

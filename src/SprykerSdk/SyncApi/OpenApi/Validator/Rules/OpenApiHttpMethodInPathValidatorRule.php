@@ -22,6 +22,7 @@ class OpenApiHttpMethodInPathValidatorRule implements ValidatorRuleInterface
         'post',
         'patch',
         'delete',
+        'put',
     ];
 
     /**
