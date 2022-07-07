@@ -99,7 +99,12 @@ class OpenApiValidateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
-        $this->assertStringContainsString(SyncApiError::openApiDoesNotDefineAnyPath(), $commandTester->getDisplay());
+        $this->assertStringContainsString(
+            SyncApiError::openApiDoesNotDefineAnyPath(
+                sprintf('%s/%s/openapi.yml', $this->tester->getRootPath(), $this->tester->getOpenApiSchemaPath()),
+            ),
+            $commandTester->getDisplay(),
+        );
     }
 
     /**
@@ -118,7 +123,12 @@ class OpenApiValidateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
-        $this->assertStringContainsString(SyncApiError::openApiDoesNotDefineAnyComponents(), $commandTester->getDisplay());
+        $this->assertStringContainsString(
+            SyncApiError::openApiDoesNotDefineAnyComponents(
+                sprintf('%s/%s/openapi.yml', $this->tester->getRootPath(), $this->tester->getOpenApiSchemaPath()),
+            ),
+            $commandTester->getDisplay(),
+        );
     }
 
     /**

@@ -43,19 +43,25 @@ class OpenApiPathValidatorRule implements ValidatorRuleInterface
         ValidateResponseTransfer $validateResponseTransfer,
         ?array $context = null
     ): ValidateResponseTransfer {
-        return $this->validateAtLeastOnePathExists($openApi, $validateResponseTransfer);
+        return $this->validateAtLeastOnePathExists($openApi, $openApiFileName, $validateResponseTransfer);
     }
 
     /**
      * @param array $openApi
+     * @param string $openApiFileName
      * @param \Transfer\ValidateResponseTransfer $validateResponseTransfer
      *
      * @return \Transfer\ValidateResponseTransfer
      */
-    protected function validateAtLeastOnePathExists(array $openApi, ValidateResponseTransfer $validateResponseTransfer): ValidateResponseTransfer
-    {
+    protected function validateAtLeastOnePathExists(
+        array $openApi,
+        string $openApiFileName,
+        ValidateResponseTransfer $validateResponseTransfer
+    ): ValidateResponseTransfer {
         if (!isset($openApi['paths'])) {
-            $validateResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::openApiDoesNotDefineAnyPath()));
+            $validateResponseTransfer->addError(
+                $this->messageBuilder->buildMessage(SyncApiError::openApiDoesNotDefineAnyPath($openApiFileName)),
+            );
         }
 
         return $validateResponseTransfer;
