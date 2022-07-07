@@ -31,7 +31,7 @@ class OpenApiValidator extends AbstractValidator
         $openApiFile = $validateRequestTransfer->getOpenApiFileOrFail();
 
         if (!is_file($openApiFile)) {
-            $validateResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::couldNotFinOpenApi($openApiFile)));
+            $validateResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::couldNotFindOpenApi($openApiFile)));
 
             return $validateResponseTransfer;
         }

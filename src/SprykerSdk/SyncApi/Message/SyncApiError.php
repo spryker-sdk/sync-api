@@ -10,12 +10,33 @@ namespace SprykerSdk\SyncApi\Message;
 class SyncApiError
 {
     /**
+     * @var string
+     */
+    protected const SCHEMA_GENERATION_ERROR_PREFIX = 'SyncAPI schema generation error';
+
+    /**
+     * @var string
+     */
+    protected const SCHEMA_VALIDATION_ERROR_PREFIX = 'SyncAPI schema validation error';
+
+    /**
+     * @var string
+     */
+    protected const CODE_GENERATION_ERROR_PREFIX = 'SyncAPI code generation error';
+
+    /**
+     * @param string $path
+     *
      * @return string
      */
-    public static function couldNotGenerateCodeFromOpenApi(): string
+    public static function couldNotGenerateCodeFromOpenApi(string $path): string
     {
         return static::format(
-            'SyncAPI schema generation error: Could not generate code from Open API schema file. Schema file is not valid, please run validation before generating code.',
+            sprintf(
+                '%s: Could not generate code from Open API schema file. Schema file "%s" is not valid, please run validation before generating code.',
+                static::CODE_GENERATION_ERROR_PREFIX,
+                $path,
+            ),
         );
     }
 
@@ -28,7 +49,8 @@ class SyncApiError
     {
         return static::format(
             sprintf(
-                'SyncAPI schema validation error: Couldn\'t find any path definition in your "%s" schema file. Please update the schema file.',
+                '%s: Couldn\'t find any path definition in your "%s" schema file. Please update the schema file.',
+                static::SCHEMA_VALIDATION_ERROR_PREFIX,
                 $path,
             ),
         );
@@ -43,7 +65,8 @@ class SyncApiError
     {
         return static::format(
             sprintf(
-                'SyncAPI schema validation error: Couldn\'t find any component definition in your "%s" schema file. Please update the schema file.',
+                '%s: Couldn\'t find any component definition in your "%s" schema file. Please update the schema file.',
+                static::SCHEMA_VALIDATION_ERROR_PREFIX,
                 $path,
             ),
         );
@@ -59,7 +82,8 @@ class SyncApiError
     {
         return static::format(
             sprintf(
-                'SyncAPI schema validation error: Found invalid HTTP method "%s" in your "%s" schema file.',
+                '%s: Found invalid HTTP method "%s" in your "%s" schema file.',
+                static::SCHEMA_VALIDATION_ERROR_PREFIX,
                 $httpMethod,
                 $path,
             ),
@@ -76,7 +100,8 @@ class SyncApiError
     {
         return static::format(
             sprintf(
-                'SyncAPI code generation error: Can\'t handle resources with placeholder at the moment. Resource "%s" from your "%s" schema file can\'t be used to auto generate code.',
+                '%s: Can\'t handle resources with placeholder at the moment. Resource "%s" from your "%s" schema file can\'t be used to auto generate code.',
+                static::CODE_GENERATION_ERROR_PREFIX,
                 $resource,
                 $path,
             ),
@@ -91,7 +116,11 @@ class SyncApiError
     public static function canNotExtractAControllerNameForPath(string $path): string
     {
         return static::format(
-            sprintf('SyncAPI code generation error: Can\'t extract a controller name from path "%s".', $path),
+            sprintf(
+                '%s: Can\'t extract a controller name from path "%s".',
+                static::CODE_GENERATION_ERROR_PREFIX,
+                $path,
+            ),
         );
     }
 
@@ -103,7 +132,11 @@ class SyncApiError
     public static function canNotExtractAModuleNameForPath(string $path): string
     {
         return static::format(
-            sprintf('SyncAPI code generation error: Can\'t extract a module name from path "%s".', $path),
+            sprintf(
+                '%s: Can\'t extract a module name from path "%s".',
+                static::CODE_GENERATION_ERROR_PREFIX,
+                $path,
+            ),
         );
     }
 
@@ -116,7 +149,8 @@ class SyncApiError
     {
         return static::format(
             sprintf(
-                'SyncAPI schema generation error: Couldn\'t create "%s" as it already exists. You can manually update it.',
+                '%s: Couldn\'t create "%s" as it already exists. You can manually update it.',
+                static::SCHEMA_GENERATION_ERROR_PREFIX,
                 $path,
             ),
         );
@@ -130,7 +164,11 @@ class SyncApiError
     public static function couldNotParseOpenApi(string $path): string
     {
         return static::format(
-            sprintf('SyncAPI schema validation error: Couldn\'t not parse Open API schema file "%s".', $path),
+            sprintf(
+                '%s: Couldn\'t not parse Open API schema file "%s".',
+                static::SCHEMA_VALIDATION_ERROR_PREFIX,
+                $path,
+            ),
         );
     }
 
@@ -139,10 +177,14 @@ class SyncApiError
      *
      * @return string
      */
-    public static function couldNotFinOpenApi(string $path): string
+    public static function couldNotFindOpenApi(string $path): string
     {
         return static::format(
-            sprintf('SyncAPI schema validation error: Couldn\'t find Open API schema file "%s".', $path),
+            sprintf(
+                '%s: Couldn\'t find Open API schema file "%s".',
+                static::SCHEMA_VALIDATION_ERROR_PREFIX,
+                $path,
+            ),
         );
     }
 

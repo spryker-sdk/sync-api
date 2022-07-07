@@ -77,7 +77,11 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         $this->generateResourceMethodResponse($openApiRequestTransfer, $openApi);
 
         if ($this->openApiResponseTransfer->getErrors()->count() > 0) {
-            $this->openApiResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::couldNotGenerateCodeFromOpenApi()));
+            $this->openApiResponseTransfer->addError(
+                $this->messageBuilder->buildMessage(
+                    SyncApiError::couldNotGenerateCodeFromOpenApi($openApiRequestTransfer->getTargetFileOrFail()),
+                ),
+            );
         }
 
         if ($this->openApiResponseTransfer->getErrors()->count() === 0) {
@@ -142,7 +146,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         if (!isset($openApi->paths) || empty($openApi->paths)) {
             $this->openApiResponseTransfer->addError(
                 $this->messageBuilder->buildMessage(
-                    SyncApiError::openApiDoesNotDefineAnyPath($openApiRequestTransfer->getTargetFile()),
+                    SyncApiError::openApiDoesNotDefineAnyPath($openApiRequestTransfer->getTargetFileOrFail()),
                 ),
             );
 
@@ -220,7 +224,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
             if (strpos($resource, '{') !== false) {
                 $this->openApiResponseTransfer->addMessage(
                     $this->messageBuilder->buildMessage(
-                        SyncApiError::canNotHandleResourcesWithPlaceholder($resource, $openApiRequestTransfer->getTargetFile()),
+                        SyncApiError::canNotHandleResourcesWithPlaceholder($resource, $openApiRequestTransfer->getTargetFileOrFail()),
                     ),
                 );
 
@@ -328,7 +332,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         } else {
             $this->openApiResponseTransfer->addError(
                 $this->messageBuilder->buildMessage(
-                    SyncApiError::openApiDoesNotDefineAnyPath($openApiRequestTransfer->getTargetFile()),
+                    SyncApiError::openApiDoesNotDefineAnyPath($openApiRequestTransfer->getTargetFileOrFail()),
                 ),
             );
         }
