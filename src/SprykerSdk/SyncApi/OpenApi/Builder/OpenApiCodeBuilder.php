@@ -565,7 +565,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
         foreach ($contents as $response) {
             if (isset($response->schema)) {
                 $responseProperties = $this->getResponsePropertiesFromSchemaOrReference($response->schema, []);
-                if (!empty($responseProperties)) {
+                if ($responseProperties) {
                     # response types with no data structure (e.g. text/plain) should not be added
                     $responses[$this->getTransferNameFromSchemaOrReference($response->schema)] = $responseProperties;
                 }
