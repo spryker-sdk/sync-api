@@ -8,6 +8,7 @@
 namespace SprykerSdk\SyncApi\OpenApi\Builder;
 
 use cebe\openapi\Reader;
+use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\PathItem;
@@ -563,16 +564,30 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     protected function getPropertiesFromOperationContent(array $contents, array $responses): array
     {
         foreach ($contents as $response) {
-            if (isset($response->schema)) {
-                $responseProperties = $this->getResponsePropertiesFromSchemaOrReference($response->schema, []);
-                if ($responseProperties) {
-                    # response types with no data structure (e.g. text/plain) should not be added
-                    $responses[$this->getTransferNameFromSchemaOrReference($response->schema)] = $responseProperties;
-                }
+            $responseProperties = $this->getResponseProperties($response);
+            if ($responseProperties) {
+                $responses[$this->getTransferNameFromSchemaOrReference($response->schema)] = $responseProperties;
             }
         }
 
         return $responses;
+    }
+
+    /**
+     * @param \cebe\openapi\spec\MediaType $response
+     *
+     * @return array|null
+     */
+    protected function getResponseProperties(MediaType $response): ?array
+    {
+        if (isset($response->schema)) {
+            $responseProperties = $this->getResponsePropertiesFromSchemaOrReference($response->schema, []);
+            if ($responseProperties) {
+                return $responseProperties;
+            }
+        }
+
+        return null;
     }
 
     /**
