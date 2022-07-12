@@ -36,6 +36,13 @@ paths:
                         application/vnd.api+json:
                             schema:
                                 $ref: '#/components/schemas/ApiErrorMessage'
+                500:
+                    description: 'Server error'
+                    content:
+                        # servers may want to report the error directly as simple text if things go very wrong
+                        text/plain:
+                            schema:
+                                type: string
                 default:
                     description: 'Expected response to a bad request.'
                     content:
