@@ -10,7 +10,7 @@ namespace SprykerSdk\SyncApi\OpenApi\Builder;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\Message\SyncApiError;
 use SprykerSdk\SyncApi\Message\SyncApiInfo;
-use Symfony\Component\Yaml\Yaml;
+use SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManagerInterface;
 use Transfer\OpenApiRequestTransfer;
 use Transfer\OpenApiResponseTransfer;
 
@@ -19,14 +19,23 @@ class OpenApiBuilder implements OpenApiBuilderInterface
     /**
      * @var \SprykerSdk\SyncApi\Message\MessageBuilderInterface
      */
-    protected MessageBuilderInterface $messageBuilder;
+    protected $messageBuilder;
+
+    /**
+     * @var \SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManagerInterface
+     */
+    protected $openApiFileManager;
 
     /**
      * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
+     * @param \SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManagerInterface $openApiFileManager
      */
-    public function __construct(MessageBuilderInterface $messageBuilder)
-    {
+    public function __construct(
+        MessageBuilderInterface $messageBuilder,
+        OpenApiFileManagerInterface $openApiFileManager
+    ) {
         $this->messageBuilder = $messageBuilder;
+        $this->openApiFileManager = $openApiFileManager;
     }
 
     /**
@@ -54,31 +63,12 @@ class OpenApiBuilder implements OpenApiBuilderInterface
             return $openApiResponseTransfer;
         }
 
-        $result = $this->writeToFile($targetFile, $openApi);
+        $result = $this->openApiFileManager->saveOpenApiFileFromArray($targetFile, $openApi);
 
         if ($result) {
             $openApiResponseTransfer->addMessage($this->messageBuilder->buildMessage(SyncApiInfo::openApiFileCreated($targetFile)));
         }
 
         return $openApiResponseTransfer;
-    }
-
-    /**
-     * @param string $targetFile
-     * @param array $openApi
-     *
-     * @return bool
-     */
-    protected function writeToFile(string $targetFile, array $openApi): bool
-    {
-        $openApiSchemaYaml = Yaml::dump($openApi, 100);
-
-        $dirname = dirname($targetFile);
-
-        if (!is_dir($dirname)) {
-            mkdir($dirname, 0770, true);
-        }
-
-        return (bool)file_put_contents($targetFile, $openApiSchemaYaml);
     }
 }

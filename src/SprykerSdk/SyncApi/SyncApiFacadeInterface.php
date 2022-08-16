@@ -7,6 +7,7 @@
 
 namespace SprykerSdk\SyncApi;
 
+use Generated\Shared\Transfer\UpdateOpenApiRequestTransfer;
 use Transfer\OpenApiRequestTransfer;
 use Transfer\OpenApiResponseTransfer;
 use Transfer\ValidateRequestTransfer;
@@ -49,4 +50,16 @@ interface SyncApiFacadeInterface
      * @return \Transfer\OpenApiResponseTransfer
      */
     public function createOpenApi(OpenApiRequestTransfer $openApiRequestTransfer): OpenApiResponseTransfer;
+
+    /**
+     * Specification:
+     * - Updates on OpenAPI file with provided JSON-ed OpenAPI schema.
+     *
+     * @api
+     *
+     * @param \Generated\Shared\Transfer\UpdateOpenApiRequestTransfer $openApiRequestTransfer
+     *
+     * @return \Transfer\OpenApiResponseTransfer
+     */
+    public function updateOpenApi(UpdateOpenApiRequestTransfer $openApiRequestTransfer): OpenApiResponseTransfer;
 }

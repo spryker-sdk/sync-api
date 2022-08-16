@@ -11,10 +11,21 @@ use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
 use SprykerSdk\SyncApi\Message\MessageBuilder;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilder;
+use SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\DataModifier\DataModifierHandlerInterface;
+use SprykerSdk\SyncApi\OpenApi\DataModifier\DataSimpleRecursiveReplacer;
+use SprykerSdk\SyncApi\OpenApi\DataModifier\SyncApiHeaderSetter;
+use SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocDecoderInterface;
+use SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocJsonDecoder;
+use SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManager;
+use SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManagerInterface;
+use SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdater;
+use SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdaterInterface;
 use SprykerSdk\SyncApi\OpenApi\Validator\OpenApiValidator;
 use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiComponentsValidatorRule;
 use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiHttpMethodInPathValidatorRule;
@@ -121,7 +132,10 @@ class SyncApiFactory
      */
     public function createOpenApiBuilder(): OpenApiBuilderInterface
     {
-        return new OpenApiBuilder($this->createMessageBuilder());
+        return new OpenApiBuilder(
+            $this->createMessageBuilder(),
+            $this->createOpenApiFileManager(),
+        );
     }
 
     /**
@@ -130,5 +144,58 @@ class SyncApiFactory
     public function createMessageBuilder(): MessageBuilderInterface
     {
         return new MessageBuilder();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface
+     */
+    public function createFilepathBuilder(): FilepathBuilderInterface
+    {
+        return new FilepathBuilder(
+            $this->getConfig()->getProjectRootPath(),
+            $this->getConfig()->getSyncApiDirPath(),
+        );
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocDecoderInterface
+     */
+    public function createOpenApiDocDecoder(): OpenApiDocDecoderInterface
+    {
+        return new OpenApiDocJsonDecoder();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManagerInterface
+     */
+    public function createOpenApiFileManager(): OpenApiFileManagerInterface
+    {
+        return new OpenApiFileManager();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\DataModifier\DataModifierHandlerInterface
+     */
+    public function createSyncApiUpdateDataModifier(): DataModifierHandlerInterface
+    {
+        return new DataSimpleRecursiveReplacer(
+            new SyncApiHeaderSetter(null),
+        );
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdaterInterface
+     */
+    public function createOpenApiUpdater(): OpenApiUpdaterInterface
+    {
+        return new OpenApiUpdater(
+            $this->createMessageBuilder(),
+            $this->createFilepathBuilder(),
+            $this->createOpenApiDocDecoder(),
+            $this->createOpenApiValidator(),
+            $this->createOpenApiFileManager(),
+            $this->createSyncApiUpdateDataModifier(),
+            $this->getConfig()->getDefaultAbsolutePathToOpenApiFile()
+        );
     }
 }

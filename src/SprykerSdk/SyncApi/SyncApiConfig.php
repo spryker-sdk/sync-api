@@ -49,4 +49,40 @@ class SyncApiConfig
 
         return (string)getcwd();
     }
+
+    /**
+     * @return string
+     */
+    public function getPackageRootDirPath(): string
+    {
+        return SRYKER_SYNCAPI_PACKAGE_ROOT_DIR;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultAbsolutePathToOpenApiFile(): string
+    {
+        return implode(
+            DIRECTORY_SEPARATOR,
+            [
+                $this->getPackageRootDirPath(),
+                $this->getDefaultRelativePathToOpenApiFile()
+            ]
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getSyncApiDirPath(): string
+    {
+        $pathFragments = [
+            'resources',
+            'api',
+            'syncapi',
+        ];
+
+        return implode(DIRECTORY_SEPARATOR, $pathFragments);
+    }
 }

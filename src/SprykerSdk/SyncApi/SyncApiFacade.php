@@ -7,6 +7,7 @@
 
 namespace SprykerSdk\SyncApi;
 
+use Generated\Shared\Transfer\UpdateOpenApiRequestTransfer;
 use Transfer\OpenApiRequestTransfer;
 use Transfer\OpenApiResponseTransfer;
 use Transfer\ValidateRequestTransfer;
@@ -81,5 +82,19 @@ class SyncApiFacade implements SyncApiFacadeInterface
     public function createOpenApi(OpenApiRequestTransfer $openApiRequestTransfer): OpenApiResponseTransfer
     {
         return $this->getFactory()->createOpenApiBuilder()->createOpenApi($openApiRequestTransfer);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     *
+     * @param \Generated\Shared\Transfer\UpdateOpenApiRequestTransfer $openApiRequestTransfer
+     *
+     * @return \Transfer\OpenApiResponseTransfer
+     */
+    public function updateOpenApi(UpdateOpenApiRequestTransfer $openApiRequestTransfer): OpenApiResponseTransfer
+    {
+        return $this->getFactory()->createOpenApiUpdater()->updateOpenApi($openApiRequestTransfer);
     }
 }
