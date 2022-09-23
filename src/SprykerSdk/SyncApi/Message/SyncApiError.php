@@ -92,6 +92,28 @@ class SyncApiError
 
     /**
      * @param string $resource
+     * @param string $httpMethod
+     * @param string $httpStatusCode
+     * @param string $path
+     *
+     * @return string
+     */
+    public static function openApiHttpStatusCodeIsNotEnclosedInQuotationMarks(string $resource, string $httpStatusCode, string $httpMethod, string $path): string
+    {
+        return static::format(
+            sprintf(
+                '%s: The HTTP status code "%s" for HTTP method "%s" for the resource "%s" in your "%s" schema file must be enclosed in quotations marks since Open API specification v3.',
+                static::SCHEMA_VALIDATION_ERROR_PREFIX,
+                $httpStatusCode,
+                $httpMethod,
+                $resource,
+                $path,
+            ),
+        );
+    }
+
+    /**
+     * @param string $resource
      * @param string $path
      *
      * @return string

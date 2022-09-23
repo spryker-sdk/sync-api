@@ -8,6 +8,7 @@
 namespace SprykerSdkTest\Helper;
 
 use Codeception\Module;
+use SprykerSdk\SyncApi\Console\AbstractConsole;
 
 class OpenApiValidatorHelper extends Module
 {
@@ -62,6 +63,30 @@ class OpenApiValidatorHelper extends Module
     }
 
     /**
+     * @return void
+     */
+    public function haveOpenApiV2FileWithHttpStatusCodeNotEnclosedInQuotationMarks(): void
+    {
+        $files = [
+            'openapi.yml' => file_get_contents(codecept_data_dir('api/invalid/openapi_v2_with_http_status_code_not_enclosed_in_quotation_marks.yml')),
+        ];
+
+        $this->prepareOpenApiSchema($files);
+    }
+
+    /**
+     * @return void
+     */
+    public function haveOpenApiV3FileWithHttpStatusCodeNotEnclosedInQuotationMarks(): void
+    {
+        $files = [
+            'openapi.yml' => file_get_contents(codecept_data_dir('api/invalid/openapi_v3_with_http_status_code_not_enclosed_in_quotation_marks.yml')),
+        ];
+
+        $this->prepareOpenApiSchema($files);
+    }
+
+    /**
      * @param array $files
      *
      * @return void
@@ -69,16 +94,40 @@ class OpenApiValidatorHelper extends Module
     protected function prepareOpenApiSchema(array $files): void
     {
         $this->getSyncApiHelper()->mockDirectoryStructure(
-            $this->buildStructureByPath($this->getOpenApiSchemaPath(), $files),
+            $this->buildStructureByPath($this->getOpenApiSchemaDirectory(), $files),
         );
     }
 
     /**
      * @return string
      */
-    public function getOpenApiSchemaPath(): string
+    public function getOpenApiSchemaDirectory(): string
     {
         return 'resources/api';
+    }
+
+    /**
+     * @return string
+     */
+    public function getOpenApiFilePath(): string
+    {
+        return sprintf('%s/%s/openapi.yml', $this->getSyncApiHelper()->getRootPath(), $this->getOpenApiSchemaDirectory());
+    }
+
+    /**
+     * @param int $statusCode
+     */
+    public function assertErrorStatusCode(int $statusCode): void
+    {
+        $this->assertSame(AbstractConsole::CODE_ERROR, $statusCode, 'Expected to get an error code but got a success code.');
+    }
+
+    /**
+     * @param int $statusCode
+     */
+    public function assertSuccessStatusCode(int $statusCode): void
+    {
+        $this->assertSame(AbstractConsole::CODE_SUCCESS, $statusCode, 'Expected to get a success code but got an error code.');
     }
 
     /**

@@ -13,7 +13,7 @@ servers:
       description: 'Internal development server'
 
 paths:
-    /apps:
+    /appsissisisisi:
         post:
             summary: 'Registers an App within the Registry service'
             requestBody:
@@ -24,19 +24,19 @@ paths:
                         schema:
                             $ref: '#/components/schemas/AppRegistrationApiRequest'
             responses:
-                201:
+                "201":
                     description: 'App is registered.'
                     content:
                         application/vnd.api+json:
                             schema:
                                 $ref: '#/components/schemas/AppRegistrationApiResponse'
-                400:
+                '400':
                     description: 'Invalid request.'
                     content:
                         application/vnd.api+json:
                             schema:
                                 $ref: '#/components/schemas/ApiErrorMessage'
-                500:
+                '500':
                     description: 'Server error'
                     content:
                         # servers may want to report the error directly as simple text if things go very wrong
@@ -67,13 +67,13 @@ paths:
                   schema:
                       type: string
             responses:
-                200:
+                '200':
                     description: 'Expected response to a valid request.'
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/AppCollectionApiResponse'
-                400:
+                '400':
                     description: 'Invalid request.'
                     content:
                         application/json:
@@ -110,20 +110,20 @@ paths:
                   schema:
                       type: string
             responses:
-                200:
+                '200':
                     description: 'Expected response to a valid request'
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/AppApiResponse'
 
-                400:
+                '400':
                     description: 'Invalid request.'
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ApiErrorMessage'
-                404:
+                '404':
                     description: 'Resource not found.'
                     content:
                         application/json:
@@ -156,16 +156,16 @@ paths:
                         schema:
                             $ref: '#/components/schemas/AppRegistrationApiRequest'
             responses:
-                204:
+                '204':
                     description: 'App is updated.'
-                404:
+                '404':
                     description: 'Resource not found.'
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ApiErrorMessage'
 
-                400:
+                '400':
                     description: 'Invalid request.'
                     content:
                         application/json:
@@ -188,13 +188,13 @@ paths:
                         schema:
                             $ref: '#/components/schemas/AppAddImageRequest'
             responses:
-                201:
+                '201':
                     description: 'Image is added.'
                     content:
                         application/vnd.api+json:
                             schema:
                                 $ref: '#/components/schemas/AppAddImageResponse'
-                400:
+                '400':
                     description: 'Invalid request.'
                     content:
                         application/vnd.api+json:
@@ -233,13 +233,13 @@ paths:
                       type: string
 
             responses:
-                200:
+                '200':
                     description: 'Expected response to a valid request.'
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/AppConnectionApiResponse'
-                400:
+                '400':
                     description: 'Invalid request.'
                     content:
                         application/json:
@@ -278,13 +278,13 @@ paths:
                       type: string
 
             responses:
-                200:
+                '200':
                     description: 'Expected response to a valid request.'
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/AppConnectionApiResponse'
-                400:
+                '400':
                     description: 'Invalid request.'
                     content:
                         application/json:
@@ -322,19 +322,19 @@ paths:
                   schema:
                       type: string
             responses:
-                200:
+                '200':
                     description: 'Expected response to a valid request.'
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/AppConfigurationApiResponse'
-                400:
+                '400':
                     description: 'Invalid request.'
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ApiErrorMessage'
-                404:
+                '404':
                     description: 'Resource not found.'
                     content:
                         application/json:
@@ -379,13 +379,13 @@ paths:
                         schema:
                             $ref: '#/components/schemas/AppConfigurationApiRequest'
             responses:
-                200:
+                '200':
                     description: 'Expected response to a valid request.'
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/AppConfigurationApiResponse'
-                400:
+                '400':
                     description: 'Invalid request.'
                     content:
                         application/json:

@@ -18,6 +18,7 @@ use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Validator\OpenApiValidator;
 use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiComponentsValidatorRule;
 use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiHttpMethodInPathValidatorRule;
+use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiHttpStatusCodeEnclosedInQuotationMarksValidatorRule;
 use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiPathValidatorRule;
 use SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface;
 
@@ -89,6 +90,7 @@ class SyncApiFactory
             $this->createOpenApiPathValidator(),
             $this->createOpenApiComponentsValidator(),
             $this->createOpenApiHttpMethodInPathValidator(),
+            $this->createOpenApiHttpStatusCodeEnclosedInQuotationMarksValidator(),
         ];
     }
 
@@ -114,6 +116,14 @@ class SyncApiFactory
     public function createOpenApiHttpMethodInPathValidator(): ValidatorRuleInterface
     {
         return new OpenApiHttpMethodInPathValidatorRule($this->createMessageBuilder());
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface
+     */
+    public function createOpenApiHttpStatusCodeEnclosedInQuotationMarksValidator(): ValidatorRuleInterface
+    {
+        return new OpenApiHttpStatusCodeEnclosedInQuotationMarksValidatorRule($this->createMessageBuilder());
     }
 
     /**

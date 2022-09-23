@@ -40,10 +40,10 @@ class OpenApiValidateConsoleTest extends Unit
         // Act
         $commandTester->execute([
             '--' . OpenApiValidateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
-        ]);
+        ], ['verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE]);
 
         // Assert
-        $this->assertSame(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
+        $this->tester->assertSuccessStatusCode($commandTester->getStatusCode());
     }
 
     /**
@@ -60,7 +60,7 @@ class OpenApiValidateConsoleTest extends Unit
         ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
 
         // Assert
-        $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
+        $this->tester->assertErrorStatusCode($commandTester->getStatusCode());
         $this->assertNotEmpty($commandTester->getDisplay());
     }
 
@@ -79,7 +79,7 @@ class OpenApiValidateConsoleTest extends Unit
         ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
 
         // Assert
-        $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
+        $this->tester->assertErrorStatusCode($commandTester->getStatusCode());
         $this->assertStringContainsString(SyncApiError::couldNotParseOpenApi('vfs://root/resources/api/openapi.yml'), $commandTester->getDisplay());
     }
 
@@ -98,10 +98,10 @@ class OpenApiValidateConsoleTest extends Unit
         ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
 
         // Assert
-        $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
+        $this->tester->assertErrorStatusCode($commandTester->getStatusCode());
         $this->assertStringContainsString(
             SyncApiError::openApiDoesNotDefineAnyPath(
-                sprintf('%s/%s/openapi.yml', $this->tester->getRootPath(), $this->tester->getOpenApiSchemaPath()),
+                sprintf('%s/%s/openapi.yml', $this->tester->getRootPath(), $this->tester->getOpenApiSchemaDirectory()),
             ),
             $commandTester->getDisplay(),
         );
@@ -122,10 +122,10 @@ class OpenApiValidateConsoleTest extends Unit
         ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
 
         // Assert
-        $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
+        $this->tester->assertErrorStatusCode($commandTester->getStatusCode());
         $this->assertStringContainsString(
             SyncApiError::openApiDoesNotDefineAnyComponents(
-                sprintf('%s/%s/openapi.yml', $this->tester->getRootPath(), $this->tester->getOpenApiSchemaPath()),
+                $this->tester->getOpenApiFilePath(),
             ),
             $commandTester->getDisplay(),
         );
@@ -146,7 +146,49 @@ class OpenApiValidateConsoleTest extends Unit
         ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
 
         // Assert
-        $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
+        $this->tester->assertErrorStatusCode($commandTester->getStatusCode());
         $this->assertStringContainsString(SyncApiError::openApiContainsInvalidHttpMethodForPath('bar', '/foo'), $commandTester->getDisplay());
+    }
+
+    /**
+     * Since Open API specification v3 status codes must be enclosed in quotation marks for v2 it is allowed to not enclose.
+     *
+     * @return void
+     */
+    public function testValidateOpenApiV2ReturnsSuccessCodeWhenHttpStatusCodeIsNotEnclosedInQuotationMarks(): void
+    {
+        // Arrange
+        $this->tester->haveOpenApiV2FileWithHttpStatusCodeNotEnclosedInQuotationMarks();
+        $commandTester = $this->tester->getConsoleTester(OpenApiValidateConsole::class);
+
+        // Act
+        $commandTester->execute([
+            '--' . OpenApiValidateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
+        ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
+
+        // Assert
+        $this->tester->assertSuccessStatusCode($commandTester->getStatusCode());
+        $this->assertStringNotContainsString(SyncApiError::openApiHttpStatusCodeIsNotEnclosedInQuotationMarks('/wrong-status-code-definition', '200', 'post', $this->tester->getOpenApiFilePath()), $commandTester->getDisplay());
+    }
+
+    /**
+     * Since Open API specification v3 status codes must be enclosed in quotation marks.
+     *
+     * @return void
+     */
+    public function testValidateOpenApiV3ReturnsErrorCodeAndPrintsErrorMessagesWhenHttpStatusCodeIsNotEnclosedInQuotationMarks(): void
+    {
+        // Arrange
+        $this->tester->haveOpenApiV3FileWithHttpStatusCodeNotEnclosedInQuotationMarks();
+        $commandTester = $this->tester->getConsoleTester(OpenApiValidateConsole::class);
+
+        // Act
+        $commandTester->execute([
+            '--' . OpenApiValidateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
+        ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
+
+        // Assert
+        $this->tester->assertErrorStatusCode($commandTester->getStatusCode());
+        $this->assertStringContainsString(SyncApiError::openApiHttpStatusCodeIsNotEnclosedInQuotationMarks('/wrong-status-code-definition', '200', 'post', $this->tester->getOpenApiFilePath()), $commandTester->getDisplay());
     }
 }
