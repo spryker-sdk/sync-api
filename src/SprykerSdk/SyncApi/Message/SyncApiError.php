@@ -131,6 +131,24 @@ class SyncApiError
     }
 
     /**
+     * @param string $serverUrl
+     * @param string $path
+     *
+     * @return string
+     */
+    public static function openApiServerUrlMustNotHaveATrailingASlash(string $serverUrl, string $path): string
+    {
+        return static::format(
+            sprintf(
+                '%s: The Server URL "%s" in your "%s" schema file must not be suffixed with a slash.',
+                static::SCHEMA_VALIDATION_ERROR_PREFIX,
+                $serverUrl,
+                $path,
+            ),
+        );
+    }
+
+    /**
      * @param string $resource
      * @param string $path
      *

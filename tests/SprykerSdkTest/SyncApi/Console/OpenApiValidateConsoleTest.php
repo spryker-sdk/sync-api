@@ -212,4 +212,25 @@ class OpenApiValidateConsoleTest extends Unit
         $this->assertStringContainsString(SyncApiError::openApiPathMustNotBeEnclosedInQuotationMarks('/', $this->tester->getOpenApiFilePath()), $commandTester->getDisplay());
         $this->assertStringContainsString(SyncApiError::openApiPathMustNotBeEnclosedInQuotationMarks('/apps/{appId}', $this->tester->getOpenApiFilePath()), $commandTester->getDisplay());
     }
+
+    /**
+     * @return void
+     */
+    public function testValidateOpenApiReturnsErrorCodeAndPrintsErrorMessagesWhenServerUrlHasATrailingSlash(): void
+    {
+        // Arrange
+        $this->tester->haveInvalidOpenApiFile();
+        $commandTester = $this->tester->getConsoleTester(OpenApiValidateConsole::class);
+
+        // Act
+        $commandTester->execute([
+            '--' . OpenApiValidateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
+        ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
+
+        // Assert
+        $this->tester->assertErrorStatusCode($commandTester->getStatusCode());
+        $this->assertStringContainsString(SyncApiError::openApiServerUrlMustNotHaveATrailingASlash('https://glue.trs.demo-spryker.com/', $this->tester->getOpenApiFilePath()), $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiError::openApiServerUrlMustNotHaveATrailingASlash('https://glue.trs-staging.demo-spryker.com/', $this->tester->getOpenApiFilePath()), $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiError::openApiServerUrlMustNotHaveATrailingASlash('http://glue.registry.spryker.local/', $this->tester->getOpenApiFilePath()), $commandTester->getDisplay());
+    }
 }
