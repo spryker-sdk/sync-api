@@ -118,6 +118,24 @@ class SyncApiError
      *
      * @return string
      */
+    public static function openApiPathMustNotBeEnclosedInQuotationMarks(string $resource, string $path): string
+    {
+        return static::format(
+            sprintf(
+                '%s: The resource "%s" in your "%s" schema file must not be enclosed in quotations marks.',
+                static::SCHEMA_VALIDATION_ERROR_PREFIX,
+                $resource,
+                $path,
+            ),
+        );
+    }
+
+    /**
+     * @param string $resource
+     * @param string $path
+     *
+     * @return string
+     */
     public static function canNotHandleResourcesWithPlaceholder(string $resource, string $path): string
     {
         return static::format(

@@ -190,5 +190,26 @@ class OpenApiValidateConsoleTest extends Unit
         // Assert
         $this->tester->assertErrorStatusCode($commandTester->getStatusCode());
         $this->assertStringContainsString(SyncApiError::openApiHttpStatusCodeIsNotEnclosedInQuotationMarks('/wrong-status-code-definition', '200', 'post', $this->tester->getOpenApiFilePath()), $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiError::openApiHttpStatusCodeIsNotEnclosedInQuotationMarks('/wrong-status-code-definition-2', '300', 'post', $this->tester->getOpenApiFilePath()), $commandTester->getDisplay());
+    }
+
+    /**
+     * @return void
+     */
+    public function testValidateOpenApiReturnsErrorCodeAndPrintsErrorMessagesWhenPathsEnclosedInQuotationMarks(): void
+    {
+        // Arrange
+        $this->tester->haveInvalidOpenApiFile();
+        $commandTester = $this->tester->getConsoleTester(OpenApiValidateConsole::class);
+
+        // Act
+        $commandTester->execute([
+            '--' . OpenApiValidateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
+        ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
+
+        // Assert
+        $this->tester->assertErrorStatusCode($commandTester->getStatusCode());
+        $this->assertStringContainsString(SyncApiError::openApiPathMustNotBeEnclosedInQuotationMarks('/', $this->tester->getOpenApiFilePath()), $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiError::openApiPathMustNotBeEnclosedInQuotationMarks('/apps/{appId}', $this->tester->getOpenApiFilePath()), $commandTester->getDisplay());
     }
 }

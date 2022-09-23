@@ -58,10 +58,39 @@ class OpenApiPathValidatorRule implements ValidatorRuleInterface
         string $openApiFileName,
         ValidateResponseTransfer $validateResponseTransfer
     ): ValidateResponseTransfer {
-        if (!isset($openApi['paths'])) {
-            $validateResponseTransfer->addError(
-                $this->messageBuilder->buildMessage(SyncApiError::openApiDoesNotDefineAnyPath($openApiFileName)),
-            );
+        if (isset($openApi['paths'])) {
+            return $this->validatePathsAreNotEnclosedInQuotationMarks($openApi['paths'], $openApiFileName, $validateResponseTransfer);
+        }
+
+        $validateResponseTransfer->addError(
+            $this->messageBuilder->buildMessage(SyncApiError::openApiDoesNotDefineAnyPath($openApiFileName)),
+        );
+
+        return $validateResponseTransfer;
+    }
+
+    /**
+     * @param array $paths
+     * @param string $openApiFileName
+     * @param \Transfer\ValidateResponseTransfer $validateResponseTransfer
+     *
+     * @return \Transfer\ValidateResponseTransfer
+     */
+    protected function validatePathsAreNotEnclosedInQuotationMarks(
+        array $paths,
+        string $openApiFileName,
+        ValidateResponseTransfer $validateResponseTransfer
+    ): ValidateResponseTransfer {
+        $fileContent = file_get_contents($openApiFileName);
+
+        foreach ($paths as $path => $pathDefinition) {
+            $pattern = sprintf('@(\'|")%s(\'|")@', $path);
+
+            if (preg_match($pattern, $fileContent)) {
+                $validateResponseTransfer->addError(
+                    $this->messageBuilder->buildMessage(SyncApiError::openApiPathMustNotBeEnclosedInQuotationMarks($path, $openApiFileName)),
+                );
+            }
         }
 
         return $validateResponseTransfer;

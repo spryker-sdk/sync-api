@@ -7,8 +7,15 @@ info:
 paths:
     /wrong-status-code-definition:
         post:
+            description: FooBar
             responses:
                 200:
+    /wrong-status-code-definition-2:
+        post:
+            description: FooBar
+            responses:
+                300:
+                default:
 
 components:
     foo:

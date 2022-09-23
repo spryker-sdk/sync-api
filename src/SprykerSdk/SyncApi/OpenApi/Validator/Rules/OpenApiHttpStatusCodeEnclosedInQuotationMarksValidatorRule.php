@@ -128,11 +128,15 @@ class OpenApiHttpStatusCodeEnclosedInQuotationMarksValidatorRule implements Vali
         ValidateResponseTransfer $validateResponseTransfer
     ): ValidateResponseTransfer {
         foreach ($methodDefinition['responses'] as $httpStatusCode => $responseDefinition) {
+            if (!is_numeric($httpStatusCode)) {
+                continue;
+            }
             // PHP converts numeric strings into an int when using it as array key.
             // Because of that, we can not use the parsed file to ensure that status codes enclosed in quotation
             // marks. The pattern is used to clearly identify the exact position where status codes are not in
             // quotation marks.
-            $pattern = sprintf('@%s:(\s*)%s:(\s*)responses:(\s*)[0-9]{3}:@', $path, $httpMethod);
+//            $pattern = sprintf('@%s:(\s*)%s:(\s*)responses:(\s*)[0-9]{3}:@U', $path, $httpMethod);
+            $pattern = sprintf('@%s:([\s\S]*)%s:([\s\S]*)%s:@U', $path, $httpMethod, $httpStatusCode);
 
             if (preg_match($pattern, $fileContent)) {
                 $validateResponseTransfer->addError($this->messageBuilder->buildMessage(SyncApiError::openApiHttpStatusCodeIsNotEnclosedInQuotationMarks($path, $httpStatusCode, $httpMethod, $openApiFileName)));

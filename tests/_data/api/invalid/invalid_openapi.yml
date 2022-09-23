@@ -13,7 +13,7 @@ servers:
       description: 'Internal development server'
 
 paths:
-    /:
+    "/":
         post:
             summary: 'Registers an App within the Registry service'
             requestBody:
@@ -77,7 +77,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ApiErrorMessage'
-    /apps/{appId}:
+    '/apps/{appId}':
         get:
             summary: 'Expose the details of a single app.'
             parameters:
