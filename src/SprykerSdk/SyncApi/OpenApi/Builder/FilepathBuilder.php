@@ -2,8 +2,6 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Builder;
 
-use Codeception\Lib\Di;
-
 class FilepathBuilder implements FilepathBuilderInterface
 {
     /**
@@ -23,14 +21,10 @@ class FilepathBuilder implements FilepathBuilderInterface
 
     /**
      * @param string $projectRootDirPath
-     * @param string $syncApiDirPath
      */
-    public function __construct(
-        string $projectRootDirPath,
-        string $syncApiDirPath
-    ) {
+    public function __construct(string $projectRootDirPath)
+    {
         $this->projectRootDirPath = $projectRootDirPath;
-        $this->syncApiDirPath = $syncApiDirPath;
     }
 
     /**
@@ -45,9 +39,7 @@ class FilepathBuilder implements FilepathBuilderInterface
             $rootDirectoryPath = $this->projectRootDirPath;
         }
 
-        return rtrim($rootDirectoryPath, DIRECTORY_SEPARATOR)
-            . '/' . $this->syncApiDirPath
-            . '/' . $this->prepareFilename($filename);
+        return rtrim($rootDirectoryPath, DIRECTORY_SEPARATOR) . '/' . $this->prepareFilename($filename);
     }
 
 

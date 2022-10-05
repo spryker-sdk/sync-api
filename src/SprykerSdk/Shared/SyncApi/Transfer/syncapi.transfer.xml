@@ -16,4 +16,53 @@
         <property name="modifyData" type="array"/>
     </transfer>
 
+    <transfer name="OpenApiDocument">
+        <property name="version" type="string"/>
+        <property name="info" type="OpenApiDocumentInfo"/>
+        <property name="servers" type="OpenApiDocumentServer[]" singular="server"/>
+        <property name="paths" type="OpenApiDocumentPath[]" singular="path"/>
+        <property name="components" type="OpenApiDocumentComponent[]" singular="component"/>
+    </transfer>
+
+    <transfer name="OpenApiDocumentInfo">
+        <!-- this is a simplified version for the first release -->
+        <property name="contents" type="array"/>
+    </transfer>
+
+    <transfer name="OpenApiDocumentServer">
+        <property name="url" type="string"/>
+        <property name="description" type="string"/>
+    </transfer>
+
+    <transfer name="OpenApiDocumentPath">
+        <!-- this is a simplified version for the first release -->
+        <property name="id" type="uuid"/>
+        <property name="uri" type="string"/>
+        <property name="httpProtocol" type="string"/>
+        <property name="contents" type="array"/>
+        <property name="refs" type="OpenApiDocumentRef[]" singular="ref"/>
+    </transfer>
+
+    <transfer name="OpenApiDocumentComponent">
+        <property name="schemas" type="OpenApiDocumentSchema[]" singular="schema"/>
+        <property name="parameters" type="OpenApiDocumentParameter[]" singular="parameter"/>
+    </transfer>
+
+    <transfer name="OpenApiDocumentSchema">
+        <!-- this is a simplified version for the first release -->
+        <property name="name" type="string"/>
+        <property name="contents" type="array"/>
+    </transfer>
+
+    <transfer name="OpenApiDocumentParameter">
+        <!-- this is a simplified version for the first release -->
+        <property name="name" type="string"/>
+        <property name="contents" type="array"/>
+    </transfer>
+
+    <transfer name="OpenApiDocumentRef">
+        <property name="contentPath" type="string"/>
+        <property name="pathIds" type="array"/>
+    </transfer>
+
 </transfers>
