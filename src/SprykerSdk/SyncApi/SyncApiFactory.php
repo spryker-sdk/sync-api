@@ -11,6 +11,24 @@ use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
 use SprykerSdk\SyncApi\Message\MessageBuilder;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\ComponentsBuilder;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\ComponentsBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\DocumentBuilder;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\DocumentBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\InfoBuilder;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\InfoBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\ParameterBuilder;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\ParameterBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathsBuilder;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathsBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriBuilder;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriProtocolsBuilder;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriProtocolsBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\SchemaBuilder;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\SchemaBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\ServersBuilder;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\ServersBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilder;
@@ -197,5 +215,87 @@ class SyncApiFactory
             $this->createSyncApiUpdateDataModifier(),
             $this->getConfig()->getDefaultAbsolutePathToOpenApiFile()
         );
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\DocumentBuilderInterface
+     */
+    public function createOpenApiDocumentBuilder(): DocumentBuilderInterface
+    {
+        return new DocumentBuilder(
+            $this->createOpenApiDocumentInfoBuilder(),
+            $this->createOpenApiDocumentServersBuilder(),
+            $this->createOpenApiDocumentPathsBuilder(),
+            $this->createOpenApiDocumentComponentsBuilder(),
+        );
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\InfoBuilderInterface
+     */
+    public function createOpenApiDocumentInfoBuilder(): InfoBuilderInterface
+    {
+        return new InfoBuilder();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\ServersBuilderInterface
+     */
+    public function createOpenApiDocumentServersBuilder(): ServersBuilderInterface
+    {
+        return new ServersBuilder();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\PathsBuilderInterface
+     */
+    public function createOpenApiDocumentPathsBuilder(): PathsBuilderInterface
+    {
+        return new PathsBuilder($this->createOpenApiDocumentPathUriBuilder());
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\ComponentsBuilderInterface
+     */
+    public function createOpenApiDocumentComponentsBuilder(): ComponentsBuilderInterface
+    {
+        return new ComponentsBuilder(
+            $this->createOpenApiDocumentParameterBuilder(),
+            $this->createOpenApiDocumentSchemaBuilder(),
+        );
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriBuilderInterface
+     */
+    public function createOpenApiDocumentPathUriBuilder(): PathUriBuilderInterface
+    {
+        return new PathUriBuilder(
+            $this->createOpenApiDocumentPathUriProtocolBuilder(),
+        );
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\ParameterBuilderInterface
+     */
+    public function createOpenApiDocumentParameterBuilder(): ParameterBuilderInterface
+    {
+        return new ParameterBuilder();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\SchemaBuilderInterface
+     */
+    public function createOpenApiDocumentSchemaBuilder(): SchemaBuilderInterface
+    {
+        return new SchemaBuilder();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriProtocolsBuilderInterface
+     */
+    public function createOpenApiDocumentPathUriProtocolBuilder(): PathUriProtocolsBuilderInterface
+    {
+        return new PathUriProtocolsBuilder();
     }
 }

@@ -20,8 +20,8 @@
         <property name="version" type="string"/>
         <property name="info" type="OpenApiDocumentInfo"/>
         <property name="servers" type="OpenApiDocumentServer[]" singular="server"/>
-        <property name="paths" type="OpenApiDocumentPath[]" singular="path"/>
-        <property name="components" type="OpenApiDocumentComponent[]" singular="component"/>
+        <property name="paths" type="OpenApiDocumentPaths"/>
+        <property name="components" type="OpenApiDocumentComponents"/>
     </transfer>
 
     <transfer name="OpenApiDocumentInfo">
@@ -34,16 +34,28 @@
         <property name="description" type="string"/>
     </transfer>
 
-    <transfer name="OpenApiDocumentPath">
-        <!-- this is a simplified version for the first release -->
-        <property name="id" type="uuid"/>
+    <transfer name="OpenApiDocumentPaths">
+        <property name="pathUris" type="OpenApiDocumentPathUri[]" singular="pathUri"/>
+    </transfer>
+
+    <transfer name="OpenApiDocumentPathUri">
         <property name="uri" type="string"/>
-        <property name="httpProtocol" type="string"/>
+        <property name="protocols" type="OpenApiDocumentPathUriProtocol[]" singular="protocol"/>
+    </transfer>
+
+    <transfer name="OpenApiDocumentPathUriProtocol">
+        <property name="protocol" type="string"/>
+        <property name="contents" type="OpenApiDocumentPathContents"/>
+    </transfer>
+
+    <transfer name="OpenApiDocumentPathContents">
+        <!-- this is a simplified version for the first release -->
+        <property name="id" type="string"/>
         <property name="contents" type="array"/>
         <property name="refs" type="OpenApiDocumentRef[]" singular="ref"/>
     </transfer>
 
-    <transfer name="OpenApiDocumentComponent">
+    <transfer name="OpenApiDocumentComponents">
         <property name="schemas" type="OpenApiDocumentSchema[]" singular="schema"/>
         <property name="parameters" type="OpenApiDocumentParameter[]" singular="parameter"/>
     </transfer>
@@ -61,6 +73,7 @@
     </transfer>
 
     <transfer name="OpenApiDocumentRef">
+        <!-- this is a simplified version for the first release -->
         <property name="contentPath" type="string"/>
         <property name="pathIds" type="array"/>
     </transfer>
