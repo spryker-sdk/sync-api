@@ -10,6 +10,16 @@ namespace SprykerSdk\SyncApi;
 class SyncApiConfig
 {
     /**
+     * @var array<string>
+     */
+    protected const FIELDS_MERGE_STRATEGY_MAP = [
+        'version' => 'replaceRecursive',
+        'info' => 'replaceRecursive',
+        'servers' => 'serversMerge',
+        'paths' => 'pathMerge',
+    ];
+
+    /**
      * @api
      *
      * @return string
@@ -84,5 +94,13 @@ class SyncApiConfig
         ];
 
         return implode(DIRECTORY_SEPARATOR, $pathFragments);
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getFieldsMergeStrategyMap(): array
+    {
+        return static::FIELDS_MERGE_STRATEGY_MAP;
     }
 }

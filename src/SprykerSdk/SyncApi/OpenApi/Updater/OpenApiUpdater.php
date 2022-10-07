@@ -2,7 +2,7 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Updater;
 
-use Generated\Shared\Transfer\OpenApiDataModifierContainerTransfer;
+use Generated\Shared\Transfer\OpenApiDocumentTransfer;
 use Generated\Shared\Transfer\UpdateOpenApiRequestTransfer;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface;
@@ -53,6 +53,11 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
     protected $openApiTemplateFilepath;
 
     /**
+     * @var string
+     */
+    protected $documentBuilder;
+
+    /**
      * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
      * @param \SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface $filepathBuilder
      * @param \SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocDecoderInterface $openApiDocDecoder
@@ -87,14 +92,14 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
     public function updateOpenApi(UpdateOpenApiRequestTransfer $updateOpenApiRequestTransfer): OpenApiResponseTransfer
     {
         try {
-            $formattedOpenApiDoc = $this->openApiDocDecoder->decode($updateOpenApiRequestTransfer->getOpenApiDoc());
+            $sourceOpenApiContents = $this->openApiDocDecoder->decode($updateOpenApiRequestTransfer->getOpenApiDoc());
         } catch (\Throwable $throwable) {
             return (new OpenApiResponseTransfer())
                 ->addError($this->messageBuilder->buildMessage($throwable->getMessage()));
         }
 
         if ($updateOpenApiRequestTransfer->getIsValidate()) {
-            $validatorResponse = $this->validateOpenApiDoc(Yaml::dump($formattedOpenApiDoc));
+            $validatorResponse = $this->validateOpenApiDoc(Yaml::dump($sourceOpenApiContents));
             if ($validatorResponse->getErrors()->count() > 0) {
                 return (new OpenApiResponseTransfer())->setErrors($validatorResponse->getErrors());
             }
@@ -113,9 +118,13 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
             );
         }
 
-        $targetOpenApiFileContents = $this->dataModify(
-            $targetOpenApiFileContents,
-            $formattedOpenApiDoc
+        $targetOpenApiDocument = $this->documentBuilder->build($targetOpenApiFileContents);
+        $sourceOpenApiDocument = $this->documentBuilder->build($sourceOpenApiContents);
+
+
+        $targetOpenApiFileContents = $this->merge(
+            $targetOpenApiDocument,
+            $sourceOpenApiDocument
         );
 
         $this->openApiFileManager->saveOpenApiFileFromArray($syncApiTargetFilepath, $targetOpenApiFileContents);
@@ -144,21 +153,15 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
     }
 
     /**
-     * @param array $targetOpenApiFileContents
-     * @param array $formattedOpenApiDoc
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocument
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $sourceOpenApiDocument
      *
      * @return array
      */
-    protected function dataModify(
-        array $targetOpenApiFileContents,
-        array $formattedOpenApiDoc
+    protected function merge(
+        OpenApiDocumentTransfer $targetOpenApiDocument,
+        OpenApiDocumentTransfer $sourceOpenApiDocument
     ): array {
-        $openApiDataModifierContainerTransfer = (new OpenApiDataModifierContainerTransfer())
-            ->setTargetData($targetOpenApiFileContents)
-            ->setModifyData($formattedOpenApiDoc);
-
-        return $this->dataModifierHandler
-            ->handle($openApiDataModifierContainerTransfer)
-            ->getTargetData();
+        foreach ($sourceOpenApiDocument as $field)
     }
 }

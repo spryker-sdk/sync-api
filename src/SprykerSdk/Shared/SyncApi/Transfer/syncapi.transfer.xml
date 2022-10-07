@@ -46,13 +46,7 @@
     <transfer name="OpenApiDocumentPathUriProtocol">
         <property name="protocol" type="string"/>
         <property name="contents" type="OpenApiDocumentPathContents"/>
-    </transfer>
-
-    <transfer name="OpenApiDocumentPathContents">
-        <!-- this is a simplified version for the first release -->
-        <property name="id" type="string"/>
-        <property name="contents" type="array"/>
-        <property name="refs" type="OpenApiDocumentRef[]" singular="ref"/>
+        <property name="refs" type="string[]" singular="ref"/>
     </transfer>
 
     <transfer name="OpenApiDocumentComponents">
@@ -64,18 +58,13 @@
         <!-- this is a simplified version for the first release -->
         <property name="name" type="string"/>
         <property name="contents" type="array"/>
+        <property name="refs" type="string[]" singular="ref"/>
     </transfer>
 
     <transfer name="OpenApiDocumentParameter">
         <!-- this is a simplified version for the first release -->
         <property name="name" type="string"/>
         <property name="contents" type="array"/>
-    </transfer>
-
-    <transfer name="OpenApiDocumentRef">
-        <!-- this is a simplified version for the first release -->
-        <property name="contentPath" type="string"/>
-        <property name="pathIds" type="array"/>
     </transfer>
 
 </transfers>

@@ -7,6 +7,19 @@ use Generated\Shared\Transfer\OpenApiDocumentPathUriProtocolTransfer;
 class PathUriProtocolsBuilder implements PathUriProtocolsBuilderInterface
 {
     /**
+     * @var \SprykerSdk\SyncApi\OpenApi\Builder\Document\RefsFinderInterface
+     */
+    protected $refsFinder;
+
+    /**
+     * @param \SprykerSdk\SyncApi\OpenApi\Builder\Document\RefsFinderInterface $refsFinder
+     */
+    public function __construct(RefsFinderInterface $refsFinder)
+    {
+        $this->refsFinder = $refsFinder;
+    }
+
+    /**
      * @param array $pathUriProtocolArray
      *
      * @return array<\Generated\Shared\Transfer\OpenApiDocumentPathUriProtocolTransfer>
@@ -18,7 +31,8 @@ class PathUriProtocolsBuilder implements PathUriProtocolsBuilderInterface
         foreach ($pathUriProtocolArray as $protocol => $contents) {
             $pathUriProtocolTransfers[] = (new OpenApiDocumentPathUriProtocolTransfer())
                 ->setProtocol($protocol)
-                ->setContents($contents);
+                ->setContents($contents)
+                ->setRefs($this->refsFinder->findRefs($contents));
         }
 
         return $pathUriProtocolTransfers;

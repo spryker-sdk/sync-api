@@ -25,6 +25,8 @@ use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriProtocolsBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriProtocolsBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\RefsFinder;
+use SprykerSdk\SyncApi\OpenApi\Builder\Document\RefsFinderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\Document\SchemaBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\Document\SchemaBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\Document\ServersBuilder;
@@ -288,7 +290,7 @@ class SyncApiFactory
      */
     public function createOpenApiDocumentSchemaBuilder(): SchemaBuilderInterface
     {
-        return new SchemaBuilder();
+        return new SchemaBuilder($this->createRefsFinder());
     }
 
     /**
@@ -296,6 +298,14 @@ class SyncApiFactory
      */
     public function createOpenApiDocumentPathUriProtocolBuilder(): PathUriProtocolsBuilderInterface
     {
-        return new PathUriProtocolsBuilder();
+        return new PathUriProtocolsBuilder($this->createRefsFinder());
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\RefsFinderInterface
+     */
+    public function createRefsFinder(): RefsFinderInterface
+    {
+        return new RefsFinder();
     }
 }
