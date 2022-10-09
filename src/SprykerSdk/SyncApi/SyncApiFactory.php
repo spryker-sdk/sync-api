@@ -9,6 +9,7 @@ namespace SprykerSdk\SyncApi;
 
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
+use parallel\Sync;
 use SprykerSdk\SyncApi\Message\MessageBuilder;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\Document\ComponentsBuilder;
@@ -37,6 +38,12 @@ use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Converter\ComponentsToArrayConverter;
+use SprykerSdk\SyncApi\OpenApi\Converter\ComponentsToArrayConverterInterface;
+use SprykerSdk\SyncApi\OpenApi\Converter\OpenApiDocumentToArrayConverter;
+use SprykerSdk\SyncApi\OpenApi\Converter\OpenApiDocumentToArrayConverterInterface;
+use SprykerSdk\SyncApi\OpenApi\Converter\PathsToArrayConverter;
+use SprykerSdk\SyncApi\OpenApi\Converter\PathsToArrayConverterInterface;
 use SprykerSdk\SyncApi\OpenApi\DataModifier\DataModifierHandlerInterface;
 use SprykerSdk\SyncApi\OpenApi\DataModifier\DataSimpleRecursiveReplacer;
 use SprykerSdk\SyncApi\OpenApi\DataModifier\SyncApiHeaderSetter;
@@ -44,6 +51,11 @@ use SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocDecoderInterface;
 use SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocJsonDecoder;
 use SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManager;
 use SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManagerInterface;
+use SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface;
+use SprykerSdk\SyncApi\OpenApi\Merge\Strategy\PathsMergerStrategy;
+use SprykerSdk\SyncApi\OpenApi\Merge\Strategy\ReplaceRecursiveMergeStrategy;
+use SprykerSdk\SyncApi\OpenApi\Merge\Strategy\ReplaceStrategy;
+use SprykerSdk\SyncApi\OpenApi\Merge\Strategy\ServersMergeStrategy;
 use SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdater;
 use SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdaterInterface;
 use SprykerSdk\SyncApi\OpenApi\Validator\OpenApiValidator;
@@ -307,5 +319,77 @@ class SyncApiFactory
     public function createRefsFinder(): RefsFinderInterface
     {
         return new RefsFinder();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface
+     */
+    public function createReplaceStrategy(): MergeStrategyInterface
+    {
+        return new ReplaceStrategy();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface
+     */
+    public function createReplaceRecursiveMergeStrategy(): MergeStrategyInterface
+    {
+        return new ReplaceRecursiveMergeStrategy();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface
+     */
+    public function createServersMergeStrategy(): MergeStrategyInterface
+    {
+        return new ServersMergeStrategy();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface
+     */
+    public function createPathMergeStrategy(): MergeStrategyInterface
+    {
+        return new PathsMergerStrategy();
+    }
+
+    /**
+     * @return array<string, MergeStrategyInterface>
+     */
+    public function getMergeStrategyCollection(): array
+    {
+        return [
+            SyncApiConfig::STRATEGY_REPLACE => $this->createReplaceStrategy(),
+            SyncApiConfig::STRATEGY_REPLACE_RECURSIVE => $this->createReplaceRecursiveMergeStrategy(),
+            SyncApiConfig::STRATEGY_SERVERS_MERGE => $this->createServersMergeStrategy(),
+            SyncApiConfig::STRATEGY_PATHS_MERGE => $this->createPathMergeStrategy(),
+        ];
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Converter\OpenApiDocumentToArrayConverterInterface
+     */
+    public function createOpenApiDocumentToArrayConverter(): OpenApiDocumentToArrayConverterInterface
+    {
+        return new OpenApiDocumentToArrayConverter(
+            $this->createOpenApiDocumentPathsToArrayConverter(),
+            $this->createOpenApiDocumentComponentsToArrayConverter(),
+        );
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Converter\PathsToArrayConverterInterface
+     */
+    public function createOpenApiDocumentPathsToArrayConverter(): PathsToArrayConverterInterface
+    {
+        return new PathsToArrayConverter();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Converter\ComponentsToArrayConverterInterface
+     */
+    public function createOpenApiDocumentComponentsToArrayConverter(): ComponentsToArrayConverterInterface
+    {
+        return new ComponentsToArrayConverter();
     }
 }

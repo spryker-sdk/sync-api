@@ -6,9 +6,12 @@ use Generated\Shared\Transfer\OpenApiDocumentTransfer;
 use Generated\Shared\Transfer\UpdateOpenApiRequestTransfer;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Converter\OpenApiDocumentToArrayConverterInterface;
 use SprykerSdk\SyncApi\OpenApi\DataModifier\DataModifierHandlerInterface;
 use SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocDecoderInterface;
 use SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManagerInterface;
+use SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface;
+use SprykerSdk\SyncApi\SyncApiConfig;
 use SprykerSdk\SyncApi\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
 use Transfer\OpenApiResponseTransfer;
@@ -53,9 +56,24 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
     protected $openApiTemplateFilepath;
 
     /**
-     * @var string
+     * @var \SprykerSdk\SyncApi\OpenApi\Builder\Document\DocumentBuilderInterface
      */
     protected $documentBuilder;
+
+    /**
+     * @var \SprykerSdk\SyncApi\SyncApiConfig
+     */
+    protected $syncApiConfig;
+
+    /**
+     * @var array<\SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface>
+     */
+    protected $mergeStrategies = [];
+
+    /**
+     * @var \SprykerSdk\SyncApi\OpenApi\Converter\OpenApiDocumentToArrayConverterInterface
+     */
+    protected $openApiDocumentToArrayConverter;
 
     /**
      * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
@@ -64,6 +82,9 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
      * @param \SprykerSdk\SyncApi\Validator\ValidatorInterface $validator
      * @param \SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManagerInterface $openApiFileManager
      * @param \SprykerSdk\SyncApi\OpenApi\DataModifier\DataModifierHandlerInterface $dataModifierHandler
+     * @param \SprykerSdk\SyncApi\SyncApiConfig $syncApiConfig
+     * @param \SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface $mergeStrategies
+     * @param \SprykerSdk\SyncApi\OpenApi\Converter\OpenApiDocumentToArrayConverterInterface $openApiDocumentToArrayConverter
      * @param string $openApiTemplateFilepath
      */
     public function __construct(
@@ -73,6 +94,9 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
         ValidatorInterface $validator,
         OpenApiFileManagerInterface $openApiFileManager,
         DataModifierHandlerInterface $dataModifierHandler,
+        SyncApiConfig $syncApiConfig,
+        MergeStrategyInterface $mergeStrategies,
+        OpenApiDocumentToArrayConverterInterface $openApiDocumentToArrayConverter,
         string $openApiTemplateFilepath
     ) {
         $this->messageBuilder = $messageBuilder;
@@ -81,7 +105,10 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
         $this->validator = $validator;
         $this->openApiFileManager = $openApiFileManager;
         $this->dataModifierHandler = $dataModifierHandler;
+        $this->syncApiConfig = $syncApiConfig;
+        $this->mergeStrategies = $mergeStrategies;
         $this->openApiTemplateFilepath = $openApiTemplateFilepath;
+        $this->openApiDocumentToArrayConverter = $openApiDocumentToArrayConverter;
     }
 
     /**
@@ -118,14 +145,15 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
             );
         }
 
-        $targetOpenApiDocument = $this->documentBuilder->build($targetOpenApiFileContents);
-        $sourceOpenApiDocument = $this->documentBuilder->build($sourceOpenApiContents);
+        $targetOpenApiDocument = $this->documentBuilder->buildOpenApiDocumentFromArray($targetOpenApiFileContents);
+        $sourceOpenApiDocument = $this->documentBuilder->buildOpenApiDocumentFromArray($sourceOpenApiContents);
 
-
-        $targetOpenApiFileContents = $this->merge(
+        $targetOpenApiDocument = $this->merge(
             $targetOpenApiDocument,
             $sourceOpenApiDocument
         );
+
+        $targetOpenApiFileContents = $this->openApiDocumentToArrayConverter->convert($targetOpenApiDocument);
 
         $this->openApiFileManager->saveOpenApiFileFromArray($syncApiTargetFilepath, $targetOpenApiFileContents);
 
@@ -156,12 +184,18 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocument
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $sourceOpenApiDocument
      *
-     * @return array
+     * @return \Generated\Shared\Transfer\OpenApiDocumentTransfer
      */
     protected function merge(
         OpenApiDocumentTransfer $targetOpenApiDocument,
         OpenApiDocumentTransfer $sourceOpenApiDocument
     ): array {
-        foreach ($sourceOpenApiDocument as $field)
+        foreach ($this->syncApiConfig->getFieldsMergeStrategyMap() as $fieldName => $strategyName) {
+            $strategy = $this->mergeStrategies[$strategyName];
+
+            $strategy->merge($targetOpenApiDocument, $sourceOpenApiDocument, $fieldName);
+        }
+
+        return $targetOpenApiDocument;
     }
 }

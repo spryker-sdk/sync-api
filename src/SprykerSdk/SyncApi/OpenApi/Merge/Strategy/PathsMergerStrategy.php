@@ -2,8 +2,11 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Merge\Strategy;
 
+use Exception;
+use Generated\Shared\Transfer\OpenApiDocumentParameterTransfer;
 use Generated\Shared\Transfer\OpenApiDocumentPathUriProtocolTransfer;
 use Generated\Shared\Transfer\OpenApiDocumentPathUriTransfer;
+use Generated\Shared\Transfer\OpenApiDocumentSchemaTransfer;
 use Generated\Shared\Transfer\OpenApiDocumentTransfer;
 
 class PathsMergerStrategy implements MergeStrategyInterface
@@ -44,6 +47,7 @@ class PathsMergerStrategy implements MergeStrategyInterface
 
                 $this->addPathUriProtocol(
                     $targetOpenApiDocumentTransfer,
+                    $sourceOpenApiDocumentTransfer,
                     $sourcePathUriProtocolTransfer,
                     $sourcePathUriTransfer->getUri()
                 );
@@ -171,7 +175,7 @@ class PathsMergerStrategy implements MergeStrategyInterface
 
         $schemas = $targetOpenApiDocumentTransfer->getComponents()->getSchemas();
 
-        if (!$this->refExistsInPathUriProtocols($ref)) {
+        if (!$this->refExistsInPathUriProtocols($targetOpenApiDocumentTransfer, $ref)) {
             return;
         }
 
@@ -225,6 +229,7 @@ class PathsMergerStrategy implements MergeStrategyInterface
 
     /**
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocumentTransfer
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer
      * @param \Generated\Shared\Transfer\OpenApiDocumentPathUriProtocolTransfer $sourcePathUriProtocolTransfer
      * @param string $uri
      *
@@ -232,6 +237,7 @@ class PathsMergerStrategy implements MergeStrategyInterface
      */
     protected function addPathUriProtocol(
         OpenApiDocumentTransfer $targetOpenApiDocumentTransfer,
+        OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer,
         OpenApiDocumentPathUriProtocolTransfer $sourcePathUriProtocolTransfer,
         string $uri
     ) {
@@ -246,14 +252,170 @@ class PathsMergerStrategy implements MergeStrategyInterface
             }
         }
 
-        // TODO complete
-
         $pathUriTransfers[$key] = $targetPathUriTransfer;
 
         $sourceRefs = $sourcePathUriProtocolTransfer->getRefs();
 
         foreach ($sourceRefs as $sourceRef) {
-            $this->addRef($)
+            $this->addRef($targetOpenApiDocumentTransfer, $sourceOpenApiDocumentTransfer, $sourcePathUriProtocolTransfer, $sourceRef);
         }
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocumentTransfer
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer
+     * @param \Generated\Shared\Transfer\OpenApiDocumentPathUriProtocolTransfer $sourcePathUriProtocolTransfer
+     * @param string $sourceRef
+     *
+     * @return void
+     */
+    protected function addRef(
+        OpenApiDocumentTransfer $targetOpenApiDocumentTransfer,
+        OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer,
+        OpenApiDocumentPathUriProtocolTransfer $sourcePathUriProtocolTransfer,
+        string $sourceRef
+    ): void {
+        if ($this->isParameter($sourceRef)) {
+            $targetParameter = $this->getParameterByRef($targetOpenApiDocumentTransfer, $sourceRef);
+            $sourceParameter = $this->getParameterByRef($sourceOpenApiDocumentTransfer, $sourceRef);
+
+            if ($targetParameter === null) {
+                $this->addParameter($targetOpenApiDocumentTransfer, $sourceParameter);
+                return;
+            }
+
+            if (!$this->isIdenticalParamContents($targetParameter, $sourceParameter)) {
+                throw new Exception('Parameter contents conflict');
+            }
+        }
+
+        if ($this->isSchema($sourceRef)) {
+            $targetSchemaContents = $this->getSchemaByRef($targetOpenApiDocumentTransfer, $sourceRef);
+            $sourceSchemaContents = $this->getSchemaByRef($sourceOpenApiDocumentTransfer, $sourceRef);
+
+            if ($targetSchemaContents === null) {
+                $this->addSchema($targetOpenApiDocumentTransfer, $sourceSchemaContents);
+            }
+
+            if (!$this->isIdenticalSchemaContents($targetSchemaContents, $sourceSchemaContents)) {
+                throw new Exception('Schema contents conflict');
+            }
+        }
+    }
+
+
+    /**
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocumentTransfer
+     * @param string $ref
+     *
+     * @return \Generated\Shared\Transfer\OpenApiDocumentParameterTransfer|null
+     */
+    protected function getParameterByRef(
+        OpenApiDocumentTransfer $targetOpenApiDocumentTransfer,
+        string $ref
+    ): ?OpenApiDocumentParameterTransfer {
+        $objectName = $this->getObjectName($ref);
+
+        foreach($targetOpenApiDocumentTransfer->getComponents()->getParameters() as $parameter) {
+            if ($parameter->getName() === $objectName) {
+                return $parameter;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $openApiDocumentTransfer
+     * @param \Generated\Shared\Transfer\OpenApiDocumentParameterTransfer $parameterTransfer
+     *
+     * @return void
+     */
+    protected function addParameter(
+        OpenApiDocumentTransfer $openApiDocumentTransfer,
+        OpenApiDocumentParameterTransfer $parameterTransfer
+    ) {
+        $openApiDocumentTransfer->getComponents()->addParameter($parameterTransfer);
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\OpenApiDocumentParameterTransfer $targetParameter
+     * @param \Generated\Shared\Transfer\OpenApiDocumentParameterTransfer $sourceParameter
+     *
+     * @return bool
+     */
+    protected function isIdenticalParamContents(
+        OpenApiDocumentParameterTransfer $targetParameter,
+        OpenApiDocumentParameterTransfer $sourceParameter
+    ): bool {
+        return $targetParameter->getContents() === $sourceParameter->getContents();
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocumentTransfer
+     * @param string $ref
+     *
+     * @return \Generated\Shared\Transfer\OpenApiDocumentSchemaTransfer|null
+     */
+    protected function getSchemaByRef(
+        OpenApiDocumentTransfer $targetOpenApiDocumentTransfer,
+        string $ref
+    ): ?OpenApiDocumentSchemaTransfer {
+        $objectName = $this->getObjectName($ref);
+
+        foreach($targetOpenApiDocumentTransfer->getComponents()->getSchemas() as $schema) {
+            if ($schema->getName() === $objectName) {
+                return $schema;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $documentTransfer
+     * @param \Generated\Shared\Transfer\OpenApiDocumentSchemaTransfer $sourceSchemaContents
+     *
+     * @return void
+     */
+    private function addSchema(
+        OpenApiDocumentTransfer $documentTransfer,
+        OpenApiDocumentSchemaTransfer $sourceSchemaContents
+    ): void {
+        $documentTransfer->getComponents()->addSchema($sourceSchemaContents);
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $documentTransfer
+     * @param string $ref
+     *
+     * @return bool
+     */
+    protected function refExistsInPathUriProtocols(
+        OpenApiDocumentTransfer $documentTransfer,
+        string $ref
+    ): bool {
+        foreach ($documentTransfer->getPaths()->getPathUris() as $pathUri) {
+            foreach($pathUri->getProtocols() as $protocol) {
+                if (in_array($ref, $protocol->getRefs())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\OpenApiDocumentSchemaTransfer $targetSchemaContents
+     * @param \Generated\Shared\Transfer\OpenApiDocumentSchemaTransfer $sourceSchemaContents
+     *
+     * @return bool
+     */
+    protected function isIdenticalSchemaContents(
+        OpenApiDocumentSchemaTransfer $targetSchemaContents,
+        OpenApiDocumentSchemaTransfer $sourceSchemaContents
+    ): bool {
+        return $targetSchemaContents->getContents() === $sourceSchemaContents->getContents();
     }
 }

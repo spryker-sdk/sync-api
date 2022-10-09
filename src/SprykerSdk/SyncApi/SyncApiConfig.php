@@ -10,13 +10,33 @@ namespace SprykerSdk\SyncApi;
 class SyncApiConfig
 {
     /**
+     * @var string
+     */
+    public const STRATEGY_REPLACE = 'replace';
+
+    /**
+     * @var string
+     */
+    public const STRATEGY_REPLACE_RECURSIVE = 'replaceRecursive';
+
+    /**
+     * @var string
+     */
+    public const STRATEGY_SERVERS_MERGE = 'serversMerge';
+
+    /**
+     * @var string
+     */
+    public const STRATEGY_PATHS_MERGE = 'pathMerge';
+
+    /**
      * @var array<string>
      */
     protected const FIELDS_MERGE_STRATEGY_MAP = [
-        'version' => 'replaceRecursive',
-        'info' => 'replaceRecursive',
-        'servers' => 'serversMerge',
-        'paths' => 'pathMerge',
+        'version' => self::STRATEGY_REPLACE,
+        'info' => self::STRATEGY_REPLACE_RECURSIVE,
+        'servers' => self::STRATEGY_SERVERS_MERGE,
+        'paths' => self::STRATEGY_PATHS_MERGE,
     ];
 
     /**
