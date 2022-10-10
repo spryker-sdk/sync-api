@@ -7,14 +7,15 @@ use Generated\Shared\Transfer\OpenApiDocumentParameterTransfer;
 class ParameterBuilder implements ParameterBuilderInterface
 {
     /**
+     * @param string $parameterName
      * @param array $parameterAsArray
      *
      * @return \Generated\Shared\Transfer\OpenApiDocumentParameterTransfer
      */
-    public function build(array $parameterAsArray): OpenApiDocumentParameterTransfer
+    public function build(string $parameterName, array $parameterAsArray): OpenApiDocumentParameterTransfer
     {
         return (new OpenApiDocumentParameterTransfer())
-            ->setName(array_keys($parameterAsArray)[0])
-            ->setContents($parameterAsArray[array_keys($parameterAsArray)[0]]);
+            ->setName($parameterName)
+            ->setContents($parameterAsArray);
     }
 }

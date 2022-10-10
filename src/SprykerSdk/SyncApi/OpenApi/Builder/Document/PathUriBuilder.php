@@ -24,14 +24,14 @@ class PathUriBuilder implements PathUriBuilderInterface
      *
      * @return \Generated\Shared\Transfer\OpenApiDocumentPathUriTransfer
      */
-    public function build(array $pathUrisAsArray): OpenApiDocumentPathUriTransfer
+    public function build(string $uri, array $pathUrisAsArray): OpenApiDocumentPathUriTransfer
     {
         $pathUriTransfer = new OpenApiDocumentPathUriTransfer();
 
-        foreach ($pathUrisAsArray as $uri => $pathUriProtocolAsArray) {
+        foreach ($pathUrisAsArray as $protocol => $pathUriProtocolAsArray) {
             $pathUriTransfer
                 ->setUri($uri)
-                ->setProtocols($this->pathUriProtocolsBuilder->build($pathUriProtocolAsArray));
+                ->addProtocol($this->pathUriProtocolsBuilder->build($protocol, $pathUriProtocolAsArray));
         }
 
         return $pathUriTransfer;

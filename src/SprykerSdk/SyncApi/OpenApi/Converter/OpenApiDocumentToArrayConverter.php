@@ -2,6 +2,7 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Converter;
 
+use ArrayObject;
 use Generated\Shared\Transfer\OpenApiDocumentTransfer;
 
 class OpenApiDocumentToArrayConverter implements OpenApiDocumentToArrayConverterInterface
@@ -37,7 +38,7 @@ class OpenApiDocumentToArrayConverter implements OpenApiDocumentToArrayConverter
     public function convert(OpenApiDocumentTransfer $openApiDocumentTransfer): array
     {
         return [
-            'version' => $openApiDocumentTransfer->getVersion(),
+            'openapi' => $openApiDocumentTransfer->getVersion(),
             'info' => $openApiDocumentTransfer->getInfo()->getContents(),
             'servers' => $this->convertServers($openApiDocumentTransfer->getServers()),
             'paths' => $this->pathsToArrayConverter->convert($openApiDocumentTransfer),
@@ -46,11 +47,11 @@ class OpenApiDocumentToArrayConverter implements OpenApiDocumentToArrayConverter
     }
 
     /**
-     * @param array<\Generated\Shared\Transfer\OpenApiDocumentServerTransfer> $serverTransfers
+     * @param \ArrayObject|\Generated\Shared\Transfer\OpenApiDocumentServerTransfer[] $serverTransfers
      *
      * @return array
      */
-    protected function convertServers(array $serverTransfers): array
+    protected function convertServers(ArrayObject $serverTransfers): array
     {
         $servers = [];
 

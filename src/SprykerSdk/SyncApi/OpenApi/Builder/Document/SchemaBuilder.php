@@ -20,15 +20,16 @@ class SchemaBuilder implements SchemaBuilderInterface
     }
 
     /**
+     * @param string $schemaName
      * @param array $schemaAsArray
      *
      * @return \Generated\Shared\Transfer\OpenApiDocumentSchemaTransfer
      */
-    public function build(array $schemaAsArray): OpenApiDocumentSchemaTransfer
+    public function build(string $schemaName, array $schemaAsArray): OpenApiDocumentSchemaTransfer
     {
         return (new OpenApiDocumentSchemaTransfer())
-            ->setName(array_keys($schemaAsArray)[0])
-            ->setContents($schemaAsArray[array_keys($schemaAsArray)[0]])
-            ->setRefs($this->refsFinder->findRefs($schemaAsArray[array_keys($schemaAsArray)[0]]));
+            ->setName($schemaName)
+            ->setContents($schemaAsArray)
+            ->setRefs($this->refsFinder->findRefs($schemaAsArray));
     }
 }

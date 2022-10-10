@@ -2,6 +2,7 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Merge\Strategy;
 
+use ArrayObject;
 use Exception;
 use Generated\Shared\Transfer\OpenApiDocumentParameterTransfer;
 use Generated\Shared\Transfer\OpenApiDocumentPathUriProtocolTransfer;
@@ -141,14 +142,11 @@ class PathsMergerStrategy implements MergeStrategyInterface
 
         foreach ($parameters as $key => $parameter) {
             if ($parameter->getName() === $parameterName) {
-                unset($parameters[$key]);
-                $targetOpenApiDocumentTransfer->getComponents()->setParameters($parameters);
+                $parameters->offsetUnset($key);
 
                 break;
             }
         }
-
-
     }
 
     /**
@@ -175,14 +173,15 @@ class PathsMergerStrategy implements MergeStrategyInterface
 
         $schemas = $targetOpenApiDocumentTransfer->getComponents()->getSchemas();
 
-        if (!$this->refExistsInPathUriProtocols($targetOpenApiDocumentTransfer, $ref)) {
+        if ($this->refExistsInPathUriProtocols($targetOpenApiDocumentTransfer, $ref)) {
             return;
         }
 
         foreach ($schemas as $key => $schema) {
-            if ($schemas->getName() === $schemaName) {
+            if ($schema->getName() === $schemaName) {
                 $schemaRefs = $schema->getRefs();
-                unset($schemas[$key]);
+                $schemas->offsetUnset($key);
+
                 $targetOpenApiDocumentTransfer->getComponents()->setSchemas($schemas);
 
                 foreach ($schemaRefs as $schemaRef)  {
@@ -220,9 +219,7 @@ class PathsMergerStrategy implements MergeStrategyInterface
                     continue;
                 }
 
-                unset($protocols[$key]);
-
-                $targetPathUriTransfer->setProtocols($protocols);
+                $protocols->offsetUnset($key);
             }
         }
     }
@@ -243,28 +240,28 @@ class PathsMergerStrategy implements MergeStrategyInterface
     ) {
         $pathUriTransfers = $targetOpenApiDocumentTransfer->getPaths()->getPathUris();
 
-        $targetPathUriTransfer = (new OpenApiDocumentPathUriTransfer())->setUri($uri);
+        $pathUriTransfer = $this->findPathUriTransfer($pathUriTransfers, $uri);
 
-        foreach ($pathUriTransfers as $key => $pathUriTransfer) {
-            if ($pathUriTransfer->getUri() === $uri) {
-                $pathUriTransfer->addProtocol($sourcePathUriProtocolTransfer);
-                break;
-            }
+        if ($pathUriTransfer !== null) {
+            $pathUriTransfer->addProtocol($sourcePathUriProtocolTransfer);
+        } else {
+            $pathUriTransfers->append(
+                (new OpenApiDocumentPathUriTransfer())
+                    ->setUri($uri)
+                    ->addProtocol($sourcePathUriProtocolTransfer)
+            );
         }
-
-        $pathUriTransfers[$key] = $targetPathUriTransfer;
 
         $sourceRefs = $sourcePathUriProtocolTransfer->getRefs();
 
         foreach ($sourceRefs as $sourceRef) {
-            $this->addRef($targetOpenApiDocumentTransfer, $sourceOpenApiDocumentTransfer, $sourcePathUriProtocolTransfer, $sourceRef);
+            $this->addRef($targetOpenApiDocumentTransfer, $sourceOpenApiDocumentTransfer, $sourceRef);
         }
     }
 
     /**
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocumentTransfer
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer
-     * @param \Generated\Shared\Transfer\OpenApiDocumentPathUriProtocolTransfer $sourcePathUriProtocolTransfer
      * @param string $sourceRef
      *
      * @return void
@@ -272,7 +269,6 @@ class PathsMergerStrategy implements MergeStrategyInterface
     protected function addRef(
         OpenApiDocumentTransfer $targetOpenApiDocumentTransfer,
         OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer,
-        OpenApiDocumentPathUriProtocolTransfer $sourcePathUriProtocolTransfer,
         string $sourceRef
     ): void {
         if ($this->isParameter($sourceRef)) {
@@ -284,20 +280,21 @@ class PathsMergerStrategy implements MergeStrategyInterface
                 return;
             }
 
-            if (!$this->isIdenticalParamContents($targetParameter, $sourceParameter)) {
+            if ($targetParameter && !$this->isIdenticalParamContents($targetParameter, $sourceParameter)) {
                 throw new Exception('Parameter contents conflict');
             }
         }
 
         if ($this->isSchema($sourceRef)) {
-            $targetSchemaContents = $this->getSchemaByRef($targetOpenApiDocumentTransfer, $sourceRef);
-            $sourceSchemaContents = $this->getSchemaByRef($sourceOpenApiDocumentTransfer, $sourceRef);
+            $targetSchema = $this->getSchemaByRef($targetOpenApiDocumentTransfer, $sourceRef);
+            $sourceSchema = $this->getSchemaByRef($sourceOpenApiDocumentTransfer, $sourceRef);
 
-            if ($targetSchemaContents === null) {
-                $this->addSchema($targetOpenApiDocumentTransfer, $sourceSchemaContents);
+            if ($targetSchema === null) {
+                $this->addSchema($targetOpenApiDocumentTransfer, $sourceSchema);
+                return;
             }
 
-            if (!$this->isIdenticalSchemaContents($targetSchemaContents, $sourceSchemaContents)) {
+            if (!$this->isIdenticalSchemaContents($targetSchema, $sourceSchema)) {
                 throw new Exception('Schema contents conflict');
             }
         }
@@ -417,5 +414,22 @@ class PathsMergerStrategy implements MergeStrategyInterface
         OpenApiDocumentSchemaTransfer $sourceSchemaContents
     ): bool {
         return $targetSchemaContents->getContents() === $sourceSchemaContents->getContents();
+    }
+
+    /**
+     * @param \ArrayObject|\Generated\Shared\Transfer\OpenApiDocumentPathUriTransfer[] $pathUriTransfers
+     * @param string $uri
+     *
+     * @return \Generated\Shared\Transfer\OpenApiDocumentPathUriTransfer|null
+     */
+    protected function findPathUriTransfer(ArrayObject $pathUriTransfers, string $uri): ?OpenApiDocumentPathUriTransfer
+    {
+        foreach ($pathUriTransfers as $pathUriTransfer) {
+            if ($pathUriTransfer->getUri() === $uri) {
+                return $pathUriTransfer;
+            }
+        }
+
+        return null;
     }
 }

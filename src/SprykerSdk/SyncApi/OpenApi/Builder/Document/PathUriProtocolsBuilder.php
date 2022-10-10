@@ -2,6 +2,7 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Builder\Document;
 
+use ArrayObject;
 use Generated\Shared\Transfer\OpenApiDocumentPathUriProtocolTransfer;
 
 class PathUriProtocolsBuilder implements PathUriProtocolsBuilderInterface
@@ -20,21 +21,16 @@ class PathUriProtocolsBuilder implements PathUriProtocolsBuilderInterface
     }
 
     /**
+     * @param string $protocol
      * @param array $pathUriProtocolArray
      *
-     * @return array<\Generated\Shared\Transfer\OpenApiDocumentPathUriProtocolTransfer>
+     * @return \Generated\Shared\Transfer\OpenApiDocumentPathUriProtocolTransfer
      */
-    public function build(array $pathUriProtocolArray): array
+    public function build(string $protocol, array $pathUriProtocolArray): OpenApiDocumentPathUriProtocolTransfer
     {
-        $pathUriProtocolTransfers = [];
-
-        foreach ($pathUriProtocolArray as $protocol => $contents) {
-            $pathUriProtocolTransfers[] = (new OpenApiDocumentPathUriProtocolTransfer())
-                ->setProtocol($protocol)
-                ->setContents($contents)
-                ->setRefs($this->refsFinder->findRefs($contents));
-        }
-
-        return $pathUriProtocolTransfers;
+        return (new OpenApiDocumentPathUriProtocolTransfer())
+            ->setProtocol($protocol)
+            ->setContents($pathUriProtocolArray)
+            ->setRefs($this->refsFinder->findRefs($pathUriProtocolArray));
     }
 }

@@ -34,8 +34,8 @@ class PathsBuilder implements PathsBuilderInterface
         $paths = new OpenApiDocumentPathsTransfer();
 
         if ($this->pathsExist($openApiYamlAsArray)) {
-            foreach ($this->getPaths($openApiYamlAsArray) as $pathItem) {
-                $paths->addPathUri($this->pathUriBuilder->build($pathItem));
+            foreach ($this->getPaths($openApiYamlAsArray) as $route => $pathUriProtocols) {
+                $paths->addPathUri($this->pathUriBuilder->build($route, $pathUriProtocols));
             }
         }
 

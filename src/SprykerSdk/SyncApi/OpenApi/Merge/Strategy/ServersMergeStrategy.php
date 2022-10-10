@@ -2,6 +2,7 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Merge\Strategy;
 
+use ArrayObject;
 use Generated\Shared\Transfer\OpenApiDocumentServerTransfer;
 use Generated\Shared\Transfer\OpenApiDocumentTransfer;
 
@@ -10,42 +11,44 @@ class ServersMergeStrategy implements MergeStrategyInterface
     /**
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocumentTransfer
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer
-     * @param string $fieldToMerge
+     * @param string|null $fieldToMerge
      *
      * @return \Generated\Shared\Transfer\OpenApiDocumentTransfer
      */
     public function merge(
         OpenApiDocumentTransfer $targetOpenApiDocumentTransfer,
-        OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer
+        OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer,
+        string $fieldToMerge = null
     ): OpenApiDocumentTransfer {
-        $targetData = $targetOpenApiDocumentTransfer->getServers();
+        $targetServerTransfers = $targetOpenApiDocumentTransfer->getServers();
         $sourceData = $sourceOpenApiDocumentTransfer->getServers();
 
         foreach ($sourceData as $sourceServerTransfer) {
-            $targetServerIndex = $this->getTargetServerIndex($targetData, $sourceServerTransfer);
+            $targetServerTransfer = $this->findTargetServer($targetServerTransfers, $sourceServerTransfer);
 
-            if ($targetServerIndex === null) {
-                $targetData[] = $sourceServerTransfer;
-                continue;
+            if ($targetServerTransfer !== null) {
+                $targetServerTransfer->setDescription($sourceServerTransfer->getDescription());
+            } else {
+                $targetServerTransfers->append($sourceServerTransfer);
             }
-
-            $targetData[$targetServerIndex] = $sourceServerTransfer;
         }
 
-        return $targetOpenApiDocumentTransfer->setServers($targetData);
+        return $targetOpenApiDocumentTransfer->setServers($targetServerTransfers);
     }
 
     /**
-     * @param array<\Generated\Shared\Transfer\OpenApiDocumentServerTransfer> $targetData
+     * @param \ArrayObject|\Generated\Shared\Transfer\OpenApiDocumentServerTransfer[] $targetServerTransfers
      * @param \Generated\Shared\Transfer\OpenApiDocumentServerTransfer $sourceServerTransfer
      *
-     * @return int|null
+     * @return \Generated\Shared\Transfer\OpenApiDocumentServerTransfer|null
      */
-    protected function getTargetServerIndex(array $targetData, OpenApiDocumentServerTransfer $sourceServerTransfer): ?int
-    {
-        foreach ($targetData as $index => $targetServerTransfer) {
-            if ($targetServerTransfer->getUrl() === $sourceServerTransfer->getUrl()) {
-                return $index;
+    protected function findTargetServer(
+        ArrayObject $targetServerTransfers,
+        OpenApiDocumentServerTransfer $sourceServerTransfer
+    ): ?OpenApiDocumentServerTransfer {
+        foreach ($targetServerTransfers as $targetServerTransfer) {
+            if ($sourceServerTransfer->getUrl() === $targetServerTransfer->getUrl()) {
+                return $targetServerTransfer;
             }
         }
 

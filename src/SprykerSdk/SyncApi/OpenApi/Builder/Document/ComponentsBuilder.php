@@ -2,6 +2,7 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Builder\Document;
 
+use ArrayObject;
 use Generated\Shared\Transfer\OpenApiDocumentComponentsTransfer;
 
 class ComponentsBuilder implements ComponentsBuilderInterface
@@ -108,14 +109,14 @@ class ComponentsBuilder implements ComponentsBuilderInterface
     /**
      * @param array $openApiYamlAsArray
      *
-     * @return array<\Generated\Shared\Transfer\OpenApiDocumentParameterTransfer>
+     * @return \ArrayObject|\Generated\Shared\Transfer\OpenApiDocumentParameterTransfer[]
      */
-    protected function buildParameters(array $openApiYamlAsArray): array
+    protected function buildParameters(array $openApiYamlAsArray): ArrayObject
     {
-        $parameterTransfers = [];
+        $parameterTransfers = new \ArrayObject();
 
-        foreach ($this->getParametersArray($openApiYamlAsArray) as $parameterAsArray) {
-            $parameterTransfers[] = $this->parameterBuilder->build($parameterAsArray);
+        foreach ($this->getParametersArray($openApiYamlAsArray) as $parameterName => $parameterAsArray) {
+            $parameterTransfers->append($this->parameterBuilder->build($parameterName, $parameterAsArray));
         }
 
         return $parameterTransfers;
@@ -124,14 +125,14 @@ class ComponentsBuilder implements ComponentsBuilderInterface
     /**
      * @param array $openApiYamlAsArray
      *
-     * @return array<\Generated\Shared\Transfer\OpenApiDocumentSchemaTransfer>
+     * @return \ArrayObject|\Generated\Shared\Transfer\OpenApiDocumentSchemaTransfer[]
      */
-    protected function buildSchemas(array $openApiYamlAsArray): array
+    protected function buildSchemas(array $openApiYamlAsArray): ArrayObject
     {
-        $schemaTransfers = [];
+        $schemaTransfers = new ArrayObject();
 
-        foreach ($this->getSchemasArray($openApiYamlAsArray) as $schemaAsArray) {
-            $schemaTransfers[] = $this->schemaBuilder->build($schemaAsArray);
+        foreach ($this->getSchemasArray($openApiYamlAsArray) as $schemaName => $schemaAsArray) {
+            $schemaTransfers->append($this->schemaBuilder->build($schemaName, $schemaAsArray));
         }
 
         return $schemaTransfers;

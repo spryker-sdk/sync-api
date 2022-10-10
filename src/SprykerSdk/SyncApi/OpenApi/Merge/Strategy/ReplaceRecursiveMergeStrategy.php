@@ -20,13 +20,19 @@ class ReplaceRecursiveMergeStrategy implements MergeStrategyInterface
         OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer,
         string $fieldToMerge = null
     ): OpenApiDocumentTransfer {
-        $targetData = $this->getField($targetOpenApiDocumentTransfer, $fieldToMerge);
-        $sourceData = $this->getField($sourceOpenApiDocumentTransfer, $fieldToMerge);
+        $targetFieldObject = $this->getField($targetOpenApiDocumentTransfer, $fieldToMerge);
+
+        $targetData = $targetFieldObject->getContents();
+        $sourceData = $this->getField($sourceOpenApiDocumentTransfer, $fieldToMerge)->getContents();
+
+        $targetData = array_replace_recursive($targetData, $sourceData);
+
+        $targetFieldObject->setContents($targetData);
 
         $this->setField(
             $targetOpenApiDocumentTransfer,
             $fieldToMerge,
-            array_replace_recursive($targetData, $sourceData)
+            $targetFieldObject
         );
 
         return $targetOpenApiDocumentTransfer;

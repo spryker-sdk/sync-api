@@ -45,7 +45,7 @@
 
     <transfer name="OpenApiDocumentPathUriProtocol">
         <property name="protocol" type="string"/>
-        <property name="contents" type="OpenApiDocumentPathContents"/>
+        <property name="contents" type="array"/>
         <property name="refs" type="string[]" singular="ref"/>
     </transfer>
 

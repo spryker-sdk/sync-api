@@ -2,12 +2,14 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Builder\Document;
 
+use ArrayObject;
+
 interface ServersBuilderInterface
 {
     /**
      * @param array $openApiYamlAsArray
      *
-     * @return array<\Generated\Shared\Transfer\OpenApiDocumentServerTransfer>
+     * @return ArrayObject|\Generated\Shared\Transfer\OpenApiDocumentServerTransfer[]
      */
-    public function build(array $openApiYamlAsArray): array;
+    public function build(array $openApiYamlAsArray): \ArrayObject;
 }

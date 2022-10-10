@@ -9,7 +9,6 @@ namespace SprykerSdk\SyncApi;
 
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
-use parallel\Sync;
 use SprykerSdk\SyncApi\Message\MessageBuilder;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\Document\ComponentsBuilder;
@@ -44,9 +43,6 @@ use SprykerSdk\SyncApi\OpenApi\Converter\OpenApiDocumentToArrayConverter;
 use SprykerSdk\SyncApi\OpenApi\Converter\OpenApiDocumentToArrayConverterInterface;
 use SprykerSdk\SyncApi\OpenApi\Converter\PathsToArrayConverter;
 use SprykerSdk\SyncApi\OpenApi\Converter\PathsToArrayConverterInterface;
-use SprykerSdk\SyncApi\OpenApi\DataModifier\DataModifierHandlerInterface;
-use SprykerSdk\SyncApi\OpenApi\DataModifier\DataSimpleRecursiveReplacer;
-use SprykerSdk\SyncApi\OpenApi\DataModifier\SyncApiHeaderSetter;
 use SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocDecoderInterface;
 use SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocJsonDecoder;
 use SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManager;
@@ -183,10 +179,7 @@ class SyncApiFactory
      */
     public function createFilepathBuilder(): FilepathBuilderInterface
     {
-        return new FilepathBuilder(
-            $this->getConfig()->getProjectRootPath(),
-            $this->getConfig()->getSyncApiDirPath(),
-        );
+        return new FilepathBuilder($this->getConfig()->getProjectRootPath());
     }
 
     /**
@@ -206,16 +199,6 @@ class SyncApiFactory
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\OpenApi\DataModifier\DataModifierHandlerInterface
-     */
-    public function createSyncApiUpdateDataModifier(): DataModifierHandlerInterface
-    {
-        return new DataSimpleRecursiveReplacer(
-            new SyncApiHeaderSetter(null),
-        );
-    }
-
-    /**
      * @return \SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdaterInterface
      */
     public function createOpenApiUpdater(): OpenApiUpdaterInterface
@@ -226,8 +209,10 @@ class SyncApiFactory
             $this->createOpenApiDocDecoder(),
             $this->createOpenApiValidator(),
             $this->createOpenApiFileManager(),
-            $this->createSyncApiUpdateDataModifier(),
-            $this->getConfig()->getDefaultAbsolutePathToOpenApiFile()
+            $this->getConfig(),
+            $this->createOpenApiDocumentBuilder(),
+            $this->getMergeStrategyCollection(),
+            $this->createOpenApiDocumentToArrayConverter()
         );
     }
 

@@ -2,6 +2,7 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Builder\Document;
 
+use ArrayObject;
 use Generated\Shared\Transfer\OpenApiDocumentServerTransfer;
 
 class ServersBuilder implements ServersBuilderInterface
@@ -16,15 +17,17 @@ class ServersBuilder implements ServersBuilderInterface
     /**
      * @param array $openApiYamlAsArray
      *
-     * @return array|\Generated\Shared\Transfer\OpenApiDocumentServerTransfer[]
+     * @return ArrayObject|\Generated\Shared\Transfer\OpenApiDocumentServerTransfer[]
      */
-    public function build(array $openApiYamlAsArray): array
+    public function build(array $openApiYamlAsArray): ArrayObject
     {
-        $servers = [];
+        $servers = new ArrayObject();
 
         if ($this->serversExist($openApiYamlAsArray)) {
             foreach ($this->getServers($openApiYamlAsArray) as $serverArray) {
-                $servers[] = $this->buildServer($serverArray);
+                $server = $this->buildServer($serverArray);
+
+                $servers->append($server);
             }
         }
 

@@ -11,14 +11,14 @@ class ReplaceStrategy implements MergeStrategyInterface
     /**
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocumentTransfer
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer
-     * @param string $fieldToMerge
+     * @param string|null $fieldToMerge
      *
      * @return \Generated\Shared\Transfer\OpenApiDocumentTransfer
      */
     public function merge(
         OpenApiDocumentTransfer $targetOpenApiDocumentTransfer,
         OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer,
-        string $fieldToMerge
+        string $fieldToMerge = null
     ): OpenApiDocumentTransfer {
         $this->setField(
             $targetOpenApiDocumentTransfer,
