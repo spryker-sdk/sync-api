@@ -10,7 +10,6 @@ use SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Converter\OpenApiDocumentToArrayConverterInterface;
 use SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocDecoderInterface;
 use SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManagerInterface;
-use SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface;
 use SprykerSdk\SyncApi\SyncApiConfig;
 use SprykerSdk\SyncApi\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -61,7 +60,7 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
     protected $syncApiConfig;
 
     /**
-     * @var array<\SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface>
+     * @var array<\SprykerSdk\SyncApi\OpenApi\Merger\Strategy\MergerStrategyInterface>
      */
     protected $mergeStrategies = [];
 
@@ -78,7 +77,7 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
      * @param \SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManagerInterface $openApiFileManager
      * @param \SprykerSdk\SyncApi\SyncApiConfig $syncApiConfig
      * @param \SprykerSdk\SyncApi\OpenApi\Builder\Document\DocumentBuilderInterface $documentBuilder
-     * @param array<string, \SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface> $mergeStrategies
+     * @param array<string, \SprykerSdk\SyncApi\OpenApi\Merger\Strategy\MergerStrategyInterface> $mergeStrategies
      * @param \SprykerSdk\SyncApi\OpenApi\Converter\OpenApiDocumentToArrayConverterInterface $openApiDocumentToArrayConverter
      */
     public function __construct(
@@ -136,9 +135,6 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
                 $this->openApiTemplateFilepath
             );
         }
-
-//        file_put_contents('OPENAPI.json', json_encode($targetOpenApiFileContents));
-//        exit;
 
         $targetOpenApiDocument = $this->documentBuilder->buildOpenApiDocumentFromArray($targetOpenApiFileContents);
         $sourceOpenApiDocument = $this->documentBuilder->buildOpenApiDocumentFromArray($sourceOpenApiContents);

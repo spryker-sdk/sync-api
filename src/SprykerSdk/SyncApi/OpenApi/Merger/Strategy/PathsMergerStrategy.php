@@ -1,17 +1,28 @@
 <?php
 
-namespace SprykerSdk\SyncApi\OpenApi\Merge\Strategy;
+namespace SprykerSdk\SyncApi\OpenApi\Merger\Strategy;
 
 use ArrayObject;
-use Exception;
 use Generated\Shared\Transfer\OpenApiDocumentParameterTransfer;
 use Generated\Shared\Transfer\OpenApiDocumentPathUriProtocolTransfer;
 use Generated\Shared\Transfer\OpenApiDocumentPathUriTransfer;
 use Generated\Shared\Transfer\OpenApiDocumentSchemaTransfer;
 use Generated\Shared\Transfer\OpenApiDocumentTransfer;
+use SprykerSdk\SyncApi\OpenApi\Exception\ParameterConflictException;
+use SprykerSdk\SyncApi\OpenApi\Exception\SchemaConflictException;
 
-class PathsMergerStrategy implements MergeStrategyInterface
+class PathsMergerStrategy implements MergerStrategyInterface
 {
+    /**
+     * @var string
+     */
+    protected const EXCEPTION_MESSAGE_PARAMETER_CONFLICTS = 'Parameter "%s" has conflicts with new version. Please review it manually.';
+
+    /**
+     * @var string
+     */
+    protected const EXCEPTION_MESSAGE_SCHEMA_CONFLICTS = 'Schema "%s" has conflicts with new version. Please review it manually.';
+
     /**
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocumentTransfer
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer
@@ -272,34 +283,77 @@ class PathsMergerStrategy implements MergeStrategyInterface
         string $sourceRef
     ): void {
         if ($this->isParameter($sourceRef)) {
-            $targetParameter = $this->getParameterByRef($targetOpenApiDocumentTransfer, $sourceRef);
-            $sourceParameter = $this->getParameterByRef($sourceOpenApiDocumentTransfer, $sourceRef);
-
-            if ($targetParameter === null) {
-                $this->addParameter($targetOpenApiDocumentTransfer, $sourceParameter);
-                return;
-            }
-
-            if ($targetParameter && !$this->isIdenticalParamContents($targetParameter, $sourceParameter)) {
-                throw new Exception('Parameter contents conflict');
-            }
+            $this->addParameterByRef($targetOpenApiDocumentTransfer, $sourceOpenApiDocumentTransfer, $sourceRef);
         }
 
         if ($this->isSchema($sourceRef)) {
-            $targetSchema = $this->getSchemaByRef($targetOpenApiDocumentTransfer, $sourceRef);
-            $sourceSchema = $this->getSchemaByRef($sourceOpenApiDocumentTransfer, $sourceRef);
-
-            if ($targetSchema === null) {
-                $this->addSchema($targetOpenApiDocumentTransfer, $sourceSchema);
-                return;
-            }
-
-            if (!$this->isIdenticalSchemaContents($targetSchema, $sourceSchema)) {
-                throw new Exception('Schema contents conflict');
-            }
+            $this->addSchemaByRef($targetOpenApiDocumentTransfer, $sourceOpenApiDocumentTransfer, $sourceRef);
         }
     }
 
+    /**
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocumentTransfer
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer
+     * @param string $sourceRef
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    protected function addParameterByRef(
+        OpenApiDocumentTransfer  $targetOpenApiDocumentTransfer,
+        OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer,
+        string $sourceRef
+    ): void {
+        $targetParameter = $this->getParameterByRef($targetOpenApiDocumentTransfer, $sourceRef);
+        $sourceParameter = $this->getParameterByRef($sourceOpenApiDocumentTransfer, $sourceRef);
+
+        if ($targetParameter === null) {
+            $this->addParameter($targetOpenApiDocumentTransfer, $sourceParameter);
+            return;
+        }
+
+        if ($targetParameter && !$this->isIdenticalParamContents($targetParameter, $sourceParameter)) {
+            throw new ParameterConflictException(
+                sprintf(
+                    static::EXCEPTION_MESSAGE_PARAMETER_CONFLICTS,
+                    $targetParameter->getName()
+                )
+            );
+        }
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocumentTransfer
+     * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer
+     * @param string $sourceRef
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    protected function addSchemaByRef(
+        OpenApiDocumentTransfer $targetOpenApiDocumentTransfer,
+        OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer,
+        string $sourceRef
+    ): void {
+        $targetSchema = $this->getSchemaByRef($targetOpenApiDocumentTransfer, $sourceRef);
+        $sourceSchema = $this->getSchemaByRef($sourceOpenApiDocumentTransfer, $sourceRef);
+
+        if ($targetSchema === null) {
+            $this->addSchema($targetOpenApiDocumentTransfer, $sourceSchema);
+            return;
+        }
+
+        if (!$this->isIdenticalSchemaContents($targetSchema, $sourceSchema)) {
+            throw new SchemaConflictException(
+                sprintf(
+                    static::EXCEPTION_MESSAGE_SCHEMA_CONFLICTS,
+                    $targetSchema->getName()
+                )
+            );
+        }
+    }
 
     /**
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocumentTransfer

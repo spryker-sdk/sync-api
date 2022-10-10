@@ -1,12 +1,12 @@
 <?php
 
-namespace SprykerSdk\SyncApi\OpenApi\Merge\Strategy;
+namespace SprykerSdk\SyncApi\OpenApi\Merger\Strategy;
 
 use ArrayObject;
 use Generated\Shared\Transfer\OpenApiDocumentServerTransfer;
 use Generated\Shared\Transfer\OpenApiDocumentTransfer;
 
-class ServersMergeStrategy implements MergeStrategyInterface
+class ServersMergerStrategy implements MergerStrategyInterface
 {
     /**
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocumentTransfer

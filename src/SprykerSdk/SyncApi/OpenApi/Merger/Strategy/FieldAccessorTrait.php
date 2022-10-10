@@ -1,6 +1,6 @@
 <?php
 
-namespace SprykerSdk\SyncApi\OpenApi\Merge\Strategy;
+namespace SprykerSdk\SyncApi\OpenApi\Merger\Strategy;
 
 use Spryker\Shared\Kernel\Transfer\TransferInterface;
 

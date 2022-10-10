@@ -1,10 +1,10 @@
 <?php
 
-namespace SprykerSdk\SyncApi\OpenApi\Merge\Strategy;
+namespace SprykerSdk\SyncApi\OpenApi\Merger\Strategy;
 
 use Generated\Shared\Transfer\OpenApiDocumentTransfer;
 
-class ReplaceRecursiveMergeStrategy implements MergeStrategyInterface
+class ReplaceRecursiveContentsMergerStrategy implements MergerStrategyInterface
 {
     use FieldAccessorTrait;
 

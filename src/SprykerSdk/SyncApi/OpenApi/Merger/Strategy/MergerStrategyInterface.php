@@ -1,13 +1,11 @@
 <?php
 
-namespace SprykerSdk\SyncApi\OpenApi\Merge\Strategy;
+namespace SprykerSdk\SyncApi\OpenApi\Merger\Strategy;
 
 use Generated\Shared\Transfer\OpenApiDocumentTransfer;
 
-class ReplaceStrategy implements MergeStrategyInterface
+interface MergerStrategyInterface
 {
-    use FieldAccessorTrait;
-
     /**
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $targetOpenApiDocumentTransfer
      * @param \Generated\Shared\Transfer\OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer
@@ -19,13 +17,5 @@ class ReplaceStrategy implements MergeStrategyInterface
         OpenApiDocumentTransfer $targetOpenApiDocumentTransfer,
         OpenApiDocumentTransfer $sourceOpenApiDocumentTransfer,
         string $fieldToMerge = null
-    ): OpenApiDocumentTransfer {
-        $this->setField(
-            $targetOpenApiDocumentTransfer,
-            $fieldToMerge,
-            $this->getField($sourceOpenApiDocumentTransfer, $fieldToMerge)
-        );
-
-        return $targetOpenApiDocumentTransfer;
-    }
+    ): OpenApiDocumentTransfer;
 }

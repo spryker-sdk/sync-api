@@ -47,11 +47,11 @@ use SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocDecoderInterface;
 use SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocJsonDecoder;
 use SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManager;
 use SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManagerInterface;
-use SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface;
-use SprykerSdk\SyncApi\OpenApi\Merge\Strategy\PathsMergerStrategy;
-use SprykerSdk\SyncApi\OpenApi\Merge\Strategy\ReplaceRecursiveMergeStrategy;
-use SprykerSdk\SyncApi\OpenApi\Merge\Strategy\ReplaceStrategy;
-use SprykerSdk\SyncApi\OpenApi\Merge\Strategy\ServersMergeStrategy;
+use SprykerSdk\SyncApi\OpenApi\Merger\Strategy\MergerStrategyInterface;
+use SprykerSdk\SyncApi\OpenApi\Merger\Strategy\PathsMergerStrategy;
+use SprykerSdk\SyncApi\OpenApi\Merger\Strategy\ReplaceRecursiveContentsMergerStrategy;
+use SprykerSdk\SyncApi\OpenApi\Merger\Strategy\ReplaceValueMergerStrategy;
+use SprykerSdk\SyncApi\OpenApi\Merger\Strategy\ServersMergerStrategy;
 use SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdater;
 use SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdaterInterface;
 use SprykerSdk\SyncApi\OpenApi\Validator\OpenApiValidator;
@@ -307,39 +307,39 @@ class SyncApiFactory
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\Strategy\MergerStrategyInterface
      */
-    public function createReplaceStrategy(): MergeStrategyInterface
+    public function createReplaceStrategy(): MergerStrategyInterface
     {
-        return new ReplaceStrategy();
+        return new ReplaceValueMergerStrategy();
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\Strategy\MergerStrategyInterface
      */
-    public function createReplaceRecursiveMergeStrategy(): MergeStrategyInterface
+    public function createReplaceRecursiveMergeStrategy(): MergerStrategyInterface
     {
-        return new ReplaceRecursiveMergeStrategy();
+        return new ReplaceRecursiveContentsMergerStrategy();
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\Strategy\MergerStrategyInterface
      */
-    public function createServersMergeStrategy(): MergeStrategyInterface
+    public function createServersMergeStrategy(): MergerStrategyInterface
     {
-        return new ServersMergeStrategy();
+        return new ServersMergerStrategy();
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Merge\Strategy\MergeStrategyInterface
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\Strategy\MergerStrategyInterface
      */
-    public function createPathMergeStrategy(): MergeStrategyInterface
+    public function createPathMergeStrategy(): MergerStrategyInterface
     {
         return new PathsMergerStrategy();
     }
 
     /**
-     * @return array<string, MergeStrategyInterface>
+     * @return array<string, MergerStrategyInterface>
      */
     public function getMergeStrategyCollection(): array
     {
