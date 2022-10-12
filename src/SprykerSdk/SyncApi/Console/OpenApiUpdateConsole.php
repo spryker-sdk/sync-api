@@ -7,7 +7,7 @@
 
 namespace SprykerSdk\SyncApi\Console;
 
-use Generated\Shared\Transfer\UpdateOpenApiRequestTransfer;
+use Transfer\UpdateOpenApiRequestTransfer;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
