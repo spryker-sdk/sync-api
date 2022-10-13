@@ -11,47 +11,16 @@ use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
 use SprykerSdk\SyncApi\Message\MessageBuilder;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\ComponentsBuilder;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\ComponentsBuilderInterface;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\DocumentBuilder;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\DocumentBuilderInterface;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\InfoBuilder;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\InfoBuilderInterface;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\ParameterBuilder;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\ParameterBuilderInterface;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathsBuilder;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathsBuilderInterface;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriBuilder;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriBuilderInterface;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriProtocolsBuilder;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriProtocolsBuilderInterface;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\RefsFinder;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\RefsFinderInterface;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\SchemaBuilder;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\SchemaBuilderInterface;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\ServersBuilder;
-use SprykerSdk\SyncApi\OpenApi\Builder\Document\ServersBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilderInterface;
-use SprykerSdk\SyncApi\OpenApi\Converter\ComponentsToArrayConverter;
-use SprykerSdk\SyncApi\OpenApi\Converter\ComponentsToArrayConverterInterface;
-use SprykerSdk\SyncApi\OpenApi\Converter\OpenApiDocumentToArrayConverter;
-use SprykerSdk\SyncApi\OpenApi\Converter\OpenApiDocumentToArrayConverterInterface;
-use SprykerSdk\SyncApi\OpenApi\Converter\PathsToArrayConverter;
-use SprykerSdk\SyncApi\OpenApi\Converter\PathsToArrayConverterInterface;
-use SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocDecoderInterface;
-use SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocJsonDecoder;
-use SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManager;
-use SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManagerInterface;
-use SprykerSdk\SyncApi\OpenApi\Merger\Strategy\MergerStrategyInterface;
-use SprykerSdk\SyncApi\OpenApi\Merger\Strategy\PathsMergerStrategy;
-use SprykerSdk\SyncApi\OpenApi\Merger\Strategy\ReplaceRecursiveContentsMergerStrategy;
-use SprykerSdk\SyncApi\OpenApi\Merger\Strategy\ReplaceValueMergerStrategy;
-use SprykerSdk\SyncApi\OpenApi\Merger\Strategy\ServersMergerStrategy;
+use SprykerSdk\SyncApi\OpenApi\Merger\InfoMerger;
+use SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface;
+use SprykerSdk\SyncApi\OpenApi\Merger\PathsMerger;
+use SprykerSdk\SyncApi\OpenApi\Merger\ServersMerger;
 use SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdater;
 use SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdaterInterface;
 use SprykerSdk\SyncApi\OpenApi\Validator\OpenApiValidator;
@@ -160,10 +129,7 @@ class SyncApiFactory
      */
     public function createOpenApiBuilder(): OpenApiBuilderInterface
     {
-        return new OpenApiBuilder(
-            $this->createMessageBuilder(),
-            $this->createOpenApiFileManager(),
-        );
+        return new OpenApiBuilder($this->createMessageBuilder());
     }
 
     /**
@@ -183,22 +149,6 @@ class SyncApiFactory
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Decoder\OpenApiDocDecoderInterface
-     */
-    public function createOpenApiDocDecoder(): OpenApiDocDecoderInterface
-    {
-        return new OpenApiDocJsonDecoder();
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\FileManager\OpenApiFileManagerInterface
-     */
-    public function createOpenApiFileManager(): OpenApiFileManagerInterface
-    {
-        return new OpenApiFileManager();
-    }
-
-    /**
      * @return \SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdaterInterface
      */
     public function createOpenApiUpdater(): OpenApiUpdaterInterface
@@ -206,175 +156,44 @@ class SyncApiFactory
         return new OpenApiUpdater(
             $this->createMessageBuilder(),
             $this->createFilepathBuilder(),
-            $this->createOpenApiDocDecoder(),
-            $this->createOpenApiValidator(),
-            $this->createOpenApiFileManager(),
             $this->getConfig(),
-            $this->createOpenApiDocumentBuilder(),
-            $this->getMergeStrategyCollection(),
-            $this->createOpenApiDocumentToArrayConverter()
+            $this->getMergerCollection(),
         );
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\DocumentBuilderInterface
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface
      */
-    public function createOpenApiDocumentBuilder(): DocumentBuilderInterface
+    public function createInfoMerger(): MergerInterface
     {
-        return new DocumentBuilder(
-            $this->createOpenApiDocumentInfoBuilder(),
-            $this->createOpenApiDocumentServersBuilder(),
-            $this->createOpenApiDocumentPathsBuilder(),
-            $this->createOpenApiDocumentComponentsBuilder(),
-        );
+        return new InfoMerger();
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\InfoBuilderInterface
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface
      */
-    public function createOpenApiDocumentInfoBuilder(): InfoBuilderInterface
+    public function createServersMerger(): MergerInterface
     {
-        return new InfoBuilder();
+        return new ServersMerger();
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\ServersBuilderInterface
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface
      */
-    public function createOpenApiDocumentServersBuilder(): ServersBuilderInterface
+    public function createPathMerger(): MergerInterface
     {
-        return new ServersBuilder();
+        return new PathsMerger($this->getConfig());
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\PathsBuilderInterface
+     * @return array
      */
-    public function createOpenApiDocumentPathsBuilder(): PathsBuilderInterface
-    {
-        return new PathsBuilder($this->createOpenApiDocumentPathUriBuilder());
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\ComponentsBuilderInterface
-     */
-    public function createOpenApiDocumentComponentsBuilder(): ComponentsBuilderInterface
-    {
-        return new ComponentsBuilder(
-            $this->createOpenApiDocumentParameterBuilder(),
-            $this->createOpenApiDocumentSchemaBuilder(),
-        );
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriBuilderInterface
-     */
-    public function createOpenApiDocumentPathUriBuilder(): PathUriBuilderInterface
-    {
-        return new PathUriBuilder(
-            $this->createOpenApiDocumentPathUriProtocolBuilder(),
-        );
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\ParameterBuilderInterface
-     */
-    public function createOpenApiDocumentParameterBuilder(): ParameterBuilderInterface
-    {
-        return new ParameterBuilder();
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\SchemaBuilderInterface
-     */
-    public function createOpenApiDocumentSchemaBuilder(): SchemaBuilderInterface
-    {
-        return new SchemaBuilder($this->createRefsFinder());
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\PathUriProtocolsBuilderInterface
-     */
-    public function createOpenApiDocumentPathUriProtocolBuilder(): PathUriProtocolsBuilderInterface
-    {
-        return new PathUriProtocolsBuilder($this->createRefsFinder());
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Builder\Document\RefsFinderInterface
-     */
-    public function createRefsFinder(): RefsFinderInterface
-    {
-        return new RefsFinder();
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Merger\Strategy\MergerStrategyInterface
-     */
-    public function createReplaceStrategy(): MergerStrategyInterface
-    {
-        return new ReplaceValueMergerStrategy();
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Merger\Strategy\MergerStrategyInterface
-     */
-    public function createReplaceRecursiveMergeStrategy(): MergerStrategyInterface
-    {
-        return new ReplaceRecursiveContentsMergerStrategy();
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Merger\Strategy\MergerStrategyInterface
-     */
-    public function createServersMergeStrategy(): MergerStrategyInterface
-    {
-        return new ServersMergerStrategy();
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Merger\Strategy\MergerStrategyInterface
-     */
-    public function createPathMergeStrategy(): MergerStrategyInterface
-    {
-        return new PathsMergerStrategy();
-    }
-
-    /**
-     * @return array<string, MergerStrategyInterface>
-     */
-    public function getMergeStrategyCollection(): array
+    public function getMergerCollection(): array
     {
         return [
-            SyncApiConfig::STRATEGY_REPLACE => $this->createReplaceStrategy(),
-            SyncApiConfig::STRATEGY_REPLACE_RECURSIVE => $this->createReplaceRecursiveMergeStrategy(),
-            SyncApiConfig::STRATEGY_SERVERS_MERGE => $this->createServersMergeStrategy(),
-            SyncApiConfig::STRATEGY_PATHS_MERGE => $this->createPathMergeStrategy(),
+            $this->createInfoMerger(),
+            $this->createServersMerger(),
+            $this->createPathMerger(),
         ];
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Converter\OpenApiDocumentToArrayConverterInterface
-     */
-    public function createOpenApiDocumentToArrayConverter(): OpenApiDocumentToArrayConverterInterface
-    {
-        return new OpenApiDocumentToArrayConverter(
-            $this->createOpenApiDocumentPathsToArrayConverter(),
-            $this->createOpenApiDocumentComponentsToArrayConverter(),
-        );
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Converter\PathsToArrayConverterInterface
-     */
-    public function createOpenApiDocumentPathsToArrayConverter(): PathsToArrayConverterInterface
-    {
-        return new PathsToArrayConverter();
-    }
-
-    /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Converter\ComponentsToArrayConverterInterface
-     */
-    public function createOpenApiDocumentComponentsToArrayConverter(): ComponentsToArrayConverterInterface
-    {
-        return new ComponentsToArrayConverter();
     }
 }

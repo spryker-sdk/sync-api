@@ -10,39 +10,9 @@ namespace SprykerSdk\SyncApi;
 class SyncApiConfig
 {
     /**
-     * @var string
-     */
-    public const STRATEGY_REPLACE = 'replace';
-
-    /**
-     * @var string
-     */
-    public const STRATEGY_REPLACE_RECURSIVE = 'replaceRecursive';
-
-    /**
-     * @var string
-     */
-    public const STRATEGY_SERVERS_MERGE = 'serversMerge';
-
-    /**
-     * @var string
-     */
-    public const STRATEGY_PATHS_MERGE = 'pathMerge';
-
-    /**
-     * @var array<string>
-     */
-    protected const FIELDS_MERGE_STRATEGY_MAP = [
-        'version' => self::STRATEGY_REPLACE,
-        'info' => self::STRATEGY_REPLACE_RECURSIVE,
-        'servers' => self::STRATEGY_SERVERS_MERGE,
-        'paths' => self::STRATEGY_PATHS_MERGE,
-    ];
-
-    /**
+     * @return string
      * @api
      *
-     * @return string
      */
     public function getDefaultRelativePathToOpenApiFile(): string
     {
@@ -56,9 +26,9 @@ class SyncApiConfig
     }
 
     /**
+     * @return string
      * @api
      *
-     * @return string
      */
     public function getProjectRootPath(): string
     {
@@ -81,46 +51,24 @@ class SyncApiConfig
     }
 
     /**
+     * @return array
+     */
+    public function getAvailableHttpMethods(): array
+    {
+        return [
+            'get',
+            'post',
+            'put',
+            'patch',
+            'delete',
+        ];
+    }
+
+    /**
      * @return string
      */
     public function getPackageRootDirPath(): string
     {
         return SRYKER_SYNCAPI_PACKAGE_ROOT_DIR;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDefaultAbsolutePathToOpenApiFile(): string
-    {
-        return implode(
-            DIRECTORY_SEPARATOR,
-            [
-                $this->getPackageRootDirPath(),
-                $this->getDefaultRelativePathToOpenApiFile()
-            ]
-        );
-    }
-
-    /**
-     * @return string
-     */
-    public function getSyncApiDirPath(): string
-    {
-        $pathFragments = [
-            'resources',
-            'api',
-            'syncapi',
-        ];
-
-        return implode(DIRECTORY_SEPARATOR, $pathFragments);
-    }
-
-    /**
-     * @return array<string>
-     */
-    public function getFieldsMergeStrategyMap(): array
-    {
-        return static::FIELDS_MERGE_STRATEGY_MAP;
     }
 }
