@@ -17,8 +17,10 @@ use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
 use SprykerSdk\SyncApi\SyncApiConfig;
 use SprykerSdk\SyncApi\SyncApiFacade;
 use SprykerSdk\SyncApi\SyncApiFactory;
+use Symfony\Component\Yaml\Yaml;
 use Transfer\OpenApiRequestTransfer;
 use Transfer\OpenApiTransfer;
+use Transfer\UpdateOpenApiRequestTransfer;
 
 class OpenApiHelper extends Module
 {
@@ -96,5 +98,43 @@ class OpenApiHelper extends Module
         $buildFromOpenApiConsole->setFacade($facade);
 
         return $buildFromOpenApiConsole;
+    }
+
+    /**
+     * @return \Transfer\UpdateOpenApiRequestTransfer
+     */
+    public function haveUpdateExistedFileRequest(): UpdateOpenApiRequestTransfer
+    {
+        $updateOpenApiRequestTransfer = new UpdateOpenApiRequestTransfer();
+
+        $config = $this->getSyncApiHelper()->getConfig();
+
+        $updateOpenApiRequestTransfer
+            ->setProjectRoot($config->getProjectRootPath())
+            ->setOpenApiFile('resources/api/openapi.yml')
+            ->setOpenApiDoc(json_encode(Yaml::parseFile(codecept_data_dir('api/valid/valid_openapi.yml'))));
+
+        return $updateOpenApiRequestTransfer;
+    }
+
+    /**
+     * @return \Transfer\UpdateOpenApiRequestTransfer
+     */
+    public function haveUpdateNotExistedFileRequest(): UpdateOpenApiRequestTransfer
+    {
+        $updateOpenApiRequestTransfer = new UpdateOpenApiRequestTransfer();
+
+        $config = $this->getSyncApiHelper()->getConfig();
+
+        $updateOpenApiRequestTransfer
+            ->setProjectRoot($config->getProjectRootPath())
+            ->setOpenApiFile('new_file.yml')
+            ->setOpenApiDoc(
+                json_encode(
+                    Yaml::parseFile(codecept_data_dir('api/invalid/invalid_openapi.yml')),
+                ),
+            );
+
+        return $updateOpenApiRequestTransfer;
     }
 }

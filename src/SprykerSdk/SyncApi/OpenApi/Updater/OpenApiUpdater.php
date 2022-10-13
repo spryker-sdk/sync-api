@@ -1,16 +1,22 @@
 <?php
 
+/**
+ * Copyright © 2019-present Spryker Systems GmbH. All rights reserved.
+ * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ */
+
 namespace SprykerSdk\SyncApi\OpenApi\Updater;
 
+use ArrayObject;
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\Writer;
-use Generated\Shared\Transfer\UpdateOpenApiRequestTransfer;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface;
 use SprykerSdk\SyncApi\SyncApiConfig;
-use Symfony\Component\Finder\Finder;
+use Throwable;
 use Transfer\OpenApiResponseTransfer;
+use Transfer\UpdateOpenApiRequestTransfer;
 
 class OpenApiUpdater implements OpenApiUpdaterInterface
 {
@@ -25,7 +31,7 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
     protected $filepathBuilder;
 
     /**
-     * @var \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface[]
+     * @var array<\SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface>
      */
     protected $mergerCollection;
 
@@ -38,7 +44,7 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
      * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
      * @param \SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface $filepathBuilder
      * @param \SprykerSdk\SyncApi\SyncApiConfig $syncApiConfig
-     * @param \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface[] $mergerCollection
+     * @param array<\SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface> $mergerCollection
      */
     public function __construct(
         MessageBuilderInterface $messageBuilder,
@@ -53,64 +59,69 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
     }
 
     /**
-     * @param \Generated\Shared\Transfer\UpdateOpenApiRequestTransfer $openApiRequestTransfer
+     * @param \Transfer\UpdateOpenApiRequestTransfer $updateOpenApiRequestTransfer
      *
      * @return \Transfer\OpenApiResponseTransfer
      */
     public function updateOpenApi(UpdateOpenApiRequestTransfer $updateOpenApiRequestTransfer): OpenApiResponseTransfer
     {
         try {
-            $sourceSpecObject = Reader::readFromJson($updateOpenApiRequestTransfer->getOpenApiDoc());
-        } catch (\Throwable $throwable) {
+            $sourceOpenApi = Reader::readFromJson($updateOpenApiRequestTransfer->getOpenApiDocOrFail());
+        } catch (Throwable $throwable) {
             return (new OpenApiResponseTransfer())
                 ->addError($this->messageBuilder->buildMessage($throwable->getMessage()));
         }
 
-        if (!$sourceSpecObject->validate()) {
+        if (!$sourceOpenApi->validate()) {
             return (new OpenApiResponseTransfer())->setErrors(
-                new \ArrayObject($sourceSpecObject->getErrors())
+                new ArrayObject($sourceOpenApi->getErrors()),
             );
         }
 
         $syncApiTargetFilepath = $this->filepathBuilder->buildSyncApiFilepath(
-            $updateOpenApiRequestTransfer->getOpenApiFile(),
-            $updateOpenApiRequestTransfer->getProjectRoot(),
+            $updateOpenApiRequestTransfer->getOpenApiFileOrFail(),
+            $updateOpenApiRequestTransfer->getProjectRootOrFail(),
         );
 
         try {
-            $targetSpecObject = Reader::readFromYamlFile($syncApiTargetFilepath, OpenApi::class, false);
-        } catch (\Throwable $throwable) {
-            $targetSpecObject = Reader::readFromYamlFile(
+            $targetOpenApi = Reader::readFromYamlFile($syncApiTargetFilepath, OpenApi::class, false);
+        } catch (Throwable $throwable) {
+            $targetOpenApi = Reader::readFromYamlFile(
                 $this->syncApiConfig->getPackageRootDirPath() . '/' .
                 $this->syncApiConfig->getDefaultRelativePathToOpenApiFile(),
                 OpenApi::class,
-                false
+                false,
             );
         }
 
-        $targetSpecObject = $this->merge($targetSpecObject, $sourceSpecObject);
+        try {
+            $targetOpenApi = $this->merge($targetOpenApi, $sourceOpenApi);
 
-        $this->createFileIfNotExists($syncApiTargetFilepath);
-        Writer::writeToYamlFile($targetSpecObject, $syncApiTargetFilepath);
+            $this->createFileIfNotExists($syncApiTargetFilepath);
+            Writer::writeToYamlFile($targetOpenApi, $syncApiTargetFilepath);
+        } catch (Throwable $throwable) {
+            return (new OpenApiResponseTransfer())
+                ->addError($this->messageBuilder->buildMessage($throwable->getMessage()));
+        }
 
         return (new OpenApiResponseTransfer())->addMessage($this->messageBuilder->buildMessage('Success!'));
     }
 
     /**
-     * @param \cebe\openapi\spec\OpenApi $targetSpecObject
-     * @param \cebe\openapi\spec\OpenApi $sourceSpecObject
+     * @param \cebe\openapi\spec\OpenApi $targetOpenApi
+     * @param \cebe\openapi\spec\OpenApi $sourceOpenApi
      *
      * @return \cebe\openapi\spec\OpenApi
      */
     protected function merge(
-        OpenApi $targetSpecObject,
-        OpenApi $sourceSpecObject
+        OpenApi $targetOpenApi,
+        OpenApi $sourceOpenApi
     ): OpenApi {
         foreach ($this->mergerCollection as $merger) {
-            $targetSpecObject = $merger->merge($targetSpecObject, $sourceSpecObject);
+            $targetOpenApi = $merger->merge($targetOpenApi, $sourceOpenApi);
         }
 
-        return $targetSpecObject;
+        return $targetOpenApi;
     }
 
     /**

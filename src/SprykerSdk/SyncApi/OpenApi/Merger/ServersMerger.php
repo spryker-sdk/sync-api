@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © 2019-present Spryker Systems GmbH. All rights reserved.
+ * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ */
+
 namespace SprykerSdk\SyncApi\OpenApi\Merger;
 
 use cebe\openapi\spec\OpenApi;
@@ -40,7 +45,7 @@ class ServersMerger implements MergerInterface
     {
         foreach ($targetOpenApi->servers as $targetServer) {
             if ($sourceServer->url === $targetServer->url) {
-                return $sourceServer;
+                return $targetServer;
             }
         }
 
@@ -53,7 +58,7 @@ class ServersMerger implements MergerInterface
      *
      * @param \cebe\openapi\spec\OpenApi $targetOpenApi
      *
-     * @return OpenApi
+     * @return \cebe\openapi\spec\OpenApi
      */
     protected function cleanupDefaultEmptyServer(OpenApi $targetOpenApi): OpenApi
     {

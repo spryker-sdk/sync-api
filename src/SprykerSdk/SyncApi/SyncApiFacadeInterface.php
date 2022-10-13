@@ -7,9 +7,9 @@
 
 namespace SprykerSdk\SyncApi;
 
-use Generated\Shared\Transfer\UpdateOpenApiRequestTransfer;
 use Transfer\OpenApiRequestTransfer;
 use Transfer\OpenApiResponseTransfer;
+use Transfer\UpdateOpenApiRequestTransfer;
 use Transfer\ValidateRequestTransfer;
 use Transfer\ValidateResponseTransfer;
 
@@ -57,7 +57,7 @@ interface SyncApiFacadeInterface
      *
      * @api
      *
-     * @param \Generated\Shared\Transfer\UpdateOpenApiRequestTransfer $openApiRequestTransfer
+     * @param \Transfer\UpdateOpenApiRequestTransfer $openApiRequestTransfer
      *
      * @return \Transfer\OpenApiResponseTransfer
      */

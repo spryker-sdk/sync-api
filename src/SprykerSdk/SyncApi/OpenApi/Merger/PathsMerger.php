@@ -1,19 +1,28 @@
 <?php
 
+/**
+ * Copyright © 2019-present Spryker Systems GmbH. All rights reserved.
+ * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ */
+
 namespace SprykerSdk\SyncApi\OpenApi\Merger;
 
 use cebe\openapi\spec\Components;
 use cebe\openapi\spec\OpenApi;
-use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\Paths;
-use cebe\openapi\spec\Schema;
 use cebe\openapi\Writer;
 use SprykerSdk\SyncApi\SyncApiConfig;
 
 class PathsMerger implements MergerInterface
 {
+    /**
+     * @var string
+     */
     protected const YML_EXTENSION = '.yml';
 
+    /**
+     * @var string
+     */
     protected const YAML_EXTENSION = '.yaml';
 
     /**
@@ -37,28 +46,26 @@ class PathsMerger implements MergerInterface
      */
     public function merge(OpenApi $targetOpenApi, OpenApi $sourceOpenApi): OpenApi
     {
-        if ($sourceOpenApi->paths) {
-            foreach ($sourceOpenApi->paths as $pathName => $sourcePathItem) {
-                if (!$targetOpenApi->paths) {
-                    $targetOpenApi->paths = new Paths([]);
-                }
+        foreach ($sourceOpenApi->paths as $pathName => $sourcePathItem) {
+            if ($targetOpenApi->paths === null) {
+                $targetOpenApi->paths = new Paths([]);
+            }
 
-                if (!$targetOpenApi->paths->hasPath($pathName)) {
-                    $targetOpenApi->paths->addPath($pathName, $sourcePathItem);
+            if (!$targetOpenApi->paths->hasPath($pathName)) {
+                $targetOpenApi->paths->addPath($pathName, $sourcePathItem);
 
-                    $targetOpenApi = $this->addRefsFromPathItem($targetOpenApi, $sourceOpenApi, $pathName);
+                $targetOpenApi = $this->addRefsFromPathItem($targetOpenApi, $sourceOpenApi, $pathName);
 
-                    continue;
-                }
+                continue;
+            }
 
-                $targetPathItem = $targetOpenApi->paths->getPath($pathName);
+            $targetPathItem = $targetOpenApi->paths->getPath($pathName);
 
-                foreach ($this->syncApiConfig->getAvailableHttpMethods() as $httpMethod) {
-                    if ($sourcePathItem->$httpMethod) {
-                        $targetPathItem->$httpMethod = $sourcePathItem->$httpMethod;
+            foreach ($this->syncApiConfig->getAvailableHttpMethods() as $httpMethod) {
+                if ($sourcePathItem->$httpMethod) {
+                    $targetPathItem->$httpMethod = $sourcePathItem->$httpMethod;
 
-                        $targetOpenApi = $this->addRefsFromOperation($targetOpenApi, $sourceOpenApi, $pathName, $httpMethod);
-                    }
+                    $targetOpenApi = $this->addRefsFromOperation($targetOpenApi, $sourceOpenApi, $pathName, $httpMethod);
                 }
             }
 
@@ -213,7 +220,7 @@ class PathsMerger implements MergerInterface
      */
     protected function getRefsFromArray(array $array, array $refs): array
     {
-        foreach($array as $key => $value) {
+        foreach ($array as $key => $value) {
             if ($key === '$ref') {
                 $refs[] = $value;
             }
@@ -274,7 +281,7 @@ class PathsMerger implements MergerInterface
 
             $targetOpenApi->components->parameters = array_merge(
                 $targetOpenApi->components->parameters,
-                [$parameterName => $parameterItem]
+                [$parameterName => $parameterItem],
             );
 
             $targetOpenApi = $this->addRefsFromParameter($targetOpenApi, $sourceOpenApi, $parameterName);
@@ -307,7 +314,7 @@ class PathsMerger implements MergerInterface
 
             $targetOpenApi->components->schemas = array_merge(
                 $targetOpenApi->components->schemas,
-                [$schemaName => $schemaItem]
+                [$schemaName => $schemaItem],
             );
 
             $targetOpenApi = $this->addRefsFromSchema($targetOpenApi, $sourceOpenApi, $schemaName);
@@ -323,19 +330,19 @@ class PathsMerger implements MergerInterface
      */
     protected function isExternalReference(string $reference): bool
     {
-        return str_contains($reference, static::YML_EXTENSION)
-            || str_contains($reference, static::YAML_EXTENSION);
+        return strpos($reference, static::YML_EXTENSION) !== false
+            || strpos($reference, static::YAML_EXTENSION) !== false;
     }
 
     /**
      * @param \cebe\openapi\spec\OpenApi $openApi
      * @param string $parameterName
      *
-     * @return \cebe\openapi\spec\Parameter|null
+     * @return \cebe\openapi\spec\Parameter|\cebe\openapi\spec\Reference|null
      */
-    protected function findParameterByReference(OpenApi $openApi, string $parameterName): ?Parameter
+    protected function findParameterByReference(OpenApi $openApi, string $parameterName)
     {
-        foreach($openApi->components->parameters as $currentParameterName => $parameterItem) {
+        foreach ($openApi->components->parameters as $currentParameterName => $parameterItem) {
             if ($currentParameterName === $parameterName) {
                 return $parameterItem;
             }
@@ -348,11 +355,11 @@ class PathsMerger implements MergerInterface
      * @param \cebe\openapi\spec\OpenApi $openApi
      * @param string $schemaName
      *
-     * @return \cebe\openapi\spec\Schema|null
+     * @return \cebe\openapi\spec\Schema|\cebe\openapi\spec\Reference|null
      */
-    protected function findSchemaByReference(OpenApi $openApi, string $schemaName): ?Schema
+    protected function findSchemaByReference(OpenApi $openApi, string $schemaName)
     {
-        foreach($openApi->components->schemas as $currentSchemaName => $schema) {
+        foreach ($openApi->components->schemas as $currentSchemaName => $schema) {
             if ($currentSchemaName === $schemaName) {
                 return $schema;
             }
@@ -379,7 +386,7 @@ class PathsMerger implements MergerInterface
                 $openApi->components->parameters
                     = $this->getArrayWithoutKey(
                         $openApi->components->parameters,
-                        $parameterName
+                        $parameterName,
                     );
             }
         }
@@ -391,7 +398,7 @@ class PathsMerger implements MergerInterface
                 $openApi->components->schemas
                     = $this->getArrayWithoutKey(
                         $openApi->components->schemas,
-                        $schemaName
+                        $schemaName,
                     );
             }
         }
@@ -432,4 +439,3 @@ class PathsMerger implements MergerInterface
         return $schemas;
     }
 }
-

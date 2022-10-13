@@ -28,11 +28,6 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
     public const PROJECT_ROOT = 'projectRoot';
 
     /**
-     * @var string
-     */
-    public const IS_VALIDATE = 'isValidate';
-
-    /**
      * @var string|null
      */
     protected $openApiFile;
@@ -48,11 +43,6 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
     protected $projectRoot;
 
     /**
-     * @var bool|null
-     */
-    protected $isValidate;
-
-    /**
      * @var array<string, string>
      */
     protected $transferPropertyNameMap = [
@@ -65,9 +55,6 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
         'project_root' => 'projectRoot',
         'projectRoot' => 'projectRoot',
         'ProjectRoot' => 'projectRoot',
-        'is_validate' => 'isValidate',
-        'isValidate' => 'isValidate',
-        'IsValidate' => 'isValidate',
     ];
 
     /**
@@ -102,18 +89,6 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
             'type' => 'string',
             'type_shim' => null,
             'name_underscore' => 'project_root',
-            'is_collection' => false,
-            'is_transfer' => false,
-            'is_value_object' => false,
-            'rest_request_parameter' => 'no',
-            'is_associative' => false,
-            'is_nullable' => false,
-            'is_strict' => false,
-        ],
-        self::IS_VALIDATE => [
-            'type' => 'bool',
-            'type_shim' => null,
-            'name_underscore' => 'is_validate',
             'is_collection' => false,
             'is_transfer' => false,
             'is_value_object' => false,
@@ -344,79 +319,6 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
     }
 
     /**
-     * @module Syncapi
-     *
-     * @param bool|null $isValidate
-     *
-     * @return $this
-     */
-    public function setIsValidate($isValidate)
-    {
-        $this->isValidate = $isValidate;
-        $this->modifiedProperties[self::IS_VALIDATE] = true;
-
-        return $this;
-    }
-
-    /**
-     * @module Syncapi
-     *
-     * @return bool|null
-     */
-    public function getIsValidate()
-    {
-        return $this->isValidate;
-    }
-
-    /**
-     * @module Syncapi
-     *
-     * @param bool|null $isValidate
-     *
-     * @throws \Spryker\Shared\Kernel\Transfer\Exception\NullValueException
-     *
-     * @return $this
-     */
-    public function setIsValidateOrFail($isValidate)
-    {
-        if ($isValidate === null) {
-            $this->throwNullValueException(static::IS_VALIDATE);
-        }
-
-        return $this->setIsValidate($isValidate);
-    }
-
-    /**
-     * @module Syncapi
-     *
-     * @throws \Spryker\Shared\Kernel\Transfer\Exception\NullValueException
-     *
-     * @return bool
-     */
-    public function getIsValidateOrFail()
-    {
-        if ($this->isValidate === null) {
-            $this->throwNullValueException(static::IS_VALIDATE);
-        }
-
-        return $this->isValidate;
-    }
-
-    /**
-     * @module Syncapi
-     *
-     * @throws \Spryker\Shared\Kernel\Transfer\Exception\RequiredTransferPropertyException
-     *
-     * @return $this
-     */
-    public function requireIsValidate()
-    {
-        $this->assertPropertyIsSet(self::IS_VALIDATE);
-
-        return $this;
-    }
-
-    /**
      * @param array<string, mixed> $data
      * @param bool $ignoreMissingProperty
      *
@@ -433,7 +335,6 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
                 case 'openApiFile':
                 case 'openApiDoc':
                 case 'projectRoot':
-                case 'isValidate':
                     $this->$normalizedPropertyName = $value;
                     $this->modifiedProperties[$normalizedPropertyName] = true;
 
@@ -556,7 +457,6 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
                 case 'openApiFile':
                 case 'openApiDoc':
                 case 'projectRoot':
-                case 'isValidate':
                     $values[$arrayKey] = $value;
 
                     break;
@@ -586,7 +486,6 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
                 case 'openApiFile':
                 case 'openApiDoc':
                 case 'projectRoot':
-                case 'isValidate':
                     $values[$arrayKey] = $value;
 
                     break;
@@ -646,7 +545,6 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
             'openApiFile' => $this->openApiFile,
             'openApiDoc' => $this->openApiDoc,
             'projectRoot' => $this->projectRoot,
-            'isValidate' => $this->isValidate,
         ];
     }
 
@@ -659,7 +557,6 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
             'open_api_file' => $this->openApiFile,
             'open_api_doc' => $this->openApiDoc,
             'project_root' => $this->projectRoot,
-            'is_validate' => $this->isValidate,
         ];
     }
 
@@ -672,7 +569,6 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
             'open_api_file' => $this->openApiFile instanceof AbstractTransfer ? $this->openApiFile->toArray(true, false) : $this->openApiFile,
             'open_api_doc' => $this->openApiDoc instanceof AbstractTransfer ? $this->openApiDoc->toArray(true, false) : $this->openApiDoc,
             'project_root' => $this->projectRoot instanceof AbstractTransfer ? $this->projectRoot->toArray(true, false) : $this->projectRoot,
-            'is_validate' => $this->isValidate instanceof AbstractTransfer ? $this->isValidate->toArray(true, false) : $this->isValidate,
         ];
     }
 
@@ -685,7 +581,6 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
             'openApiFile' => $this->openApiFile instanceof AbstractTransfer ? $this->openApiFile->toArray(true, true) : $this->openApiFile,
             'openApiDoc' => $this->openApiDoc instanceof AbstractTransfer ? $this->openApiDoc->toArray(true, true) : $this->openApiDoc,
             'projectRoot' => $this->projectRoot instanceof AbstractTransfer ? $this->projectRoot->toArray(true, true) : $this->projectRoot,
-            'isValidate' => $this->isValidate instanceof AbstractTransfer ? $this->isValidate->toArray(true, true) : $this->isValidate,
         ];
     }
 }

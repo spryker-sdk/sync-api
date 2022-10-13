@@ -26,9 +26,9 @@ class SyncApiConfig
     }
 
     /**
-     * @return string
      * @api
      *
+     * @return string
      */
     public function getProjectRootPath(): string
     {
@@ -57,10 +57,13 @@ class SyncApiConfig
     {
         return [
             'get',
-            'post',
             'put',
-            'patch',
+            'post',
             'delete',
+            'options',
+            'head',
+            'patch',
+            'trace',
         ];
     }
 

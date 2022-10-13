@@ -7,6 +7,8 @@
 
 namespace SprykerSdkTest\Helper;
 
+use Codeception\Module;
+
 trait SyncApiHelperTrait
 {
     /**
@@ -25,5 +27,5 @@ trait SyncApiHelperTrait
      *
      * @return \Codeception\Module
      */
-    abstract protected function getModule($name);
+    abstract protected function getModule(string $name): Module;
 }

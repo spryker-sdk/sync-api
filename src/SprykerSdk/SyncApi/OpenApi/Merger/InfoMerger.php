@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © 2019-present Spryker Systems GmbH. All rights reserved.
+ * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ */
+
 namespace SprykerSdk\SyncApi\OpenApi\Merger;
 
 use cebe\openapi\spec\OpenApi;
@@ -14,7 +19,7 @@ class InfoMerger implements MergerInterface
      */
     public function merge(OpenApi $targetOpenApi, OpenApi $sourceOpenApi): OpenApi
     {
-        if ($sourceOpenApi->info) {
+        if ($sourceOpenApi->info !== null) {
             $targetOpenApi->info = $sourceOpenApi->info;
         }
 
