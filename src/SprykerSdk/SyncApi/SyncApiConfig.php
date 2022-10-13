@@ -10,9 +10,9 @@ namespace SprykerSdk\SyncApi;
 class SyncApiConfig
 {
     /**
-     * @return string
      * @api
      *
+     * @return string
      */
     public function getDefaultRelativePathToOpenApiFile(): string
     {
