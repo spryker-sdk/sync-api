@@ -26,6 +26,7 @@ The following console commands are available:
 - `vendor/bin/syncapi schema:openapi:create`
 - `vendor/bin/syncapi schema:openapi:validate`
 - `vendor/bin/syncapi code:openapi:generate`
+- `vendor/bin/syncapi code:openapi:update`
 
 ## Adding an OpenAPI file
 
@@ -35,9 +36,12 @@ The `vendor/bin/syncapi schema:openapi:create` adds a minimal OpenAPI file.
 
 The `vendor/bin/syncapi schema:openapi:validate` validates an OpenAPI file.
 
-
 ## Create code from an existing OpenAPI
 
 The `vendor/bin/syncapi code:openapi:generate` reads an existing OpenAPI file and creates code out of it.
+
+## Update an OpenApi file with provided OpenApi schema
+
+The `vendor/bin/syncapi code:openapi:update` updates an existing (or creates new if file doesn't exist) OpenAPI file with provided via CLI OpenAPI shcema converted to JSON.
 
 

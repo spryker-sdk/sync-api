@@ -28,18 +28,6 @@ class OpenApiUpdateConsoleTest extends Unit
     /**
      * @return void
      */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        if (!defined('SRYKER_SYNCAPI_PACKAGE_ROOT_DIR')) {
-            require __DIR__ . '/../../../../bootstrap/bootstrap.php';
-        }
-    }
-
-    /**
-     * @return void
-     */
     public function testOpenApiUpdateConsoleWithExistedFile(): void
     {
         // Arrange

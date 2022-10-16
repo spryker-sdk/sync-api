@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+    title: 'App Tenant Registry Service (ATRS)'
+    description: 'The App Tenant Registry Service is capable of managing Apps, Tenants and connection and configureation between them.'
+    version: 0.2.3
+servers:
+    - url: https://glue.trs.demo-spryker.com
+      description: 'Main (production) server'
+    - url: https://glue.trs-staging.demo-spryker.com
+      description: 'Internal staging server for testing'
+    - url: http://glue.registry.spryker.local
+      description: 'Internal development server'
+paths:
+    /apps:
+        post:
+            summary: 'Registers an App within the Registry service'
+            requestBody:
+                description: 'Contains all required data to register an App within the Registry service.'
+                required: true
+                content:
+                    application/vnd.api+json:
+                        schema:
+                            $ref: '#/components/schemas/AppRegistrationApiRequest'
+            responses:
+                201:
+                    description: 'App is registered.'
+                    content:
+                        application/vnd.api+json:
+                            schema:
+                                $ref: '#/components/schemas/AppRegistrationApiResponse'
+                500:
+                    description: 'Server error'
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+components:
+    schemas:
+        AppRegistrationApiRequest:
+            properties:
+                prop:
+                    type: string
+        AppRegistrationApiResponse:
+            properties:
+                prop:
+                    type: string
+    parameters:

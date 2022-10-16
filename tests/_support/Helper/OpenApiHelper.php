@@ -101,18 +101,36 @@ class OpenApiHelper extends Module
     }
 
     /**
+     * @param string $pathToOpenApi
+     *
+     * @return void
+     */
+    protected function prepareExistingOpenApiFile(string $pathToOpenApi): void
+    {
+        $filePath = sprintf('%s/resources/api/existing.yml', $this->getSyncApiHelper()->getRootPath());
+
+        if (!is_dir(dirname($filePath))) {
+            mkdir(dirname($filePath), 0770, true);
+        }
+
+        file_put_contents($filePath, file_get_contents($pathToOpenApi));
+    }
+
+    /**
      * @return \Transfer\UpdateOpenApiRequestTransfer
      */
-    public function haveUpdateExistedFileRequest(): UpdateOpenApiRequestTransfer
+    public function haveUpdateExistingFileRequest(): UpdateOpenApiRequestTransfer
     {
+        $this->prepareExistingOpenApiFile(codecept_data_dir('api/update/existing.yml'));
+
         $updateOpenApiRequestTransfer = new UpdateOpenApiRequestTransfer();
 
         $config = $this->getSyncApiHelper()->getConfig();
 
         $updateOpenApiRequestTransfer
             ->setProjectRoot($config->getProjectRootPath())
-            ->setOpenApiFile('resources/api/openapi.yml')
-            ->setOpenApiDoc(json_encode(Yaml::parseFile(codecept_data_dir('api/valid/valid_openapi.yml'))));
+            ->setOpenApiFile('resources/api/existing.yml')
+            ->setOpenApiDoc(json_encode(Yaml::parseFile(codecept_data_dir('api/update/source.yml'))));
 
         return $updateOpenApiRequestTransfer;
     }
@@ -120,7 +138,7 @@ class OpenApiHelper extends Module
     /**
      * @return \Transfer\UpdateOpenApiRequestTransfer
      */
-    public function haveUpdateNotExistedFileRequest(): UpdateOpenApiRequestTransfer
+    public function haveUpdateNewFileRequest(): UpdateOpenApiRequestTransfer
     {
         $updateOpenApiRequestTransfer = new UpdateOpenApiRequestTransfer();
 
@@ -128,12 +146,8 @@ class OpenApiHelper extends Module
 
         $updateOpenApiRequestTransfer
             ->setProjectRoot($config->getProjectRootPath())
-            ->setOpenApiFile('new_file.yml')
-            ->setOpenApiDoc(
-                json_encode(
-                    Yaml::parseFile(codecept_data_dir('api/invalid/invalid_openapi.yml')),
-                ),
-            );
+            ->setOpenApiFile('resources/api/new_file.yml')
+            ->setOpenApiDoc(json_encode(Yaml::parseFile(codecept_data_dir('api/update/source.yml'))));
 
         return $updateOpenApiRequestTransfer;
     }

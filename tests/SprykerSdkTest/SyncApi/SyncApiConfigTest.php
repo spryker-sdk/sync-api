@@ -20,19 +20,7 @@ class SyncApiConfigTest extends Unit
     /**
      * @var \SprykerSdkTest\SyncApi\SyncApiTester
      */
-    protected SyncApiTester $tester;
-
-    /**
-     * @return void
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        if (!defined('SRYKER_SYNCAPI_PACKAGE_ROOT_DIR')) {
-            require __DIR__ . '/../../../bootstrap/bootstrap.php';
-        }
-    }
+    protected $tester;
 
     /**
      * Tests that ensures we get the default executable path when installed the "normal" way.
@@ -115,20 +103,5 @@ class SyncApiConfigTest extends Unit
             ],
             $httpMethods,
         );
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetPackageRootDirPath(): void
-    {
-        // Arrange
-        $config = new SyncApiConfig();
-
-        // Act
-        $packageRootDir = $config->getPackageRootDirPath();
-
-        // Assert
-        $this->assertEquals(SRYKER_SYNCAPI_PACKAGE_ROOT_DIR, $packageRootDir);
     }
 }

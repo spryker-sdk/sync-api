@@ -66,12 +66,4 @@ class SyncApiConfig
             'trace',
         ];
     }
-
-    /**
-     * @return string
-     */
-    public function getPackageRootDirPath(): string
-    {
-        return SRYKER_SYNCAPI_PACKAGE_ROOT_DIR;
-    }
 }

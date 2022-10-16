@@ -17,8 +17,6 @@ if (!defined('COMPOSER_INSTALL')) {
 
 require_once COMPOSER_INSTALL;
 
-require_once __DIR__ . '/../bootstrap/bootstrap.php';
-
 use SprykerSdk\SyncApi\Console\OpenApiUpdateConsole;
 use Symfony\Component\Console\Application;
 use SprykerSdk\SyncApi\Console\OpenApiCodeGenerateConsole;

@@ -67,7 +67,7 @@ class SyncApiHelper extends Module
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\SyncApiConfig
+     * @return \SprykerSdk\SyncApi\SyncApiConfig|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getConfig(): SyncApiConfig
     {
