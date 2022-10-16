@@ -7,6 +7,8 @@
 
 namespace SprykerSdkTest\SyncApi;
 
+use cebe\openapi\Reader;
+use cebe\openapi\spec\OpenApi;
 use Codeception\Actor;
 
 /**
@@ -30,6 +32,12 @@ class SyncApiTester extends Actor
     use _generated\SyncApiTesterActions;
 
     /**
-     * Define custom actions here
+     * @param string $yamlFixturePath
+     *
+     * @return \cebe\openapi\spec\OpenApi
      */
+    public function loadOpenApiFromYaml(string $yamlFixturePath): OpenApi
+    {
+        return Reader::readFromYamlFile(codecept_data_dir('api/' . $yamlFixturePath), OpenApi::class, false);
+    }
 }

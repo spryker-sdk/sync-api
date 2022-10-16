@@ -14,6 +14,7 @@ use org\bovigo\vfs\vfsStream;
 use SprykerSdk\SyncApi\SyncApiConfig;
 use SprykerSdk\SyncApi\SyncApiFacade;
 use SprykerSdk\SyncApi\SyncApiFacadeInterface;
+use SprykerSdk\SyncApi\SyncApiFactory;
 
 class SyncApiHelper extends Module
 {
@@ -55,6 +56,14 @@ class SyncApiHelper extends Module
     public function getFacade(): SyncApiFacadeInterface
     {
         return new SyncApiFacade();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\SyncApiFactory
+     */
+    public function getFactory(): SyncApiFactory
+    {
+        return new SyncApiFactory();
     }
 
     /**

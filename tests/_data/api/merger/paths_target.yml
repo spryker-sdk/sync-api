@@ -1,0 +1,146 @@
+openapi: 3.0.0
+info:
+    version: 1.0.0
+    contact:
+        name: Spryker
+        url: 'https://apps.spryker.com/'
+        email: support@spryker.com
+    title: 'Spryker App API'
+    license:
+        name: Proprietary
+servers:
+    - url: https://glue.trs.demo-spryker.com
+      description: 'Main (production) server'
+    - url: https://glue.trs-staging.demo-spryker.com
+      description: 'Internal staging server for testing'
+    - url: http://glue.registry.spryker.local
+      description: 'Internal development server'
+paths:
+    /apps:
+        post:
+            summary: 'Registers an App within the Registry service'
+            parameters:
+                -   $ref: '#/components/parameters/storeReference'
+            requestBody:
+                description: 'Contains all required data to register an App within the Registry service.'
+                required: true
+                content:
+                    application/vnd.api+json:
+                        schema:
+                            $ref: '#/components/schemas/AppRegistrationApiRequest'
+            responses:
+                201:
+                    description: 'App is registered.'
+                    content:
+                        application/vnd.api+json:
+                            schema:
+                                $ref: '#/components/schemas/AppRegistrationApiResponse'
+                400:
+                    description: 'Invalid request.'
+                    content:
+                        application/vnd.api+json:
+                            schema:
+                                $ref: '#/components/schemas/ApiErrorMessage'
+                500:
+                    description: 'Server error'
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                default:
+                    description: 'Expected response to a bad request.'
+                    content:
+                        application/vnd.api+json:
+                            schema:
+                                $ref: '#/components/schemas/ApiErrorMessage'
+        get:
+            summary: 'will be updated'
+            parameters:
+                -   $ref: '#/components/parameters/storeReferenceObsolete'
+            responses:
+                200:
+                    description: 'will be updated'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AppCollectionApiResponse will be updated'
+                400:
+                    description: 'Invalid request. will be updated'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ApiErrorMessage'
+                default:
+                    description: 'Expected response to a bad request. will be updated'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ApiErrorMessage'
+components:
+    schemas:
+        AppRegistrationApiRequest:
+            properties:
+                data:
+                    $ref: '#/components/schemas/AppRegistrationApiRequestData'
+        AppRegistrationApiRequestData:
+            properties:
+                type:
+                    type: string
+                    example: 'apps'
+
+                attributes:
+                    $ref: '#/components/schemas/AppRegistrationApiRequestAttributes'
+        AppRegistrationApiRequestAttributes:
+            properties:
+                api:
+                    type: string
+                    example: '{
+                        "connect": "https://some-url",
+                        "disconnect": "https://some-url",
+                        "configuration": "https://some-url"
+                    }'
+                manifest:
+                    type: string
+                    example: '{
+                        "en_US", {},
+                        "de_DE", {},
+                        }'
+                configuration:
+                    type: string
+                    example: '{"type": "object", "title": "title", "description": "description", "properties": {"username": {"type": "string","title": "username"}}}'
+                translation:
+                    type: string
+                    example: '{"username": {"de_DE": "Benutzername","en_US": "Username"}}'
+            required:
+                - manifest
+        ApiErrorMessage:
+            properties:
+                code:
+                    type: string
+                detail:
+                    type: string
+                status:
+                    type: integer
+        ApiErrorMessageToRemove:
+            properties:
+                code:
+                    type: 'to remove'
+                detail:
+                    type: 'to remove'
+                status:
+                    type: 'to remove'
+    parameters:
+        storeReferenceObsolete:
+            name: X-Store-Reference-Obsolete
+            in: header
+            required: true
+            description: 'Reference of the Tenants store. (to remove)'
+            schema:
+                type: string
+        storeReferenceToRemove:
+            name: 'to remove'
+            in: 'to remove'
+            required: 'to remove'
+            description: 'to remove'
+            schema:
+                type: 'to remove'

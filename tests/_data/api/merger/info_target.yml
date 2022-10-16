@@ -1,0 +1,51 @@
+openapi: 3.0.0
+info:
+    version: 'will be updated'
+    contact:
+        name: 'will be updated'
+        url: 'will be updated'
+        email: 'will be updated'
+    title: 'will be updated'
+    license:
+        name: 'will be updated'
+servers:
+    - url: https://glue.trs.demo-spryker.com
+      description: 'Main (production) server'
+paths:
+    /apps:
+        get:
+            summary: 'Lists all available apps for a given locale.'
+            parameters:
+                - name: Accept-Language
+                  in: header
+                  description: 'Locale to be used to get the localised details.'
+                  example: 'en'
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: 'Expected response to a valid request.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AppCollectionApiResponse'
+                default:
+                    description: 'Expected response to a bad request.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ApiErrorMessage'
+components:
+    schemas:
+        ApiErrorMessage:
+            properties:
+                code:
+                    type: string
+                detail:
+                    type: string
+                status:
+                    type: integer
+        AppCollectionApiResponse:
+            properties:
+                data:
+                    type: string

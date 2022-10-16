@@ -68,11 +68,9 @@ class PathsMerger implements MergerInterface
                     $targetOpenApi = $this->addRefsFromOperation($targetOpenApi, $sourceOpenApi, $pathName, $httpMethod);
                 }
             }
-
-            $targetOpenApi = $this->removeUnusedComponents($targetOpenApi);
         }
 
-        return $targetOpenApi;
+        return $this->removeUnusedComponents($targetOpenApi);
     }
 
     /**

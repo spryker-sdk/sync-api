@@ -1,0 +1,105 @@
+openapi: 3.0.0
+info:
+    version: 1.0.0
+    contact:
+        name: Spryker
+        url: 'https://apps.spryker.com/'
+        email: support@spryker.com
+    title: 'Spryker App API'
+    license:
+        name: Proprietary
+servers:
+    - url: https://glue.trs.demo-spryker.com
+      description: 'Main (production) server'
+    - url: https://glue.trs-staging.demo-spryker.com
+      description: 'Internal staging server for testing'
+    - url: http://glue.registry.spryker.local
+      description: 'Internal development server'
+paths:
+    /apps:
+        get:
+            summary: 'Lists all available apps for a given locale.'
+            parameters:
+                -   $ref: '#/components/parameters/storeReference'
+            responses:
+                200:
+                    description: 'Expected response to a valid request.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AppCollectionApiResponse'
+                400:
+                    description: 'Invalid request.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ApiErrorMessage'
+                default:
+                    description: 'Expected response to a bad request.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ApiErrorMessage'
+components:
+    schemas:
+        AppCollectionApiResponse:
+            properties:
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AppCollectionApiResponseData'
+
+        AppCollectionApiResponseData:
+            properties:
+                type:
+                    type: string
+                    example: 'App Collection'
+                items:
+                    $ref: '#/components/schemas/AppApiResponseAttributes'
+        AppApiResponseAttributes:
+            properties:
+                id:
+                    type: string
+                    example: 'UUID_app123'
+                name:
+                    type: string
+                    example: 'Spryker App'
+                description:
+                    type: string
+                    example: 'App short description'
+                status:
+                    $ref: 'remote_status.yml#/components/schemas/ConnectionStatus'
+                categories:
+                    type: array
+                    items:
+                        type: string
+                    example: [ 'Category A', 'Category B' ]
+                labels:
+                    type: array
+                    items:
+                        type: string
+                    example: [ 'Label A', 'Label B' ]
+                iconUrl:
+                    type: string
+                    example: 'https://app.com/icon/app.png'
+                manifest:
+                    $ref: 'remote_manifest.yaml#/components/schemas/ConnectionStatus'
+                configuration:
+                    type: string
+                    example: '{"type": "object", "title": "Credentials", "description": "Security area", "properties": {"username": {"type": "string","title": "username"}}}'
+        ApiErrorMessage:
+            properties:
+                code:
+                    type: string
+                detail:
+                    type: string
+                status:
+                    type: integer
+    parameters:
+        storeReference:
+            name: X-Store-Reference
+            in: header
+            required: true
+            description: 'Reference of the Tenants store.'
+            schema:
+                type: string
