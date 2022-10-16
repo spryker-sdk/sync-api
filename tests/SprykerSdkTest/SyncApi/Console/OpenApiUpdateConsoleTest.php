@@ -28,7 +28,7 @@ class OpenApiUpdateConsoleTest extends Unit
     /**
      * @return void
      */
-    public function testOpenApiUpdateConsoleWithExistedFile(): void
+    public function testOpenApiUpdateConsoleSuccessfullyUpdatesExistedFile(): void
     {
         // Arrange
         $commandTester = $this->tester->getConsoleTester(OpenApiUpdateConsole::class);
@@ -53,7 +53,7 @@ class OpenApiUpdateConsoleTest extends Unit
     /**
      * @return void
      */
-    public function testOpenApiUpdateConsoleWithNotExistedFile(): void
+    public function testOpenApiUpdateConsoleSuccessfullyUpdatesNewFile(): void
     {
         // Arrange
         $commandTester = $this->tester->getConsoleTester(OpenApiUpdateConsole::class);
@@ -77,7 +77,7 @@ class OpenApiUpdateConsoleTest extends Unit
     /**
      * @return void
      */
-    public function testOpenApiUpdateConsoleWithExistedFileAndInvalidSourceData(): void
+    public function testOpenApiUpdateConsoleStopsWithErrorWhenSourceDataHasInvalidJson(): void
     {
         // Arrange
         $commandTester = $this->tester->getConsoleTester(OpenApiUpdateConsole::class);
@@ -87,6 +87,50 @@ class OpenApiUpdateConsoleTest extends Unit
         $commandTester->execute(
             [
                 OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => 'INVALID_JSON',
+                '--' . OpenApiUpdateConsole::OPTION_OPEN_API_FILE => $this->tester->getOpenApiSchemaPath() . '/openapi.yml',
+                '--' . OpenApiUpdateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
+            ],
+        );
+
+        // Assert
+        $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
+    }
+
+    /**
+     * @return void
+     */
+    public function testOpenApiUpdateConsoleStopsWithErrorWhenSourceDataHasInvalidOpenApiSchema(): void
+    {
+        // Arrange
+        $commandTester = $this->tester->getConsoleTester(OpenApiUpdateConsole::class);
+        $this->tester->haveValidOpenApiFile();
+
+        // Act
+        $commandTester->execute(
+            [
+                OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => '{}',
+                '--' . OpenApiUpdateConsole::OPTION_OPEN_API_FILE => $this->tester->getOpenApiSchemaPath() . '/openapi.yml',
+                '--' . OpenApiUpdateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
+            ],
+        );
+
+        // Assert
+        $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
+    }
+
+    /**
+     * @return void
+     */
+    public function testOpenApiUpdateConsoleStopsWithErrorWhenMergeProcessWillFails(): void
+    {
+        // Arrange
+        $commandTester = $this->tester->getConsoleTester(OpenApiUpdateConsole::class);
+        $this->tester->haveValidOpenApiFile();
+
+        // Act
+        $commandTester->execute(
+            [
+                OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => $this->tester->getOpenApiContentsWithMissedReferenceJson(),
                 '--' . OpenApiUpdateConsole::OPTION_OPEN_API_FILE => $this->tester->getOpenApiSchemaPath() . '/openapi.yml',
                 '--' . OpenApiUpdateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
             ],

@@ -11,9 +11,9 @@ interface FilepathBuilderInterface
 {
     /**
      * @param string $filename
-     * @param string|null $rootDirectoryPath
+     * @param string $rootDirectoryPath
      *
      * @return string
      */
-    public function buildSyncApiFilepath(string $filename, ?string $rootDirectoryPath): string;
+    public function buildSyncApiFilepath(string $filename, string $rootDirectoryPath): string;
 }

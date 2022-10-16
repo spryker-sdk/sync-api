@@ -11,10 +11,22 @@ use cebe\openapi\spec\Components;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Paths;
 use cebe\openapi\Writer;
+use SprykerSdk\SyncApi\OpenApi\Merger\Exception\ParameterNotFoundInSourceOpenApiException;
+use SprykerSdk\SyncApi\OpenApi\Merger\Exception\SchemaNotFoundInSourceOpenApiException;
 use SprykerSdk\SyncApi\SyncApiConfig;
 
 class PathsMerger implements MergerInterface
 {
+    /**
+     * @var string
+     */
+    public const PARAMETER_NOT_FOUND_EXCEPTION_MESSAGE_TEMPLATE = 'Parameter "%s" not found in source Open API';
+
+    /**
+     * @var string
+     */
+    public const SCHEMA_NOT_FOUND_EXCEPTION_MESSAGE_TEMPLATE = 'Schema "%s" not found in source Open API';
+
     /**
      * @var string
      */
@@ -266,26 +278,14 @@ class PathsMerger implements MergerInterface
     {
         $parameterName = $this->getObjectName($reference);
 
-        $parameterItem = $this->findParameterByReference($sourceOpenApi, $parameterName);
+        $parameterItem = $this->getParameterByReference($sourceOpenApi, $parameterName);
 
-        if ($parameterItem) {
-            if (!$targetOpenApi->components) {
-                $targetOpenApi->components = new Components([]);
-            }
+        $targetOpenApi->components->parameters = array_merge(
+            $targetOpenApi->components->parameters,
+            [$parameterName => $parameterItem],
+        );
 
-            if (!$targetOpenApi->components->parameters) {
-                $targetOpenApi->components->parameters = [];
-            }
-
-            $targetOpenApi->components->parameters = array_merge(
-                $targetOpenApi->components->parameters,
-                [$parameterName => $parameterItem],
-            );
-
-            $targetOpenApi = $this->addRefsFromParameter($targetOpenApi, $sourceOpenApi, $parameterName);
-        }
-
-        return $targetOpenApi;
+        return $this->addRefsFromParameter($targetOpenApi, $sourceOpenApi, $parameterName);
     }
 
     /**
@@ -299,26 +299,22 @@ class PathsMerger implements MergerInterface
     {
         $schemaName = $this->getObjectName($reference);
 
-        $schemaItem = $this->findSchemaByReference($sourceOpenApi, $schemaName);
+        $schemaItem = $this->getSchemaByReference($sourceOpenApi, $schemaName);
 
-        if ($schemaItem) {
-            if (!$targetOpenApi->components) {
-                $targetOpenApi->components = new Components([]);
-            }
-
-            if (!$targetOpenApi->components->schemas) {
-                $targetOpenApi->components->schemas = [];
-            }
-
-            $targetOpenApi->components->schemas = array_merge(
-                $targetOpenApi->components->schemas,
-                [$schemaName => $schemaItem],
-            );
-
-            $targetOpenApi = $this->addRefsFromSchema($targetOpenApi, $sourceOpenApi, $schemaName);
+        if (!$targetOpenApi->components) {
+            $targetOpenApi->components = new Components([]);
         }
 
-        return $targetOpenApi;
+        if (!$targetOpenApi->components->schemas) {
+            $targetOpenApi->components->schemas = [];
+        }
+
+        $targetOpenApi->components->schemas = array_merge(
+            $targetOpenApi->components->schemas,
+            [$schemaName => $schemaItem],
+        );
+
+        return $this->addRefsFromSchema($targetOpenApi, $sourceOpenApi, $schemaName);
     }
 
     /**
@@ -336,9 +332,11 @@ class PathsMerger implements MergerInterface
      * @param \cebe\openapi\spec\OpenApi $openApi
      * @param string $parameterName
      *
-     * @return \cebe\openapi\spec\Parameter|\cebe\openapi\spec\Reference|null
+     * @throws \SprykerSdk\SyncApi\OpenApi\Merger\Exception\ParameterNotFoundInSourceOpenApiException
+     *
+     * @return \cebe\openapi\spec\Parameter|\cebe\openapi\spec\Reference
      */
-    protected function findParameterByReference(OpenApi $openApi, string $parameterName)
+    protected function getParameterByReference(OpenApi $openApi, string $parameterName)
     {
         foreach ($openApi->components->parameters as $currentParameterName => $parameterItem) {
             if ($currentParameterName === $parameterName) {
@@ -346,16 +344,23 @@ class PathsMerger implements MergerInterface
             }
         }
 
-        return null;
+        throw new ParameterNotFoundInSourceOpenApiException(
+            sprintf(
+                static::PARAMETER_NOT_FOUND_EXCEPTION_MESSAGE_TEMPLATE,
+                $parameterName,
+            ),
+        );
     }
 
     /**
      * @param \cebe\openapi\spec\OpenApi $openApi
      * @param string $schemaName
      *
-     * @return \cebe\openapi\spec\Schema|\cebe\openapi\spec\Reference|null
+     * @throws \SprykerSdk\SyncApi\OpenApi\Merger\Exception\SchemaNotFoundInSourceOpenApiException
+     *
+     * @return \cebe\openapi\spec\Schema|\cebe\openapi\spec\Reference
      */
-    protected function findSchemaByReference(OpenApi $openApi, string $schemaName)
+    protected function getSchemaByReference(OpenApi $openApi, string $schemaName)
     {
         foreach ($openApi->components->schemas as $currentSchemaName => $schema) {
             if ($currentSchemaName === $schemaName) {
@@ -363,7 +368,12 @@ class PathsMerger implements MergerInterface
             }
         }
 
-        return null;
+        throw new SchemaNotFoundInSourceOpenApiException(
+            sprintf(
+                static::PARAMETER_NOT_FOUND_EXCEPTION_MESSAGE_TEMPLATE,
+                $schemaName,
+            ),
+        );
     }
 
     /**

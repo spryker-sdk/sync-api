@@ -145,7 +145,7 @@ class SyncApiFactory
      */
     public function createFilepathBuilder(): FilepathBuilderInterface
     {
-        return new FilepathBuilder($this->getConfig()->getProjectRootPath());
+        return new FilepathBuilder();
     }
 
     /**
