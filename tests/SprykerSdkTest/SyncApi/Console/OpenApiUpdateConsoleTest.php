@@ -86,7 +86,7 @@ class OpenApiUpdateConsoleTest extends Unit
         // Act
         $commandTester->execute(
             [
-                OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => '{}',
+                OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => 'INVALID_JSON',
                 '--' . OpenApiUpdateConsole::OPTION_OPEN_API_FILE => $this->tester->getOpenApiSchemaPath() . '/openapi.yml',
                 '--' . OpenApiUpdateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
             ],
@@ -95,4 +95,6 @@ class OpenApiUpdateConsoleTest extends Unit
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
     }
+
+
 }
