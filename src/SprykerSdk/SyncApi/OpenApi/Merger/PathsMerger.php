@@ -180,10 +180,6 @@ class PathsMerger implements MergerInterface
 
         $parameterAsArray = $sourceOpenApiAsArray['components']['parameters'][$parameterName];
 
-        if (!$parameterAsArray) {
-            return $targetOpenApi;
-        }
-
         $refs = array_unique($this->getRefsFromArray($parameterAsArray, []));
 
         foreach ($refs as $ref) {
@@ -208,10 +204,6 @@ class PathsMerger implements MergerInterface
         $sourceOpenApiAsArray = json_decode(Writer::writeToJson($sourceOpenApi), true);
 
         $schemaAsArray = $sourceOpenApiAsArray['components']['schemas'][$schemaName];
-
-        if (!$schemaAsArray) {
-            return $targetOpenApi;
-        }
 
         $refs = array_unique($this->getRefsFromArray($schemaAsArray, []));
 
@@ -248,23 +240,21 @@ class PathsMerger implements MergerInterface
      * @param \cebe\openapi\spec\OpenApi $sourceOpenApi
      * @param string $reference
      *
-     * @return \cebe\openapi\spec\OpenApi
+     * @return void
      */
-    protected function addInternalReference(OpenApi $targetOpenApi, OpenApi $sourceOpenApi, string $reference): OpenApi
+    protected function addInternalReference(OpenApi $targetOpenApi, OpenApi $sourceOpenApi, string $reference): void
     {
         if ($this->isExternalReference($reference)) {
-            return $targetOpenApi;
+            return;
         }
 
         if ($this->isParameter($reference)) {
-            return $this->addInternalParameter($targetOpenApi, $sourceOpenApi, $reference);
+            $this->addInternalParameter($targetOpenApi, $sourceOpenApi, $reference);
         }
 
         if ($this->isSchema($reference)) {
-            return $this->addInternalSchema($targetOpenApi, $sourceOpenApi, $reference);
+            $this->addInternalSchema($targetOpenApi, $sourceOpenApi, $reference);
         }
-
-        return $targetOpenApi;
     }
 
     /**

@@ -42,7 +42,7 @@ class PathMergerTest extends Unit
         $actualOpenApi = $pathMerger->merge($targetOpenApi, $sourceOpenApi);
 
         // Assert
-        $this->assertEquals(Writer::writeToJson($expectedOpenApi), Writer::writeToJson($actualOpenApi));
+        $this->assertSame(Writer::writeToYaml($expectedOpenApi), Writer::writeToYaml($actualOpenApi));
     }
 
     /**

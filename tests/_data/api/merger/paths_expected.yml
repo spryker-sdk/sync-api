@@ -57,6 +57,7 @@ paths:
             summary: 'Lists all available apps for a given locale.'
             parameters:
                 -   $ref: '#/components/parameters/storeReference'
+                -   $ref: '#/components/parameters/testParamArray'
             responses:
                 200:
                     description: 'Expected response to a valid request.'
@@ -121,6 +122,10 @@ components:
                     type: string
                 status:
                     type: integer
+        testParamRef:
+            properties:
+                data:
+                    type: string
         AppCollectionApiResponse:
             properties:
                 data:
@@ -173,3 +178,12 @@ components:
             description: 'Reference of the Tenants store.'
             schema:
                 type: string
+        testParamArray:
+            name: testParamArray
+            in: header
+            required: true
+            description: 'Reference of the Tenants store.'
+            schema:
+                type: array
+                items:
+                    $ref: '#/components/schemas/testParamRef'
