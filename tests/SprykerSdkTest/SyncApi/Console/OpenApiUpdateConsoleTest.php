@@ -95,6 +95,4 @@ class OpenApiUpdateConsoleTest extends Unit
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
     }
-
-
 }
