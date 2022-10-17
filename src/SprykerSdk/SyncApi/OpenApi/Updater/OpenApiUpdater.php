@@ -84,17 +84,17 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
         );
 
         try {
-            $targetOpenApi = Reader::readFromYamlFile($syncApiTargetFilepath, OpenApi::class, false);
-        } catch (Throwable $throwable) {
-            $targetOpenApi = Reader::readFromYamlFile(
-                $this->syncApiConfig->getProjectRootPath() . '/' .
-                $this->syncApiConfig->getDefaultRelativePathToOpenApiFile(),
-                OpenApi::class,
-                false,
-            );
-        }
+            if (is_file($syncApiTargetFilepath)) {
+                $targetOpenApi = Reader::readFromYamlFile($syncApiTargetFilepath, OpenApi::class, false);
+            } else {
+                $targetOpenApi = Reader::readFromYamlFile(
+                    $this->syncApiConfig->getPackageRootPath() . '/' .
+                    $this->syncApiConfig->getDefaultRelativePathToOpenApiFile(),
+                    OpenApi::class,
+                    false,
+                );
+            }
 
-        try {
             $targetOpenApi = $this->merge($targetOpenApi, $sourceOpenApi);
 
             $this->createFileIfNotExists($syncApiTargetFilepath);

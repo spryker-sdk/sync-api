@@ -59,6 +59,24 @@ class SyncApiConfigTest extends Unit
     }
 
     /**
+     * Tests that ensures we get the default executable path when installed the "normal" way.
+     *
+     * @return void
+     */
+    public function testGetPackageRootPathReturnsPackageRootDirectory(): void
+    {
+        // Arrange
+        $expectedExecutable = realpath(__DIR__) . '/../../..';
+        $config = new SyncApiConfig();
+
+        // Act
+        $packageRootPath = $config->getPackageRootPath();
+
+        // Assert
+        $this->assertSame(scandir($expectedExecutable), scandir($packageRootPath));
+    }
+
+    /**
      * Tests that ensures we get a path to where this SDK is installed. Usually only when used within the SprykerSDK.
      *
      * @return void
