@@ -7,9 +7,8 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Merger;
 
-use cebe\openapi\spec\Components;
 use cebe\openapi\spec\OpenApi;
-use cebe\openapi\spec\Paths;
+use cebe\openapi\spec\PathItem;
 use cebe\openapi\Writer;
 use SprykerSdk\SyncApi\OpenApi\Merger\Exception\ParameterNotFoundInSourceOpenApiException;
 use SprykerSdk\SyncApi\OpenApi\Merger\Exception\SchemaNotFoundInSourceOpenApiException;
@@ -17,37 +16,31 @@ use SprykerSdk\SyncApi\SyncApiConfig;
 
 class PathsMerger implements MergerInterface
 {
-    /**
-     * @var string
-     */
-    public const PARAMETER_NOT_FOUND_EXCEPTION_MESSAGE_TEMPLATE = 'Parameter "%s" not found in source Open API';
+    use OpenApiAccessorTrait;
 
     /**
      * @var string
      */
-    public const SCHEMA_NOT_FOUND_EXCEPTION_MESSAGE_TEMPLATE = 'Schema "%s" not found in source Open API';
-
-    /**
-     * @var string
-     */
-    protected const YML_EXTENSION = '.yml';
-
-    /**
-     * @var string
-     */
-    protected const YAML_EXTENSION = '.yaml';
+    protected const YAML_EXTENSION_PATTERN = '/(\.yaml|\.yml)/';
 
     /**
      * @var \SprykerSdk\SyncApi\SyncApiConfig
      */
-    protected $syncApiConfig;
+    protected SyncApiConfig $syncApiConfig;
+
+    /**
+     * @var \SprykerSdk\SyncApi\OpenApi\Merger\ComponentsCleanerInterface
+     */
+    protected ComponentsCleanerInterface $componentsCleaner;
 
     /**
      * @param \SprykerSdk\SyncApi\SyncApiConfig $syncApiConfig
+     * @param \SprykerSdk\SyncApi\OpenApi\Merger\ComponentsCleanerInterface $componentsCleaner
      */
-    public function __construct(SyncApiConfig $syncApiConfig)
+    public function __construct(SyncApiConfig $syncApiConfig, ComponentsCleanerInterface $componentsCleaner)
     {
         $this->syncApiConfig = $syncApiConfig;
+        $this->componentsCleaner = $componentsCleaner;
     }
 
     /**
@@ -59,81 +52,68 @@ class PathsMerger implements MergerInterface
     public function merge(OpenApi $targetOpenApi, OpenApi $sourceOpenApi): OpenApi
     {
         foreach ($sourceOpenApi->paths as $pathName => $sourcePathItem) {
-            if ($targetOpenApi->paths === null) {
-                $targetOpenApi->paths = new Paths([]);
-            }
+            if (!$this->getPaths($targetOpenApi)->hasPath($pathName)) {
+                $this->getPaths($targetOpenApi)->addPath($pathName, $sourcePathItem);
 
-            if (!$targetOpenApi->paths->hasPath($pathName)) {
-                $targetOpenApi->paths->addPath($pathName, $sourcePathItem);
-
-                $targetOpenApi = $this->addRefsFromPathItem($targetOpenApi, $sourceOpenApi, $pathName);
+                $targetOpenApi = $this->addReferencesFromPathItem($targetOpenApi, $sourceOpenApi, $pathName);
 
                 continue;
             }
 
-            $targetPathItem = $targetOpenApi->paths->getPath($pathName);
-
-            foreach ($this->syncApiConfig->getAvailableHttpMethods() as $httpMethod) {
-                if ($sourcePathItem->$httpMethod) {
-                    $targetPathItem->$httpMethod = $sourcePathItem->$httpMethod;
-
-                    $targetOpenApi = $this->addRefsFromOperation($targetOpenApi, $sourceOpenApi, $pathName, $httpMethod);
-                }
-            }
+            $this->mergePath($targetOpenApi, $sourceOpenApi, $pathName, $sourcePathItem);
         }
 
-        return $this->removeUnusedComponents($targetOpenApi);
-    }
-
-    /**
-     * @param string $ref
-     *
-     * @return bool
-     */
-    protected function isParameter(string $ref): bool
-    {
-        return strpos($ref, '/parameters/') !== false;
-    }
-
-    /**
-     * @param string $ref
-     *
-     * @return bool
-     */
-    protected function isSchema(string $ref): bool
-    {
-        return strpos($ref, '/schemas/') !== false;
-    }
-
-    /**
-     * @param string $ref
-     *
-     * @return string
-     */
-    protected function getObjectName(string $ref): string
-    {
-        $refParts = explode('/', $ref);
-
-        return end($refParts);
+        return $this->componentsCleaner->cleanUnused($targetOpenApi);
     }
 
     /**
      * @param \cebe\openapi\spec\OpenApi $targetOpenApi
      * @param \cebe\openapi\spec\OpenApi $sourceOpenApi
      * @param string $pathName
+     * @param \cebe\openapi\spec\PathItem $sourcePathItem
      *
      * @return \cebe\openapi\spec\OpenApi
      */
-    protected function addRefsFromPathItem(OpenApi $targetOpenApi, OpenApi $sourceOpenApi, string $pathName): OpenApi
-    {
+    protected function mergePath(
+        OpenApi $targetOpenApi,
+        OpenApi $sourceOpenApi,
+        string $pathName,
+        PathItem $sourcePathItem
+    ): OpenApi {
+        $targetPathItem = $this->getPaths($targetOpenApi)->getPath($pathName);
+
         foreach ($this->syncApiConfig->getAvailableHttpMethods() as $httpMethod) {
-            $this->addRefsFromOperation($targetOpenApi, $sourceOpenApi, $pathName, $httpMethod);
+            if ($sourcePathItem->$httpMethod) {
+                $targetPathItem->$httpMethod = $sourcePathItem->$httpMethod;
+
+                $targetOpenApi = $this->addReferencesFromOperation($targetOpenApi, $sourceOpenApi, $pathName, $httpMethod);
+            }
         }
 
         return $targetOpenApi;
     }
 
     /**
+     * Copies schemas by references from source OpenApi Path Item to target OpenApi
+     *
+     * @param \cebe\openapi\spec\OpenApi $targetOpenApi
+     * @param \cebe\openapi\spec\OpenApi $sourceOpenApi
+     * @param string $pathName
+     *
+     * @return \cebe\openapi\spec\OpenApi
+     */
+    protected function addReferencesFromPathItem(OpenApi $targetOpenApi, OpenApi $sourceOpenApi, string $pathName): OpenApi
+    {
+        foreach ($this->syncApiConfig->getAvailableHttpMethods() as $httpMethod) {
+            $this->addReferencesFromOperation($targetOpenApi, $sourceOpenApi, $pathName, $httpMethod);
+        }
+
+        return $targetOpenApi;
+    }
+
+    /**
+     * Copies schemas by references from source OpenApi Operation Item to target OpenApi
+     *
      * @param \cebe\openapi\spec\OpenApi $targetOpenApi
      * @param \cebe\openapi\spec\OpenApi $sourceOpenApi
      * @param string $pathName
@@ -141,7 +121,7 @@ class PathsMerger implements MergerInterface
      *
      * @return \cebe\openapi\spec\OpenApi
      */
-    protected function addRefsFromOperation(
+    protected function addReferencesFromOperation(
         OpenApi $targetOpenApi,
         OpenApi $sourceOpenApi,
         string $pathName,
@@ -153,12 +133,10 @@ class PathsMerger implements MergerInterface
             return $targetOpenApi;
         }
 
-        $operationAsArray = $sourceOpenApiAsArray['paths'][$pathName][$httpMethod];
+        $references = ReferenceFinder::findInArray($sourceOpenApiAsArray['paths'][$pathName][$httpMethod]);
 
-        $refs = array_unique($this->getRefsFromArray($operationAsArray, []));
-
-        foreach ($refs as $ref) {
-            $this->addInternalReference($targetOpenApi, $sourceOpenApi, $ref);
+        foreach ($references as $reference) {
+            $this->addInternalReference($targetOpenApi, $sourceOpenApi, $reference);
         }
 
         return $targetOpenApi;
@@ -171,19 +149,17 @@ class PathsMerger implements MergerInterface
      *
      * @return \cebe\openapi\spec\OpenApi
      */
-    protected function addRefsFromParameter(
+    protected function addReferencesFromParameter(
         OpenApi $targetOpenApi,
         OpenApi $sourceOpenApi,
         string $parameterName
     ): OpenApi {
         $sourceOpenApiAsArray = json_decode(Writer::writeToJson($sourceOpenApi), true);
 
-        $parameterAsArray = $sourceOpenApiAsArray['components']['parameters'][$parameterName];
+        $references = ReferenceFinder::findInArray($sourceOpenApiAsArray['components']['parameters'][$parameterName]);
 
-        $refs = array_unique($this->getRefsFromArray($parameterAsArray, []));
-
-        foreach ($refs as $ref) {
-            $this->addInternalReference($targetOpenApi, $sourceOpenApi, $ref);
+        foreach ($references as $reference) {
+            $this->addInternalReference($targetOpenApi, $sourceOpenApi, $reference);
         }
 
         return $targetOpenApi;
@@ -196,43 +172,20 @@ class PathsMerger implements MergerInterface
      *
      * @return \cebe\openapi\spec\OpenApi
      */
-    protected function addRefsFromSchema(
+    protected function addReferencesFromSchema(
         OpenApi $targetOpenApi,
         OpenApi $sourceOpenApi,
         string $schemaName
     ): OpenApi {
         $sourceOpenApiAsArray = json_decode(Writer::writeToJson($sourceOpenApi), true);
 
-        $schemaAsArray = $sourceOpenApiAsArray['components']['schemas'][$schemaName];
+        $references = ReferenceFinder::findInArray($sourceOpenApiAsArray['components']['schemas'][$schemaName]);
 
-        $refs = array_unique($this->getRefsFromArray($schemaAsArray, []));
-
-        foreach ($refs as $ref) {
-            $this->addInternalReference($targetOpenApi, $sourceOpenApi, $ref);
+        foreach ($references as $reference) {
+            $this->addInternalReference($targetOpenApi, $sourceOpenApi, $reference);
         }
 
         return $targetOpenApi;
-    }
-
-    /**
-     * @param array $array
-     * @param array $refs
-     *
-     * @return array
-     */
-    protected function getRefsFromArray(array $array, array $refs): array
-    {
-        foreach ($array as $key => $value) {
-            if ($key === '$ref') {
-                $refs[] = $value;
-            }
-
-            if (is_array($value)) {
-                $refs = $this->getRefsFromArray($value, $refs);
-            }
-        }
-
-        return $refs;
     }
 
     /**
@@ -270,12 +223,9 @@ class PathsMerger implements MergerInterface
 
         $parameterItem = $this->getParameterByReference($sourceOpenApi, $parameterName);
 
-        $targetOpenApi->components->parameters = array_merge(
-            $targetOpenApi->components->parameters,
-            [$parameterName => $parameterItem],
-        );
+        $this->addParameter($targetOpenApi, $parameterName, $parameterItem);
 
-        return $this->addRefsFromParameter($targetOpenApi, $sourceOpenApi, $parameterName);
+        return $this->addReferencesFromParameter($targetOpenApi, $sourceOpenApi, $parameterName);
     }
 
     /**
@@ -288,23 +238,43 @@ class PathsMerger implements MergerInterface
     protected function addInternalSchema(OpenApi $targetOpenApi, OpenApi $sourceOpenApi, string $reference): OpenApi
     {
         $schemaName = $this->getObjectName($reference);
-
         $schemaItem = $this->getSchemaByReference($sourceOpenApi, $schemaName);
 
-        if (!$targetOpenApi->components) {
-            $targetOpenApi->components = new Components([]);
-        }
+        $this->addSchema($targetOpenApi, $schemaName, $schemaItem);
 
-        if (!$targetOpenApi->components->schemas) {
-            $targetOpenApi->components->schemas = [];
-        }
+        return $this->addReferencesFromSchema($targetOpenApi, $sourceOpenApi, $schemaName);
+    }
 
-        $targetOpenApi->components->schemas = array_merge(
-            $targetOpenApi->components->schemas,
-            [$schemaName => $schemaItem],
-        );
+    /**
+     * @param string $reference
+     *
+     * @return bool
+     */
+    protected function isParameter(string $reference): bool
+    {
+        return strpos($reference, '/parameters/') !== false;
+    }
 
-        return $this->addRefsFromSchema($targetOpenApi, $sourceOpenApi, $schemaName);
+    /**
+     * @param string $reference
+     *
+     * @return bool
+     */
+    protected function isSchema(string $reference): bool
+    {
+        return strpos($reference, '/schemas/') !== false;
+    }
+
+    /**
+     * @param string $reference
+     *
+     * @return string
+     */
+    protected function getObjectName(string $reference): string
+    {
+        $referenceParts = explode(DIRECTORY_SEPARATOR, $reference);
+
+        return end($referenceParts);
     }
 
     /**
@@ -314,8 +284,7 @@ class PathsMerger implements MergerInterface
      */
     protected function isExternalReference(string $reference): bool
     {
-        return strpos($reference, static::YML_EXTENSION) !== false
-            || strpos($reference, static::YAML_EXTENSION) !== false;
+        return (bool)preg_match(static::YAML_EXTENSION_PATTERN, $reference);
     }
 
     /**
@@ -328,17 +297,14 @@ class PathsMerger implements MergerInterface
      */
     protected function getParameterByReference(OpenApi $openApi, string $parameterName)
     {
-        foreach ($openApi->components->parameters as $currentParameterName => $parameterItem) {
+        foreach ($this->getParameters($openApi) as $currentParameterName => $parameterItem) {
             if ($currentParameterName === $parameterName) {
                 return $parameterItem;
             }
         }
 
         throw new ParameterNotFoundInSourceOpenApiException(
-            sprintf(
-                static::PARAMETER_NOT_FOUND_EXCEPTION_MESSAGE_TEMPLATE,
-                $parameterName,
-            ),
+            $this->createParameterIsNotFoundMessage($parameterName),
         );
     }
 
@@ -352,56 +318,13 @@ class PathsMerger implements MergerInterface
      */
     protected function getSchemaByReference(OpenApi $openApi, string $schemaName)
     {
-        foreach ($openApi->components->schemas as $currentSchemaName => $schema) {
+        foreach ($this->getSchemas($openApi) as $currentSchemaName => $schema) {
             if ($currentSchemaName === $schemaName) {
                 return $schema;
             }
         }
 
-        throw new SchemaNotFoundInSourceOpenApiException(
-            sprintf(
-                static::PARAMETER_NOT_FOUND_EXCEPTION_MESSAGE_TEMPLATE,
-                $schemaName,
-            ),
-        );
-    }
-
-    /**
-     * @param \cebe\openapi\spec\OpenApi $openApi
-     *
-     * @return \cebe\openapi\spec\OpenApi
-     */
-    protected function removeUnusedComponents(OpenApi $openApi): OpenApi
-    {
-        $openApiAsArray = json_decode(Writer::writeToJson($openApi), true);
-
-        $refs = $this->getRefsFromArray($openApiAsArray, []);
-
-        foreach (array_keys($openApi->components->parameters) as $parameterName) {
-            $paramReferenceName = $this->createParameterReferenceName($parameterName);
-
-            if (!in_array($paramReferenceName, $refs)) {
-                $openApi->components->parameters
-                    = $this->getArrayWithoutKey(
-                        $openApi->components->parameters,
-                        $parameterName,
-                    );
-            }
-        }
-
-        foreach (array_keys($openApi->components->schemas) as $schemaName) {
-            $schemaReferenceName = $this->createSchemaReferenceName($schemaName);
-
-            if (!in_array($schemaReferenceName, $refs)) {
-                $openApi->components->schemas
-                    = $this->getArrayWithoutKey(
-                        $openApi->components->schemas,
-                        $schemaName,
-                    );
-            }
-        }
-
-        return $openApi;
+        throw new SchemaNotFoundInSourceOpenApiException($this->createSchemaIsNotFoundMessage($schemaName));
     }
 
     /**
@@ -409,9 +332,9 @@ class PathsMerger implements MergerInterface
      *
      * @return string
      */
-    protected function createParameterReferenceName(string $parameterName): string
+    protected function createParameterIsNotFoundMessage(string $parameterName): string
     {
-        return '#/components/parameters/' . $parameterName;
+        return sprintf('Parameter "%s" is not found in given Open API', $parameterName);
     }
 
     /**
@@ -419,21 +342,8 @@ class PathsMerger implements MergerInterface
      *
      * @return string
      */
-    protected function createSchemaReferenceName(string $schemaName): string
+    protected function createSchemaIsNotFoundMessage(string $schemaName): string
     {
-        return '#/components/schemas/' . $schemaName;
-    }
-
-    /**
-     * @param array $schemas
-     * @param string $schemaName
-     *
-     * @return array
-     */
-    protected function getArrayWithoutKey(array $schemas, string $schemaName): array
-    {
-        unset($schemas[$schemaName]);
-
-        return $schemas;
+        return sprintf('Schema "%s" is not found in given Open API', $schemaName);
     }
 }

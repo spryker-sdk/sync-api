@@ -11,6 +11,7 @@ use cebe\openapi\Writer;
 use Codeception\Test\Unit;
 use SprykerSdk\SyncApi\OpenApi\Merger\Exception\ParameterNotFoundInSourceOpenApiException;
 use SprykerSdk\SyncApi\OpenApi\Merger\Exception\SchemaNotFoundInSourceOpenApiException;
+use SprykerSdkTest\SyncApi\SyncApiTester;
 
 /**
  * @group SprykerSdkTest
@@ -19,12 +20,12 @@ use SprykerSdk\SyncApi\OpenApi\Merger\Exception\SchemaNotFoundInSourceOpenApiExc
  * @group Merger
  * @group PathsMergerTest
  */
-class PathMergerTest extends Unit
+class PathsMergerTest extends Unit
 {
     /**
      * @var \SprykerSdkTest\SyncApi\SyncApiTester
      */
-    protected $tester;
+    protected SyncApiTester $tester;
 
     /**
      * @return void
@@ -34,9 +35,9 @@ class PathMergerTest extends Unit
         // Arrange
         $pathMerger = $this->tester->getFactory()->createPathMerger();
 
-        $targetOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths_target.yml');
-        $sourceOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths_source.yml');
-        $expectedOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths_expected.yml');
+        $targetOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths/target_openapi.yml');
+        $sourceOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths/source_openapi.yml');
+        $expectedOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths/expected_openapi.yml');
 
         // Act
         $actualOpenApi = $pathMerger->merge($targetOpenApi, $sourceOpenApi);
@@ -48,13 +49,13 @@ class PathMergerTest extends Unit
     /**
      * @return void
      */
-    public function testPathMergerThrowsExceptionWhenParameterMissedInSourceOpenApi(): void
+    public function testPathMergerThrowsExceptionWhenParameterIsMissedInSourceOpenApi(): void
     {
         // Arrange
         $pathMerger = $this->tester->getFactory()->createPathMerger();
 
-        $targetOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths_target.yml');
-        $sourceOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths_source_parameter_missed.yml');
+        $targetOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths/target_openapi.yml');
+        $sourceOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths/source_openapi_with_parameter_missing.yml');
 
         // Assert
         $this->expectException(ParameterNotFoundInSourceOpenApiException::class);
@@ -66,13 +67,13 @@ class PathMergerTest extends Unit
     /**
      * @return void
      */
-    public function testPathMergerThrowsExceptionWhenSchemaMissedInSourceOpenApi(): void
+    public function testPathMergerThrowsExceptionWhenSchemaIsMissedInSourceOpenApi(): void
     {
         // Arrange
         $pathMerger = $this->tester->getFactory()->createPathMerger();
 
-        $targetOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths_target.yml');
-        $sourceOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths_source_schema_missed.yml');
+        $targetOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths/target_openapi.yml');
+        $sourceOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths/source_openapi_with_schema_missing.yml');
 
         // Assert
         $this->expectException(SchemaNotFoundInSourceOpenApiException::class);

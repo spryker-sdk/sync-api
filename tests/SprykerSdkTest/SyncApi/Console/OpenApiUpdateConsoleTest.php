@@ -10,6 +10,7 @@ namespace SprykerSdkTest\SyncApi\Console;
 use Codeception\Test\Unit;
 use SprykerSdk\SyncApi\Console\AbstractConsole;
 use SprykerSdk\SyncApi\Console\OpenApiUpdateConsole;
+use SprykerSdkTest\SyncApi\SyncApiTester;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -23,12 +24,12 @@ class OpenApiUpdateConsoleTest extends Unit
     /**
      * @var \SprykerSdkTest\SyncApi\SyncApiTester
      */
-    protected $tester;
+    protected SyncApiTester $tester;
 
     /**
      * @return void
      */
-    public function testOpenApiUpdateConsoleSuccessfullyUpdatesExistedFile(): void
+    public function testOpenApiUpdateConsoleSuccessfullyUpdatesAnExistingFile(): void
     {
         // Arrange
         $commandTester = $this->tester->getConsoleTester(OpenApiUpdateConsole::class);
@@ -38,8 +39,6 @@ class OpenApiUpdateConsoleTest extends Unit
         $commandTester->execute(
             [
                 OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => $this->tester->getValidOpenApiContentsAsJson(),
-                '--' . OpenApiUpdateConsole::OPTION_OPEN_API_FILE => $this->tester->getOpenApiSchemaPath() . '/openapi.yml',
-                '--' . OpenApiUpdateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -47,13 +46,15 @@ class OpenApiUpdateConsoleTest extends Unit
         );
 
         // Assert
-        $this->assertSame(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
+        $this->assertEquals(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
+        $this->assertMatchesRegularExpression('/Successfully updated .+/', $commandTester->getDisplay());
+        $this->assertFileExists('vfs://root/resources/api/openapi.yml');
     }
 
     /**
      * @return void
      */
-    public function testOpenApiUpdateConsoleSuccessfullyUpdatesNewFile(): void
+    public function testOpenApiUpdateConsoleSuccessfullyAddsANewFileWithPassedJson(): void
     {
         // Arrange
         $commandTester = $this->tester->getConsoleTester(OpenApiUpdateConsole::class);
@@ -62,8 +63,6 @@ class OpenApiUpdateConsoleTest extends Unit
         $commandTester->execute(
             [
                 OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => $this->tester->getValidOpenApiContentsAsJson(),
-                '--' . OpenApiUpdateConsole::OPTION_OPEN_API_FILE => $this->tester->getOpenApiSchemaPath() . '/openapi.yml',
-                '--' . OpenApiUpdateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -72,6 +71,34 @@ class OpenApiUpdateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
+        $this->assertMatchesRegularExpression('/Successfully updated .+/', $commandTester->getDisplay());
+        $this->assertFileExists('vfs://root/resources/api/openapi.yml');
+    }
+
+    /**
+     * @return void
+     */
+    public function testOpenApiUpdateConsoleSuccessfullyAddsANewFileWithPassedJsonAndCustomOptions(): void
+    {
+        // Arrange
+        $commandTester = $this->tester->getConsoleTester(OpenApiUpdateConsole::class);
+
+        // Act
+        $commandTester->execute(
+            [
+                OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => $this->tester->getValidOpenApiContentsAsJson(),
+                '--' . OpenApiUpdateConsole::OPTION_OPEN_API_FILE => 'custom_openapi.yml',
+                '--' . OpenApiUpdateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath() . '/custom_dir/',
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ],
+        );
+
+        // Assert
+        $this->assertSame(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
+        $this->assertMatchesRegularExpression('/Successfully updated .+/', $commandTester->getDisplay());
+        $this->assertFileExists('vfs://root/custom_dir/custom_openapi.yml');
     }
 
     /**
@@ -81,41 +108,21 @@ class OpenApiUpdateConsoleTest extends Unit
     {
         // Arrange
         $commandTester = $this->tester->getConsoleTester(OpenApiUpdateConsole::class);
-        $this->tester->haveValidOpenApiFile();
 
         // Act
         $commandTester->execute(
             [
                 OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => 'INVALID_JSON',
-                '--' . OpenApiUpdateConsole::OPTION_OPEN_API_FILE => $this->tester->getOpenApiSchemaPath() . '/openapi.yml',
-                '--' . OpenApiUpdateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
             ],
-        );
-
-        // Assert
-        $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
-    }
-
-    /**
-     * @return void
-     */
-    public function testOpenApiUpdateConsoleStopsWithErrorWhenSourceDataHasInvalidOpenApiSchema(): void
-    {
-        // Arrange
-        $commandTester = $this->tester->getConsoleTester(OpenApiUpdateConsole::class);
-        $this->tester->haveValidOpenApiFile();
-
-        // Act
-        $commandTester->execute(
             [
-                OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => '{}',
-                '--' . OpenApiUpdateConsole::OPTION_OPEN_API_FILE => $this->tester->getOpenApiSchemaPath() . '/openapi.yml',
-                '--' . OpenApiUpdateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
             ],
         );
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
+        $this->assertMatchesRegularExpression('/Provided Open API data is invalid.+/', $commandTester->getDisplay());
+        $this->assertFileNotExists('vfs://root/resources/api/openapi.yml');
     }
 
     /**
@@ -125,18 +132,20 @@ class OpenApiUpdateConsoleTest extends Unit
     {
         // Arrange
         $commandTester = $this->tester->getConsoleTester(OpenApiUpdateConsole::class);
-        $this->tester->haveValidOpenApiFile();
 
         // Act
         $commandTester->execute(
             [
-                OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => $this->tester->getOpenApiContentsWithMissedReferenceJson(),
-                '--' . OpenApiUpdateConsole::OPTION_OPEN_API_FILE => $this->tester->getOpenApiSchemaPath() . '/openapi.yml',
-                '--' . OpenApiUpdateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
+                OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => $this->tester->getOpenApiContentsWithIsMissingReferenceJson(),
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
             ],
         );
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
+        $this->assertMatchesRegularExpression('/Update Open API failed with error.+/', $commandTester->getDisplay());
+        $this->assertFileNotExists('vfs://root/resources/api/openapi.yml');
     }
 }

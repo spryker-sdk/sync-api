@@ -11,12 +11,12 @@ use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
 use SprykerSdk\SyncApi\Message\MessageBuilder;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
-use SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilder;
-use SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Merger\ComponentsCleaner;
+use SprykerSdk\SyncApi\OpenApi\Merger\ComponentsCleanerInterface;
 use SprykerSdk\SyncApi\OpenApi\Merger\InfoMerger;
 use SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface;
 use SprykerSdk\SyncApi\OpenApi\Merger\PathsMerger;
@@ -141,21 +141,12 @@ class SyncApiFactory
     }
 
     /**
-     * @return \SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface
-     */
-    public function createFilepathBuilder(): FilepathBuilderInterface
-    {
-        return new FilepathBuilder();
-    }
-
-    /**
      * @return \SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdaterInterface
      */
     public function createOpenApiUpdater(): OpenApiUpdaterInterface
     {
         return new OpenApiUpdater(
             $this->createMessageBuilder(),
-            $this->createFilepathBuilder(),
             $this->getConfig(),
             $this->getMergerCollection(),
         );
@@ -182,11 +173,19 @@ class SyncApiFactory
      */
     public function createPathMerger(): MergerInterface
     {
-        return new PathsMerger($this->getConfig());
+        return new PathsMerger($this->getConfig(), $this->createComponentsCleaner());
     }
 
     /**
-     * @return array
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\ComponentsCleanerInterface
+     */
+    public function createComponentsCleaner(): ComponentsCleanerInterface
+    {
+        return new ComponentsCleaner();
+    }
+
+    /**
+     * @return array<\SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface>
      */
     public function getMergerCollection(): array
     {

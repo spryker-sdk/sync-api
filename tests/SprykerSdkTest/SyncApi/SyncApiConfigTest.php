@@ -20,7 +20,7 @@ class SyncApiConfigTest extends Unit
     /**
      * @var \SprykerSdkTest\SyncApi\SyncApiTester
      */
-    protected $tester;
+    protected SyncApiTester $tester;
 
     /**
      * Tests that ensures we get the default executable path when installed the "normal" way.
@@ -73,7 +73,10 @@ class SyncApiConfigTest extends Unit
         $packageRootPath = $config->getPackageRootPath();
 
         // Assert
-        $this->assertSame(scandir($expectedExecutable), scandir($packageRootPath));
+        $this->assertSame(
+            $this->tester->getAbsolutePath($expectedExecutable),
+            $this->tester->getAbsolutePath($packageRootPath),
+        );
     }
 
     /**

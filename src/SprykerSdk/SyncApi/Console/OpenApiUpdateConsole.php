@@ -38,7 +38,7 @@ class OpenApiUpdateConsole extends AbstractConsole
     /**
      * @var string
      */
-    public const OPTION_OPEN_API_FILE_DESCRIPTION = 'Path to target OpenAPI file. The openapi.yml template will be taken by default';
+    public const OPTION_OPEN_API_FILE_DESCRIPTION = 'Path to target OpenAPI file. Use this option only when your file is not in the default path or has a different name. Defaults to: resources/api/openapi.json';
 
     /**
      * @var string
@@ -53,7 +53,7 @@ class OpenApiUpdateConsole extends AbstractConsole
     /**
      * @var string
      */
-    public const OPTION_PROJECT_ROOT_DESCRIPTION = 'Project root directory. By default project root retrieved from getcwd() function.';
+    public const OPTION_PROJECT_ROOT_DESCRIPTION = 'Project root directory. By default project root is retrieved from getcwd() function.';
 
     /**
      * @return void
@@ -70,15 +70,16 @@ class OpenApiUpdateConsole extends AbstractConsole
             ->addOption(
                 static::OPTION_OPEN_API_FILE,
                 static::OPTION_OPEN_API_FILE_SHORT,
-                InputOption::VALUE_REQUIRED,
+                InputOption::VALUE_OPTIONAL,
                 static::OPTION_OPEN_API_FILE_DESCRIPTION,
+                $this->getConfig()->getDefaultRelativePathToOpenApiFile(),
             )
             ->addOption(
                 static::OPTION_PROJECT_ROOT,
                 static::OPTION_PROJECT_ROOT_SHORT,
                 InputOption::VALUE_OPTIONAL,
                 static::OPTION_PROJECT_ROOT_DESCRIPTION,
-                getcwd(),
+                $this->getConfig()->getProjectRootPath(),
             );
     }
 

@@ -44,4 +44,3 @@ components:
             properties:
                 prop:
                     type: string
-    parameters:

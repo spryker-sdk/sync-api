@@ -42,6 +42,6 @@ The `vendor/bin/syncapi code:openapi:generate` reads an existing OpenAPI file an
 
 ## Update an OpenApi file with provided OpenApi schema
 
-The `vendor/bin/syncapi code:openapi:update` updates an existing (or creates new if file doesn't exist) OpenAPI file with provided via CLI OpenAPI shcema converted to JSON.
+The `vendor/bin/syncapi code:openapi:update` updates an existing OpenAPI file (or creates a new one if the file doesn't exist) with the provided JSON.
 
 

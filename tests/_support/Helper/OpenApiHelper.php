@@ -119,9 +119,9 @@ class OpenApiHelper extends Module
     /**
      * @return \Transfer\UpdateOpenApiRequestTransfer
      */
-    public function haveUpdateExistingFileRequest(): UpdateOpenApiRequestTransfer
+    public function haveUpdateRequestWithExistingFile(): UpdateOpenApiRequestTransfer
     {
-        $this->prepareExistingOpenApiFile(codecept_data_dir('api/update/existing.yml'));
+        $this->prepareExistingOpenApiFile(codecept_data_dir('api/update/existing_openapi.yml'));
 
         $updateOpenApiRequestTransfer = new UpdateOpenApiRequestTransfer();
 
@@ -129,8 +129,8 @@ class OpenApiHelper extends Module
 
         $updateOpenApiRequestTransfer
             ->setProjectRoot($config->getProjectRootPath())
-            ->setOpenApiFile('resources/api/existing.yml')
-            ->setOpenApiDoc(json_encode(Yaml::parseFile(codecept_data_dir('api/update/source.yml'))));
+            ->setOpenApiFile('resources/api/existing_openapi.yml')
+            ->setOpenApiDoc(json_encode(Yaml::parseFile(codecept_data_dir('api/update/source_openapi.yml'))));
 
         return $updateOpenApiRequestTransfer;
     }
@@ -138,7 +138,7 @@ class OpenApiHelper extends Module
     /**
      * @return \Transfer\UpdateOpenApiRequestTransfer
      */
-    public function haveUpdateNewFileRequest(): UpdateOpenApiRequestTransfer
+    public function haveUpdateRequestWithNewFile(): UpdateOpenApiRequestTransfer
     {
         $updateOpenApiRequestTransfer = new UpdateOpenApiRequestTransfer();
 
@@ -146,8 +146,8 @@ class OpenApiHelper extends Module
 
         $updateOpenApiRequestTransfer
             ->setProjectRoot($config->getProjectRootPath())
-            ->setOpenApiFile('resources/api/new_file.yml')
-            ->setOpenApiDoc(json_encode(Yaml::parseFile(codecept_data_dir('api/update/source.yml'))));
+            ->setOpenApiFile('resources/api/new_openapi.yml')
+            ->setOpenApiDoc(json_encode(Yaml::parseFile(codecept_data_dir('api/update/source_openapi.yml'))));
 
         return $updateOpenApiRequestTransfer;
     }

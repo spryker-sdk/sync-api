@@ -40,4 +40,27 @@ class SyncApiTester extends Actor
     {
         return Reader::readFromYamlFile(codecept_data_dir('api/' . $yamlFixturePath), OpenApi::class, false);
     }
+
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    public function getAbsolutePath(string $path): string
+    {
+        $pathItems = explode(DIRECTORY_SEPARATOR, $path);
+        $resultPathItems = [];
+
+        foreach ($pathItems as $pathItem) {
+            if ($pathItem === '..') {
+                array_pop($resultPathItems);
+
+                continue;
+            }
+
+            $resultPathItems[] = $pathItem;
+        }
+
+        return implode(DIRECTORY_SEPARATOR, $resultPathItems);
+    }
 }

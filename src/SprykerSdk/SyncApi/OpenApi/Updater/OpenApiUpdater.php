@@ -7,12 +7,12 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Updater;
 
-use ArrayObject;
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\Writer;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
-use SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface;
+use SprykerSdk\SyncApi\Message\SyncApiError;
+use SprykerSdk\SyncApi\Message\SyncApiInfo;
 use SprykerSdk\SyncApi\SyncApiConfig;
 use Throwable;
 use Transfer\OpenApiResponseTransfer;
@@ -23,39 +23,31 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
     /**
      * @var \SprykerSdk\SyncApi\Message\MessageBuilderInterface
      */
-    protected $messageBuilder;
-
-    /**
-     * @var \SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface
-     */
-    protected $filepathBuilder;
-
-    /**
-     * @var array<\SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface>
-     */
-    protected $mergerCollection;
+    protected MessageBuilderInterface $messageBuilder;
 
     /**
      * @var \SprykerSdk\SyncApi\SyncApiConfig
      */
-    protected $syncApiConfig;
+    protected SyncApiConfig $syncApiConfig;
+
+    /**
+     * @var array<\SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface>
+     */
+    protected array $mergerCollection;
 
     /**
      * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
-     * @param \SprykerSdk\SyncApi\OpenApi\Builder\FilepathBuilderInterface $filepathBuilder
      * @param \SprykerSdk\SyncApi\SyncApiConfig $syncApiConfig
      * @param array<\SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface> $mergerCollection
      */
     public function __construct(
         MessageBuilderInterface $messageBuilder,
-        FilepathBuilderInterface $filepathBuilder,
         SyncApiConfig $syncApiConfig,
         array $mergerCollection
     ) {
         $this->messageBuilder = $messageBuilder;
-        $this->filepathBuilder = $filepathBuilder;
-        $this->mergerCollection = $mergerCollection;
         $this->syncApiConfig = $syncApiConfig;
+        $this->mergerCollection = $mergerCollection;
     }
 
     /**
@@ -66,45 +58,79 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
     public function updateOpenApi(UpdateOpenApiRequestTransfer $updateOpenApiRequestTransfer): OpenApiResponseTransfer
     {
         try {
-            $sourceOpenApi = Reader::readFromJson($updateOpenApiRequestTransfer->getOpenApiDocOrFail());
-        } catch (Throwable $throwable) {
-            return (new OpenApiResponseTransfer())
-                ->addError($this->messageBuilder->buildMessage($throwable->getMessage()));
-        }
-
-        if (!$sourceOpenApi->validate()) {
-            return (new OpenApiResponseTransfer())->setErrors(
-                new ArrayObject($sourceOpenApi->getErrors()),
-            );
-        }
-
-        $syncApiTargetFilepath = $this->filepathBuilder->buildSyncApiFilepath(
-            $updateOpenApiRequestTransfer->getOpenApiFileOrFail(),
-            $updateOpenApiRequestTransfer->getProjectRootOrFail(),
-        );
-
-        try {
-            if (is_file($syncApiTargetFilepath)) {
-                $targetOpenApi = Reader::readFromYamlFile($syncApiTargetFilepath, OpenApi::class, false);
-            } else {
-                $targetOpenApi = Reader::readFromYamlFile(
-                    $this->syncApiConfig->getPackageRootPath() . '/' .
-                    $this->syncApiConfig->getDefaultRelativePathToOpenApiFile(),
-                    OpenApi::class,
-                    false,
-                );
+            if (!$this->isJsonValid($updateOpenApiRequestTransfer->getOpenApiDocOrFail())) {
+                return $this->createValidationErrorMessage('Provided JSON is invalid');
             }
 
-            $targetOpenApi = $this->merge($targetOpenApi, $sourceOpenApi);
+            $sourceOpenApi = Reader::readFromJson($updateOpenApiRequestTransfer->getOpenApiDocOrFail());
 
-            $this->createFileIfNotExists($syncApiTargetFilepath);
-            Writer::writeToYamlFile($targetOpenApi, $syncApiTargetFilepath);
+            $syncApiTargetFilepath = $this->getSyncApiTargetFilepath($updateOpenApiRequestTransfer);
+
+            $targetOpenApi = $this->merge($this->getTargetOpenApi($syncApiTargetFilepath), $sourceOpenApi);
+
+            $this->saveTargetOpenApi($syncApiTargetFilepath, $targetOpenApi);
         } catch (Throwable $throwable) {
-            return (new OpenApiResponseTransfer())
-                ->addError($this->messageBuilder->buildMessage($throwable->getMessage()));
+            return $this->createErrorResponse($throwable->getMessage());
         }
 
-        return (new OpenApiResponseTransfer())->addMessage($this->messageBuilder->buildMessage('Success!'));
+        return $this->createSuccessResponse($syncApiTargetFilepath);
+    }
+
+    /**
+     * @param string $getOpenApiDocOrFail
+     *
+     * @return bool
+     */
+    protected function isJsonValid(string $getOpenApiDocOrFail): bool
+    {
+        json_decode($getOpenApiDocOrFail);
+
+        return json_last_error() === JSON_ERROR_NONE;
+    }
+
+    /**
+     * @param \Transfer\UpdateOpenApiRequestTransfer $updateOpenApiRequestTransfer
+     *
+     * @return string
+     */
+    protected function getSyncApiTargetFilepath(UpdateOpenApiRequestTransfer $updateOpenApiRequestTransfer): string
+    {
+        return $this->getFilePath(
+            $updateOpenApiRequestTransfer->getProjectRootOrFail(),
+            $updateOpenApiRequestTransfer->getOpenApiFileOrFail(),
+        );
+    }
+
+    /**
+     * @param string $syncApiTargetFilepath
+     *
+     * @return \cebe\openapi\spec\OpenApi
+     */
+    protected function getTargetOpenApi(string $syncApiTargetFilepath): OpenApi
+    {
+        if (is_file($syncApiTargetFilepath)) {
+             return Reader::readFromYamlFile($syncApiTargetFilepath, OpenApi::class, false);
+        }
+
+        return Reader::readFromYamlFile(
+            $this->getFilePath(
+                $this->syncApiConfig->getPackageRootPath(),
+                $this->syncApiConfig->getDefaultRelativePathToOpenApiFile(),
+            ),
+            OpenApi::class,
+            false,
+        );
+    }
+
+    /**
+     * @param string $rootDirectory
+     * @param string $fileName
+     *
+     * @return string
+     */
+    protected function getFilePath(string $rootDirectory, string $fileName): string
+    {
+        return $rootDirectory . DIRECTORY_SEPARATOR . $fileName;
     }
 
     /**
@@ -113,15 +139,26 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
      *
      * @return \cebe\openapi\spec\OpenApi
      */
-    protected function merge(
-        OpenApi $targetOpenApi,
-        OpenApi $sourceOpenApi
-    ): OpenApi {
+    protected function merge(OpenApi $targetOpenApi, OpenApi $sourceOpenApi): OpenApi
+    {
         foreach ($this->mergerCollection as $merger) {
             $targetOpenApi = $merger->merge($targetOpenApi, $sourceOpenApi);
         }
 
         return $targetOpenApi;
+    }
+
+    /**
+     * @param string $syncApiTargetFilepath
+     * @param \cebe\openapi\spec\OpenApi $targetOpenApi
+     *
+     * @return void
+     */
+    protected function saveTargetOpenApi(string $syncApiTargetFilepath, OpenApi $targetOpenApi): void
+    {
+        $this->createFileIfNotExists($syncApiTargetFilepath);
+
+        Writer::writeToYamlFile($targetOpenApi, $syncApiTargetFilepath);
     }
 
     /**
@@ -131,12 +168,56 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
      */
     protected function createFileIfNotExists(string $fileName): void
     {
-        if (!is_file($fileName)) {
-            if (!is_dir(dirname($fileName))) {
-                mkdir(dirname($fileName), 0755, true);
-            }
-
-            file_put_contents($fileName, '');
+        if (!is_dir(dirname($fileName))) {
+            mkdir(dirname($fileName), 0755, true);
         }
+
+        file_put_contents($fileName, '');
+    }
+
+    /**
+     * @param string $errorMessage
+     *
+     * @return \Transfer\OpenApiResponseTransfer
+     */
+    protected function createValidationErrorMessage(string $errorMessage): OpenApiResponseTransfer
+    {
+        return (new OpenApiResponseTransfer())->addError(
+            $this->messageBuilder->buildMessage(
+                SyncApiError::openApiDataIsInvalid(
+                    $errorMessage,
+                ),
+            ),
+        );
+    }
+
+    /**
+     * @param string $errorMessage
+     *
+     * @return \Transfer\OpenApiResponseTransfer
+     */
+    protected function createErrorResponse(string $errorMessage): OpenApiResponseTransfer
+    {
+        return (new OpenApiResponseTransfer())->addError(
+            $this->messageBuilder->buildMessage(
+                SyncApiError::couldNotUpdateOpenApiFile(
+                    $errorMessage,
+                ),
+            ),
+        );
+    }
+
+    /**
+     * @param string $syncApiTargetFilepath
+     *
+     * @return \Transfer\OpenApiResponseTransfer
+     */
+    protected function createSuccessResponse(string $syncApiTargetFilepath): OpenApiResponseTransfer
+    {
+        return (new OpenApiResponseTransfer())->addMessage(
+            $this->messageBuilder->buildMessage(
+                SyncApiInfo::openApiFileUpdated($syncApiTargetFilepath),
+            ),
+        );
     }
 }

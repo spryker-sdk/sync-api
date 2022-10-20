@@ -9,13 +9,12 @@ namespace SprykerSdk\SyncApi\OpenApi\Merger;
 
 use cebe\openapi\spec\OpenApi;
 
-interface MergerInterface
+interface ComponentsCleanerInterface
 {
     /**
-     * @param \cebe\openapi\spec\OpenApi $targetOpenApi
-     * @param \cebe\openapi\spec\OpenApi $sourceOpenApi
+     * @param \cebe\openapi\spec\OpenApi $openApi
      *
      * @return \cebe\openapi\spec\OpenApi
      */
-    public function merge(OpenApi $targetOpenApi, OpenApi $sourceOpenApi): OpenApi;
+    public function cleanUnused(OpenApi $openApi): OpenApi;
 }

@@ -9,6 +9,7 @@ namespace SprykerSdkTest\SyncApi\OpenApi\Merger;
 
 use cebe\openapi\Writer;
 use Codeception\Test\Unit;
+use SprykerSdkTest\SyncApi\SyncApiTester;
 
 /**
  * @group SprykerSdkTest
@@ -22,7 +23,7 @@ class InfoMergerTest extends Unit
     /**
      * @var \SprykerSdkTest\SyncApi\SyncApiTester
      */
-    protected $tester;
+    protected SyncApiTester $tester;
 
     /**
      * @return void
@@ -32,9 +33,9 @@ class InfoMergerTest extends Unit
         // Arrange
         $infoMerger = $this->tester->getFactory()->createInfoMerger();
 
-        $targetOpenApi = $this->tester->loadOpenApiFromYaml('merger/info_target.yml');
-        $sourceOpenApi = $this->tester->loadOpenApiFromYaml('merger/info_source.yml');
-        $expectedOpenApi = $this->tester->loadOpenApiFromYaml('merger/info_expected.yml');
+        $targetOpenApi = $this->tester->loadOpenApiFromYaml('merger/info/target_openapi.yml');
+        $sourceOpenApi = $this->tester->loadOpenApiFromYaml('merger/info/source_openapi.yml');
+        $expectedOpenApi = $this->tester->loadOpenApiFromYaml('merger/info/expected_openapi.yml');
 
         // Act
         $actualOpenApi = $infoMerger->merge($targetOpenApi, $sourceOpenApi);
