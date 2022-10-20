@@ -7,7 +7,6 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Merger;
 
-use cebe\openapi\spec\Components;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\Writer;
 
