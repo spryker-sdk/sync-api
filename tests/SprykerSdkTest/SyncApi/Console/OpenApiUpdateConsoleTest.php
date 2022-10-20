@@ -47,7 +47,7 @@ class OpenApiUpdateConsoleTest extends Unit
 
         // Assert
         $this->assertEquals(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
-        $this->assertMatchesRegularExpression('/Successfully updated .+/', $commandTester->getDisplay());
+        $this->assertStringContainsString('Successfully updated', $commandTester->getDisplay());
         $this->assertFileExists('vfs://root/resources/api/openapi.yml');
     }
 
@@ -71,7 +71,7 @@ class OpenApiUpdateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
-        $this->assertMatchesRegularExpression('/Successfully updated .+/', $commandTester->getDisplay());
+        $this->assertStringContainsString('Successfully updated', $commandTester->getDisplay());
         $this->assertFileExists('vfs://root/resources/api/openapi.yml');
     }
 
@@ -97,7 +97,7 @@ class OpenApiUpdateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
-        $this->assertMatchesRegularExpression('/Successfully updated .+/', $commandTester->getDisplay());
+        $this->assertStringContainsString('Successfully updated', $commandTester->getDisplay());
         $this->assertFileExists('vfs://root/custom_dir/custom_openapi.yml');
     }
 
@@ -121,7 +121,7 @@ class OpenApiUpdateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
-        $this->assertMatchesRegularExpression('/Provided Open API data is invalid.+/', $commandTester->getDisplay());
+        $this->assertStringContainsString('Provided Open API data is invalid', $commandTester->getDisplay());
         $this->assertFileNotExists('vfs://root/resources/api/openapi.yml');
     }
 
@@ -145,7 +145,7 @@ class OpenApiUpdateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
-        $this->assertMatchesRegularExpression('/Update Open API failed with error.+/', $commandTester->getDisplay());
+        $this->assertStringContainsString('Update Open API failed with error', $commandTester->getDisplay());
         $this->assertFileNotExists('vfs://root/resources/api/openapi.yml');
     }
 }
