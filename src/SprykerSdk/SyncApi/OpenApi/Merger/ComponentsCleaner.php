@@ -50,7 +50,7 @@ class ComponentsCleaner implements ComponentsCleanerInterface
             }
         }
 
-        return $this->repackComponents($openApi);
+        return $openApi;
     }
 
     /**
@@ -106,36 +106,5 @@ class ComponentsCleaner implements ComponentsCleanerInterface
         unset($schemas[$schemaName]);
 
         return $schemas;
-    }
-
-    /**
-     * This prevents appearing empty keys of components, params and schemas when they are empty
-     *
-     * @param \cebe\openapi\spec\OpenApi $openApi
-     *
-     * @return \cebe\openapi\spec\OpenApi
-     */
-    protected function repackComponents(OpenApi $openApi): OpenApi
-    {
-        $parameters = $this->getParameters($openApi);
-        $schemas = $this->getSchemas($openApi);
-
-        if (!$parameters && !$schemas) {
-            $openApi->components = null;
-
-            return $openApi;
-        }
-
-        $openApi->components = new Components([]);
-
-        if ($schemas) {
-            $openApi->components->schemas = $schemas;
-        }
-
-        if ($parameters) {
-            $openApi->components->parameters = $parameters;
-        }
-
-        return $openApi;
     }
 }

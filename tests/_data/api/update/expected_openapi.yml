@@ -35,6 +35,7 @@ paths:
                             schema:
                                 type: string
 components:
+    parameters: []
     schemas:
         AppRegistrationApiRequest:
             properties:
