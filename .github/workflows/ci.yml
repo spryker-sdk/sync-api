@@ -14,7 +14,6 @@ jobs:
         runs-on: ubuntu-18.04
         env:
             APPLICATION_ENV: testing
-            APPLICATION_ENV: testing
         strategy:
             fail-fast: false
             matrix:
