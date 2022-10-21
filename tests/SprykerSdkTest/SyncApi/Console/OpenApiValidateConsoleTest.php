@@ -11,6 +11,7 @@ use Codeception\Test\Unit;
 use SprykerSdk\SyncApi\Console\AbstractConsole;
 use SprykerSdk\SyncApi\Console\OpenApiValidateConsole;
 use SprykerSdk\SyncApi\Message\SyncApiError;
+use SprykerSdk\SyncApi\Message\SyncApiInfo;
 use SprykerSdkTest\SyncApi\SyncApiTester;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -45,6 +46,24 @@ class OpenApiValidateConsoleTest extends Unit
         // Assert
         $this->assertSame(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
     }
+    /**
+     * @return void
+     */
+    public function testValidateOpenApiReturnsSuccessCodeAndPrintsMessageWhenValidationIsSuccessful(): void
+    {
+        // Arrange
+        $this->tester->haveValidOpenApiFile();
+
+        $commandTester = $this->tester->getConsoleTester(OpenApiValidateConsole::class);
+
+        // Act
+        $commandTester->execute([
+            '--' . OpenApiValidateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
+        ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
+
+        // Assert
+        $this->assertStringContainsString(SyncApiInfo::openApiSchemaFileIsValid(), $commandTester->getDisplay());
+    }
 
     /**
      * @return void
@@ -62,6 +81,7 @@ class OpenApiValidateConsoleTest extends Unit
         // Assert
         $this->assertSame(AbstractConsole::CODE_ERROR, $commandTester->getStatusCode());
         $this->assertNotEmpty($commandTester->getDisplay());
+        $this->assertStringNotContainsString(SyncApiInfo::openApiSchemaFileIsValid(), $commandTester->getDisplay());
     }
 
     /**

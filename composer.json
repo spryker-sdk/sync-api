@@ -10,7 +10,11 @@
         "spryker-sdk/spryk": "^0.4.0",
         "symfony/console": "^4.0.0 || ^5.3 || ^6.0",
         "symfony/finder": "^4.0.0 || ^5.3 || ^6.0",
-        "symfony/process": "^4.0.0 || ^5.4"
+        "symfony/process": "^4.0.0 || ^5.4",
+        "spryker/glue-backend-api-application": "^0.2.0",
+        "spryker/glue-application": "^1.39.0",
+        "spryker/glue-http": "^0.3.0",
+        "spryker/glue-rest-api-convention": "^0.2.0"
     },
     "require-dev": {
         "codeception/codeception": "*",

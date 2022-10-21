@@ -4,24 +4,12 @@
             "src/SprykerSdk"
         ]
     },
-    "timeout": 20,
+    "timeout": 30,
     "logs": {
-        "text": "tests/_output/infection.log",
-        "html": "tests/_output/infection.html",
-        "summary": "tests/_output/summary.log",
-        "json": "tests/_output/infection-log.json",
-        "perMutator": "tests/_output/per-mutator.md"
+        "html": "tests/_output/infection.html"
     },
     "tmpDir": "./tests/_data/mutations",
     "mutators": {
-        "global-ignore": [
-            "FooClass::__construct"
-        ],
-        "global-ignoreSourceCodeByRegex": [
-            "Assert::.*",
-            "getcwd",
-            "PHP_SAPI",
-        ],
         "@default": true,
         "@function_signature": false,
         "CastString": {
@@ -30,6 +18,11 @@
                 "SprykerSdk\\SyncApi\\SyncApiConfig::getSprykRunExecutablePath::50",
                 "SprykerSdk\\SyncApi\\Message\\SyncApiInfo::format",
                 "SprykerSdk\\SyncApi\\Message\\SyncApiError::format",
+            ],
+        },
+        "DecrementInteger": {
+            "ignore": [
+                "SprykerSdk\\SyncApi\\OpenApi\\Validator\\OpenApiValidator::validate",
             ],
         },
     },

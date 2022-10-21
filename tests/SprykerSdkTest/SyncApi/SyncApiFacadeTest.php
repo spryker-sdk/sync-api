@@ -8,6 +8,7 @@
 namespace SprykerSdkTest\SyncApi;
 
 use Codeception\Test\Unit;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @group SprykerSdkTest
@@ -36,5 +37,35 @@ class SyncApiFacadeTest extends Unit
 
         // Assert
         $this->assertFileExists($openApiRequestTransfer->getTargetFile());
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateOpenApiCreatesExpectedOpenApiFile(): void
+    {
+        // Arrange
+        $openApiRequestTransfer = $this->tester->haveOpenApiAddRequest();
+
+        // Act
+        $this->tester->getFacade()->createOpenApi(
+            $openApiRequestTransfer,
+        );
+
+        // Assert
+        $openApi = Yaml::parseFile($openApiRequestTransfer->getTargetFile());
+        $this->assertArrayHasKey('openapi', $openApi);
+        $this->assertSame('3.0.0', $openApi['openapi']);
+        $this->assertArrayHasKey('info', $openApi);
+
+        $info = $openApi['info'];
+
+        // Test that title is correct
+        $this->assertArrayHasKey('title', $info);
+        $this->assertSame('Test File', $info['title']);
+
+        // Tests that version is correct
+        $this->assertArrayHasKey('version', $info);
+        $this->assertSame('0.1.0', $info['version']);
     }
 }
