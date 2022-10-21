@@ -29,7 +29,7 @@ class OpenApiHelper extends Module
      */
     public function haveOpenApiAddRequest(): OpenApiRequestTransfer
     {
-        $config = $this->getSyncApiHelper()->getConfig();
+        $targetFile = sprintf('%s/%s', $this->getSyncApiHelper()->getRootPath(), 'openapi.yml');
 
         $openApiTransfer = new OpenApiTransfer();
         $openApiTransfer
@@ -38,7 +38,7 @@ class OpenApiHelper extends Module
 
         $openApiRequestTransfer = new OpenApiRequestTransfer();
         $openApiRequestTransfer
-            ->setTargetFile($config->getDefaultRelativePathToOpenApiFile())
+            ->setTargetFile($targetFile)
             ->setOpenApi($openApiTransfer);
 
         return $openApiRequestTransfer;

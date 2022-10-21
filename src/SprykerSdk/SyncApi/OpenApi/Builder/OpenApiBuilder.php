@@ -71,11 +71,13 @@ class OpenApiBuilder implements OpenApiBuilderInterface
      */
     protected function writeToFile(string $targetFile, array $openApi): bool
     {
+        // inline: 100 is set as we want to allow deep nesting, a lower value would break the YML style we want.
         $openApiSchemaYaml = Yaml::dump($openApi, 100);
 
         $dirname = dirname($targetFile);
 
         if (!is_dir($dirname)) {
+            // permissions: 0770 is an agreed value don't change this
             mkdir($dirname, 0770, true);
         }
 

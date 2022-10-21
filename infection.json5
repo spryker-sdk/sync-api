@@ -2,27 +2,35 @@
     "source": {
         "directories": [
             "src/SprykerSdk"
+        ],
+        "excludes": [
+            "SprykerSdk/SyncApi/Message/SyncApiMessageFormatter.php"
         ]
     },
     "timeout": 30,
     "logs": {
-        "html": "tests/_output/infection.html"
+        "text": "tests/_output/infection.log",
+        "html": "tests/_output/infection.html",
+        "summary": "tests/_output/summary.log",
+        "json": "tests/_output/infection-log.json",
+        "perMutator": "tests/_output/per-mutator.md"
     },
     "tmpDir": "./tests/_data/mutations",
     "mutators": {
         "@default": true,
         "@function_signature": false,
-        "CastString": {
-            "ignore": [
-                "SprykerSdk\\SyncApi\\SyncApiConfig::getProjectRootPath::35",
-                "SprykerSdk\\SyncApi\\SyncApiConfig::getSprykRunExecutablePath::50",
-                "SprykerSdk\\SyncApi\\Message\\SyncApiInfo::format",
-                "SprykerSdk\\SyncApi\\Message\\SyncApiError::format",
-            ],
-        },
+        "CastString": false,
+        "CastBool": false,
         "DecrementInteger": {
             "ignore": [
                 "SprykerSdk\\SyncApi\\OpenApi\\Validator\\OpenApiValidator::validate",
+                "SprykerSdk\\SyncApi\\OpenApi\\Builder\\OpenApiBuilder::writeToFile",
+            ],
+        },
+        "IncrementInteger": {
+            "ignore": [
+                "SprykerSdk\\SyncApi\\OpenApi\\Validator\\OpenApiValidator::validate",
+                "SprykerSdk\\SyncApi\\OpenApi\\Builder\\OpenApiBuilder::writeToFile",
             ],
         },
     },

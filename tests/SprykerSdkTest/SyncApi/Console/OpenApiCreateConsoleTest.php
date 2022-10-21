@@ -11,6 +11,7 @@ use Codeception\Test\Unit;
 use SprykerSdk\SyncApi\Console\AbstractConsole;
 use SprykerSdk\SyncApi\Console\OpenApiCreateConsole;
 use SprykerSdk\SyncApi\Message\SyncApiError;
+use SprykerSdk\SyncApi\Message\SyncApiInfo;
 use SprykerSdkTest\SyncApi\SyncApiTester;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -48,6 +49,29 @@ class OpenApiCreateConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
+    }
+
+    /**
+     * @return void
+     */
+    public function testOpenApiCreateConsolePrintsSuccessMessage(): void
+    {
+        // Arrange
+        $commandTester = $this->tester->getConsoleTester(OpenApiCreateConsole::class);
+
+        // Act
+        $commandTester->execute(
+            [
+                OpenApiCreateConsole::ARGUMENT_TITLE => 'Test File',
+                '--' . OpenApiCreateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
+            ],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ],
+        );
+
+        // AssertSyncApi
+        $this->assertStringContainsString(SyncApiInfo::openApiFileCreated('vfs://root/resources/api/openapi.yml'), $commandTester->getDisplay());
     }
 
     /**

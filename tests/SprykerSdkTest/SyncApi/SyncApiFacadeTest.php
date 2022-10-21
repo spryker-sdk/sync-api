@@ -31,12 +31,14 @@ class SyncApiFacadeTest extends Unit
         $openApiRequestTransfer = $this->tester->haveOpenApiAddRequest();
 
         // Act
-        $this->tester->getFacade()->createOpenApi(
+        $openApiResponseTransfer = $this->tester->getFacade()->createOpenApi(
             $openApiRequestTransfer,
         );
 
         // Assert
         $this->assertFileExists($openApiRequestTransfer->getTargetFile());
+        $this->assertCount(0, $openApiResponseTransfer->getErrors());
+        $this->assertCount(1, $openApiResponseTransfer->getMessages());
     }
 
     /**
@@ -48,7 +50,7 @@ class SyncApiFacadeTest extends Unit
         $openApiRequestTransfer = $this->tester->haveOpenApiAddRequest();
 
         // Act
-        $this->tester->getFacade()->createOpenApi(
+        $openApiResponseTransfer = $this->tester->getFacade()->createOpenApi(
             $openApiRequestTransfer,
         );
 
@@ -56,12 +58,14 @@ class SyncApiFacadeTest extends Unit
         $expectedOpenApi = [
             'openapi' => '3.0.0',
             'info' => [
-                'title' => 'Test File',
+                'title' => 'Test title',
                 'version' => '0.1.0',
             ],
         ];
-        
+
         $openApi = Yaml::parseFile($openApiRequestTransfer->getTargetFile());
         $this->assertSame($expectedOpenApi, $openApi);
+        $this->assertCount(0, $openApiResponseTransfer->getErrors());
+        $this->assertCount(1, $openApiResponseTransfer->getMessages());
     }
 }
