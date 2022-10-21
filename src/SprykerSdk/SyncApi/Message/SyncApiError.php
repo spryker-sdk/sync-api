@@ -189,6 +189,36 @@ class SyncApiError
     }
 
     /**
+     * @param string $errorMessage
+     *
+     * @return string
+     */
+    public static function openApiDataIsInvalid(string $errorMessage): string
+    {
+        return static::format(
+            sprintf(
+                'Provided Open API data is invalid. Error: %s',
+                $errorMessage,
+            ),
+        );
+    }
+
+    /**
+     * @param string $errorMessage
+     *
+     * @return string
+     */
+    public static function couldNotUpdateOpenApiFile(string $errorMessage): string
+    {
+        return static::format(
+            sprintf(
+                'Update Open API failed with error: "%s"',
+                $errorMessage,
+            ),
+        );
+    }
+
+    /**
      * Colorize output in CLI on Linux machines.
      *
      * Info text will be in green, everything in double quotes will be yellow, and quotes will be removed.

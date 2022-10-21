@@ -1,0 +1,8 @@
+openapi: 3.0.0
+servers:
+    - url: https://glue.trs.demo-spryker.com
+      description: 'Main (production) server'
+    - url: https://glue.trs-staging.demo-spryker.com
+      description: 'Internal staging server for testing'
+    - url: http://glue.registry.spryker.local
+      description: 'Internal development server'

@@ -36,6 +36,14 @@ class SyncApiConfig
     }
 
     /**
+     * @return string
+     */
+    public function getPackageRootPath(): string
+    {
+        return realpath(__DIR__) . '/../../..';
+    }
+
+    /**
      * Returns the current working directory or `INSTALLED_ROOT_DIRECTORY` (when INSTALLED_ROOT_DIRECTORY is defined).
      * This is needed to be able to execute this tool within the SprykerSdk and not inside of a project directly.
      *
@@ -48,5 +56,22 @@ class SyncApiConfig
         }
 
         return (string)getcwd();
+    }
+
+    /**
+     * @return array
+     */
+    public function getAvailableHttpMethods(): array
+    {
+        return [
+            'get',
+            'put',
+            'post',
+            'delete',
+            'options',
+            'head',
+            'patch',
+            'trace',
+        ];
     }
 }

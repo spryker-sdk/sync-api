@@ -8,6 +8,7 @@
 namespace SprykerSdkTest\Helper;
 
 use Codeception\Module;
+use Symfony\Component\Yaml\Yaml;
 
 class OpenApiValidatorHelper extends Module
 {
@@ -23,6 +24,30 @@ class OpenApiValidatorHelper extends Module
         ];
 
         $this->prepareOpenApiSchema($files);
+    }
+
+    /**
+     * @return string
+     */
+    public function getValidOpenApiContentsAsJson(): string
+    {
+        return json_encode(Yaml::parseFile(codecept_data_dir('api/valid/valid_openapi.yml')));
+    }
+
+    /**
+     * @return string
+     */
+    public function getOpenApiContentsWithIsMissingReferenceJson(): string
+    {
+        return json_encode(Yaml::parseFile(codecept_data_dir('api/invalid/missed_references_openapi.yml')));
+    }
+
+    /**
+     * @return string
+     */
+    public function getInvalidOpenApiContentsAsJson(): string
+    {
+        return json_encode(Yaml::parseFile(codecept_data_dir('api/invalid/invalid_openapi.yml')));
     }
 
     /**

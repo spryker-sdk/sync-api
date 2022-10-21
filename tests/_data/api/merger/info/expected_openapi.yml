@@ -1,0 +1,10 @@
+openapi: 3.0.0
+info:
+    version: 1.0.0
+    contact:
+        name: Spryker
+        url: 'https://apps.spryker.com/'
+        email: support@spryker.com
+    title: 'Spryker App API'
+    license:
+        name: Proprietary

@@ -8,6 +8,7 @@
 namespace SprykerSdkTest\SyncApi;
 
 use Codeception\Test\Unit;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @group SprykerSdkTest
@@ -36,5 +37,43 @@ class SyncApiFacadeTest extends Unit
 
         // Assert
         $this->assertFileExists($openApiRequestTransfer->getTargetFile());
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateOpenApiUpdatesExistingOpenApiFile(): void
+    {
+        // Arrange
+        $updateOpenApiRequestTransfer = $this->tester->haveUpdateRequestWithExistingFile();
+
+        // Act
+        $this->tester->getFacade()->updateOpenApi($updateOpenApiRequestTransfer);
+
+        // Assert
+        $this->assertFileExists('vfs://root/resources/api/existing_openapi.yml');
+        $this->assertEquals(
+            Yaml::parseFile(codecept_data_dir('api/update/expected_openapi.yml')),
+            Yaml::parseFile('vfs://root/resources/api/existing_openapi.yml'),
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateOpenApiCreatesNewOpenApiFile(): void
+    {
+        // Arrange
+        $updateOpenApiRequestTransfer = $this->tester->haveUpdateRequestWithNewFile();
+
+        // Act
+        $this->tester->getFacade()->updateOpenApi($updateOpenApiRequestTransfer);
+
+        // Assert
+        $this->assertFileExists('vfs://root/resources/api/new_openapi.yml');
+        $this->assertEquals(
+            Yaml::parseFile(codecept_data_dir('api/update/expected_openapi.yml')),
+            Yaml::parseFile('vfs://root/resources/api/new_openapi.yml'),
+        );
     }
 }

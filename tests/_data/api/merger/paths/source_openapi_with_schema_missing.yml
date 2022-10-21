@@ -1,0 +1,10 @@
+openapi: 3.0.0
+paths:
+    /apps:
+        get:
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AppCollectionApiResponse'

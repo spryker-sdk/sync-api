@@ -15,6 +15,14 @@ use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Merger\ComponentsCleaner;
+use SprykerSdk\SyncApi\OpenApi\Merger\ComponentsCleanerInterface;
+use SprykerSdk\SyncApi\OpenApi\Merger\InfoMerger;
+use SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface;
+use SprykerSdk\SyncApi\OpenApi\Merger\PathsMerger;
+use SprykerSdk\SyncApi\OpenApi\Merger\ServersMerger;
+use SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdater;
+use SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdaterInterface;
 use SprykerSdk\SyncApi\OpenApi\Validator\OpenApiValidator;
 use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiComponentsValidatorRule;
 use SprykerSdk\SyncApi\OpenApi\Validator\Rules\OpenApiHttpMethodInPathValidatorRule;
@@ -130,5 +138,61 @@ class SyncApiFactory
     public function createMessageBuilder(): MessageBuilderInterface
     {
         return new MessageBuilder();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdaterInterface
+     */
+    public function createOpenApiUpdater(): OpenApiUpdaterInterface
+    {
+        return new OpenApiUpdater(
+            $this->createMessageBuilder(),
+            $this->getConfig(),
+            $this->getMergerCollection(),
+        );
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface
+     */
+    public function createInfoMerger(): MergerInterface
+    {
+        return new InfoMerger();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface
+     */
+    public function createServersMerger(): MergerInterface
+    {
+        return new ServersMerger();
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface
+     */
+    public function createPathMerger(): MergerInterface
+    {
+        return new PathsMerger($this->getConfig(), $this->createComponentsCleaner());
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\ComponentsCleanerInterface
+     */
+    public function createComponentsCleaner(): ComponentsCleanerInterface
+    {
+        return new ComponentsCleaner();
+    }
+
+    /**
+     * @return array<\SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface>
+     */
+    public function getMergerCollection(): array
+    {
+        return [
+            $this->createInfoMerger(),
+            $this->createServersMerger(),
+            $this->createPathMerger(),
+        ];
     }
 }
