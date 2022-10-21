@@ -20,7 +20,6 @@
         "codeception/codeception": "*",
         "codeception/module-asserts": "*",
         "infection/codeception-adapter": "^0.4.1",
-        "infection/infection": "^0.26.6",
         "mikey179/vfsstream": "^1.6",
         "sllh/composer-versions-check": "^2.0",
         "spryker-sdk/architector": "0.1.x-dev",

@@ -53,19 +53,15 @@ class SyncApiFacadeTest extends Unit
         );
 
         // Assert
+        $expectedOpenApi = [
+            'openapi' => '3.0.0',
+            'info' => [
+                'title' => 'Test File',
+                'version' => '0.1.0',
+            ],
+        ];
+        
         $openApi = Yaml::parseFile($openApiRequestTransfer->getTargetFile());
-        $this->assertArrayHasKey('openapi', $openApi);
-        $this->assertSame('3.0.0', $openApi['openapi']);
-        $this->assertArrayHasKey('info', $openApi);
-
-        $info = $openApi['info'];
-
-        // Test that title is correct
-        $this->assertArrayHasKey('title', $info);
-        $this->assertSame('Test File', $info['title']);
-
-        // Tests that version is correct
-        $this->assertArrayHasKey('version', $info);
-        $this->assertSame('0.1.0', $info['version']);
+        $this->assertSame($expectedOpenApi, $openApi);
     }
 }
