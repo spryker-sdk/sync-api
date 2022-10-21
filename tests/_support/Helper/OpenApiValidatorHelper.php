@@ -37,14 +37,6 @@ class OpenApiValidatorHelper extends Module
     /**
      * @return string
      */
-    public function getOpenApiContentsWithIsMissingReferenceJson(): string
-    {
-        return json_encode(Yaml::parseFile(codecept_data_dir('api/invalid/missed_references_openapi.yml')));
-    }
-
-    /**
-     * @return string
-     */
     public function getInvalidOpenApiContentsAsJson(): string
     {
         return json_encode(Yaml::parseFile(codecept_data_dir('api/invalid/invalid_openapi.yml')));

@@ -16,9 +16,9 @@ use SprykerSdkTest\SyncApi\SyncApiTester;
  * @group SyncApi
  * @goupr OpenApi
  * @group Merger
- * @group PathsMergerTest
+ * @group ComponentsCleanerTest
  */
-class PathsMergerTest extends Unit
+class ComponentsCleanerTest extends Unit
 {
     /**
      * @var \SprykerSdkTest\SyncApi\SyncApiTester
@@ -31,14 +31,13 @@ class PathsMergerTest extends Unit
     public function testPathMergedSuccessfully(): void
     {
         // Arrange
-        $pathMerger = $this->tester->getFactory()->createPathsMerger();
+        $componentsCleaner = $this->tester->getFactory()->createComponentsCleaner();
 
-        $targetOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths/target_openapi.yml');
-        $sourceOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths/source_openapi.yml');
-        $expectedOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths/expected_openapi.yml');
+        $targetOpenApi = $this->tester->loadOpenApiFromYaml('merger/cleaner/target_openapi.yml');
+        $expectedOpenApi = $this->tester->loadOpenApiFromYaml('merger/cleaner/expected_openapi.yml');
 
         // Act
-        $actualOpenApi = $pathMerger->merge($targetOpenApi, $sourceOpenApi);
+        $actualOpenApi = $componentsCleaner->cleanUnused($targetOpenApi);
 
         // Assert
         $this->assertSame(Writer::writeToYaml($expectedOpenApi), Writer::writeToYaml($actualOpenApi));

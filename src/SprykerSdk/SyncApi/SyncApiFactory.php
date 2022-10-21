@@ -15,10 +15,12 @@ use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiBuilderInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
 use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Merger\ComponentMerger;
 use SprykerSdk\SyncApi\OpenApi\Merger\ComponentsCleaner;
 use SprykerSdk\SyncApi\OpenApi\Merger\ComponentsCleanerInterface;
 use SprykerSdk\SyncApi\OpenApi\Merger\InfoMerger;
 use SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface;
+use SprykerSdk\SyncApi\OpenApi\Merger\OpenApiMerger;
 use SprykerSdk\SyncApi\OpenApi\Merger\PathsMerger;
 use SprykerSdk\SyncApi\OpenApi\Merger\ServersMerger;
 use SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdater;
@@ -148,7 +150,18 @@ class SyncApiFactory
         return new OpenApiUpdater(
             $this->createMessageBuilder(),
             $this->getConfig(),
+            $this->createOpenApiMerger(),
+        );
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface
+     */
+    public function createOpenApiMerger(): MergerInterface
+    {
+        return new OpenApiMerger(
             $this->getMergerCollection(),
+            $this->createComponentsCleaner(),
         );
     }
 
@@ -171,9 +184,17 @@ class SyncApiFactory
     /**
      * @return \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface
      */
-    public function createPathMerger(): MergerInterface
+    public function createPathsMerger(): MergerInterface
     {
-        return new PathsMerger($this->getConfig(), $this->createComponentsCleaner());
+        return new PathsMerger($this->getConfig());
+    }
+
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface
+     */
+    public function createComponentsMerger(): MergerInterface
+    {
+        return new ComponentMerger();
     }
 
     /**
@@ -192,7 +213,8 @@ class SyncApiFactory
         return [
             $this->createInfoMerger(),
             $this->createServersMerger(),
-            $this->createPathMerger(),
+            $this->createPathsMerger(),
+            $this->createComponentsMerger(),
         ];
     }
 }

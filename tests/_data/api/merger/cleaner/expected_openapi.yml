@@ -1,0 +1,33 @@
+openapi: 3.0.0
+paths:
+    /apps:
+        post:
+            summary: 'Registers an App within the Registry service'
+            parameters:
+                -   $ref: '#/components/parameters/storeReference'
+            requestBody:
+                description: 'Contains all required data to register an App within the Registry service.'
+                required: true
+                content:
+                    application/vnd.api+json:
+                        schema:
+                            $ref: '#/components/schemas/AppRegistrationApiRequest'
+components:
+    schemas:
+        AppRegistrationApiRequest:
+            properties:
+                data:
+                    $ref: '#/components/schemas/AppRegistrationApiRequestData'
+        AppRegistrationApiRequestData:
+            properties:
+                type:
+                    type: string
+                    example: 'apps'
+    parameters:
+        storeReference:
+            name: X-Store-Reference
+            in: header
+            required: true
+            description: 'Reference of the Tenants store.'
+            schema:
+                type: string

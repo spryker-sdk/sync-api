@@ -13,6 +13,7 @@ use cebe\openapi\Writer;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\Message\SyncApiError;
 use SprykerSdk\SyncApi\Message\SyncApiInfo;
+use SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface;
 use SprykerSdk\SyncApi\SyncApiConfig;
 use Throwable;
 use Transfer\OpenApiResponseTransfer;
@@ -23,31 +24,31 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
     /**
      * @var \SprykerSdk\SyncApi\Message\MessageBuilderInterface
      */
-    protected MessageBuilderInterface $messageBuilder;
+    private MessageBuilderInterface $messageBuilder;
 
     /**
      * @var \SprykerSdk\SyncApi\SyncApiConfig
      */
-    protected SyncApiConfig $syncApiConfig;
+    private SyncApiConfig $syncApiConfig;
 
     /**
-     * @var array<\SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface>
+     * @var \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface
      */
-    protected array $mergerCollection;
+    private MergerInterface $openApiMerger;
 
     /**
      * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
      * @param \SprykerSdk\SyncApi\SyncApiConfig $syncApiConfig
-     * @param array<\SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface> $mergerCollection
+     * @param \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface $openApiMerger
      */
     public function __construct(
         MessageBuilderInterface $messageBuilder,
         SyncApiConfig $syncApiConfig,
-        array $mergerCollection
+        MergerInterface $openApiMerger
     ) {
         $this->messageBuilder = $messageBuilder;
         $this->syncApiConfig = $syncApiConfig;
-        $this->mergerCollection = $mergerCollection;
+        $this->openApiMerger = $openApiMerger;
     }
 
     /**
@@ -66,7 +67,7 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
 
             $syncApiTargetFilepath = $this->getSyncApiTargetFilepath($updateOpenApiRequestTransfer);
 
-            $targetOpenApi = $this->merge($this->getTargetOpenApi($syncApiTargetFilepath), $sourceOpenApi);
+            $targetOpenApi = $this->openApiMerger->merge($this->getTargetOpenApi($syncApiTargetFilepath), $sourceOpenApi);
 
             $this->saveTargetOpenApi($syncApiTargetFilepath, $targetOpenApi);
         } catch (Throwable $throwable) {
@@ -131,21 +132,6 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
     protected function getFilePath(string $rootDirectory, string $fileName): string
     {
         return $rootDirectory . DIRECTORY_SEPARATOR . $fileName;
-    }
-
-    /**
-     * @param \cebe\openapi\spec\OpenApi $targetOpenApi
-     * @param \cebe\openapi\spec\OpenApi $sourceOpenApi
-     *
-     * @return \cebe\openapi\spec\OpenApi
-     */
-    protected function merge(OpenApi $targetOpenApi, OpenApi $sourceOpenApi): OpenApi
-    {
-        foreach ($this->mergerCollection as $merger) {
-            $targetOpenApi = $merger->merge($targetOpenApi, $sourceOpenApi);
-        }
-
-        return $targetOpenApi;
     }
 
     /**
