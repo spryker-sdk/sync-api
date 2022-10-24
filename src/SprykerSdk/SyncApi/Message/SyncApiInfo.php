@@ -36,6 +36,16 @@ class SyncApiInfo
     }
 
     /**
+     * @param string $fileName
+     *
+     * @return string
+     */
+    public static function openApiFileUpdated(string $fileName): string
+    {
+        return static::format(sprintf('Successfully updated "%s".', $fileName));
+    }
+
+    /**
      * Colorize output in CLI on Linux machines.
      *
      * Info text will be in green, everything in double quotes will be yellow, and quotes will be removed.

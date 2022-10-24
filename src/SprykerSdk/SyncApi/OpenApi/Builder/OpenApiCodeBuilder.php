@@ -758,7 +758,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
      *
      * @return string|null
      */
-    protected function getTransferPropertyType(array $parameters)
+    protected function getTransferPropertyType(array $parameters): ?string
     {
         if (count($parameters) === 1) {
             $propertyName = array_key_first($parameters);
@@ -774,7 +774,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
      *
      * @return string|null
      */
-    protected function getTransferPropertySingular(array $parameters)
+    protected function getTransferPropertySingular(array $parameters): ?string
     {
         $propertyName = array_key_first($parameters);
         $propertyTypes = explode(':', $parameters[$propertyName]);
@@ -856,7 +856,7 @@ class OpenApiCodeBuilder implements OpenApiCodeBuilderInterface
     {
         $process = new Process($command, $this->config->getProjectRootPath(), null, null, 300);
 
-        $process->run(function ($a, $buffer) {
+        $process->run(function ($a, $buffer): void {
             echo $buffer;
             // For debugging purposes, set a breakpoint here to see issues.
         });

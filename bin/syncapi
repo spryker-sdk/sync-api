@@ -17,6 +17,7 @@ if (!defined('COMPOSER_INSTALL')) {
 
 require_once COMPOSER_INSTALL;
 
+use SprykerSdk\SyncApi\Console\OpenApiUpdateConsole;
 use Symfony\Component\Console\Application;
 use SprykerSdk\SyncApi\Console\OpenApiCodeGenerateConsole;
 use SprykerSdk\SyncApi\Console\OpenApiValidateConsole;
@@ -27,6 +28,7 @@ $application->addCommands([
     new OpenApiCodeGenerateConsole(),
     new OpenApiValidateConsole(),
     new OpenApiCreateConsole(),
+    new OpenApiUpdateConsole(),
 ]);
 
 $application->run();

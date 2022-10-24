@@ -1,0 +1,10 @@
+openapi: 3.0.0
+info:
+    version: 'will be updated'
+    contact:
+        name: 'will be updated'
+        url: 'will be updated'
+        email: 'will be updated'
+    title: 'will be updated'
+    license:
+        name: 'will be updated'

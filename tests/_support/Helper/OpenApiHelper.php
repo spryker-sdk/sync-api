@@ -17,8 +17,10 @@ use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
 use SprykerSdk\SyncApi\SyncApiConfig;
 use SprykerSdk\SyncApi\SyncApiFacade;
 use SprykerSdk\SyncApi\SyncApiFactory;
+use Symfony\Component\Yaml\Yaml;
 use Transfer\OpenApiRequestTransfer;
 use Transfer\OpenApiTransfer;
+use Transfer\UpdateOpenApiRequestTransfer;
 
 class OpenApiHelper extends Module
 {
@@ -96,5 +98,57 @@ class OpenApiHelper extends Module
         $buildFromOpenApiConsole->setFacade($facade);
 
         return $buildFromOpenApiConsole;
+    }
+
+    /**
+     * @param string $pathToOpenApi
+     *
+     * @return void
+     */
+    protected function prepareExistingOpenApiFile(string $pathToOpenApi): void
+    {
+        $filePath = sprintf('%s/resources/api/existing.yml', $this->getSyncApiHelper()->getRootPath());
+
+        if (!is_dir(dirname($filePath))) {
+            mkdir(dirname($filePath), 0770, true);
+        }
+
+        file_put_contents($filePath, file_get_contents($pathToOpenApi));
+    }
+
+    /**
+     * @return \Transfer\UpdateOpenApiRequestTransfer
+     */
+    public function haveUpdateRequestWithExistingFile(): UpdateOpenApiRequestTransfer
+    {
+        $this->prepareExistingOpenApiFile(codecept_data_dir('api/update/existing_openapi.yml'));
+
+        $updateOpenApiRequestTransfer = new UpdateOpenApiRequestTransfer();
+
+        $config = $this->getSyncApiHelper()->getConfig();
+
+        $updateOpenApiRequestTransfer
+            ->setProjectRoot($config->getProjectRootPath())
+            ->setOpenApiFile('resources/api/existing_openapi.yml')
+            ->setOpenApiDoc(json_encode(Yaml::parseFile(codecept_data_dir('api/update/source_openapi.yml'))));
+
+        return $updateOpenApiRequestTransfer;
+    }
+
+    /**
+     * @return \Transfer\UpdateOpenApiRequestTransfer
+     */
+    public function haveUpdateRequestWithNewFile(): UpdateOpenApiRequestTransfer
+    {
+        $updateOpenApiRequestTransfer = new UpdateOpenApiRequestTransfer();
+
+        $config = $this->getSyncApiHelper()->getConfig();
+
+        $updateOpenApiRequestTransfer
+            ->setProjectRoot($config->getProjectRootPath())
+            ->setOpenApiFile('resources/api/new_openapi.yml')
+            ->setOpenApiDoc(json_encode(Yaml::parseFile(codecept_data_dir('api/update/source_openapi.yml'))));
+
+        return $updateOpenApiRequestTransfer;
     }
 }
