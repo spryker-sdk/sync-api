@@ -30,6 +30,8 @@ class ComponentsCleanerTest extends Unit
      */
     public function testPathMergedSuccessfully(): void
     {
+        $this->markTestSkipped('Components cleaner is currently unused');
+
         // Arrange
         $componentsCleaner = $this->tester->getFactory()->createComponentsCleaner();
 
