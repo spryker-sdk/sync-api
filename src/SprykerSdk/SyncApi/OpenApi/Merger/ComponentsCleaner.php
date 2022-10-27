@@ -25,7 +25,9 @@ class ComponentsCleaner implements ComponentsCleanerInterface
 
         $references = ReferenceFinder::findInArray($openApiAsArray);
 
-        return $this->cleanUnusedParameters($openApi, $references);
+        $openApi = $this->cleanUnusedParameters($openApi, $references);
+
+        return $this->cleanUnusedSchemas($openApi, $references);
     }
 
     /**

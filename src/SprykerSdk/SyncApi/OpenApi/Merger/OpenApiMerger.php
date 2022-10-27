@@ -45,6 +45,6 @@ class OpenApiMerger implements MergerInterface
             $targetOpenApi = $merger->merge($targetOpenApi, $sourceOpenApi);
         }
 
-        return $this->componentsCleaner->cleanUnused($targetOpenApi);
+        return $targetOpenApi;
     }
 }

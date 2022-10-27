@@ -56,7 +56,7 @@ class PathsMerger implements MergerInterface
      *
      * @return \cebe\openapi\spec\OpenApi
      */
-    private function mergePath(
+    protected function mergePath(
         OpenApi $targetOpenApi,
         string $pathName,
         PathItem $sourcePathItem
