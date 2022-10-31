@@ -61,6 +61,8 @@ class OpenApiReader implements OpenApiReaderInterface
      */
     protected function getFileExtension(string $filePath): string
     {
-        return pathinfo($filePath)['extension'];
+        $parts = explode('.', basename($filePath));
+
+        return array_pop($parts);
     }
 }

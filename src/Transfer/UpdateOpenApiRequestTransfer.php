@@ -40,6 +40,11 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
     /**
      * @var string|null
      */
+    protected $openApiDocFile;
+
+    /**
+     * @var string|null
+     */
     protected $openApiDoc;
 
     /**
