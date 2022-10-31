@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © 2019-present Spryker Systems GmbH. All rights reserved.
+ * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ */
+
 namespace SprykerSdk\SyncApi\OpenApi\Reader;
 
 use cebe\openapi\Reader;
@@ -8,10 +13,9 @@ use SprykerSdk\SyncApi\Exception\OpenApiFileReadException;
 
 class OpenApiReader implements OpenApiReaderInterface
 {
-
-    /**
-     * @var string
-     */
+ /**
+  * @var string
+  */
     protected const FILE_EXTENSION_YAML = 'yaml';
 
     /**
@@ -36,6 +40,8 @@ class OpenApiReader implements OpenApiReaderInterface
 
     /**
      * @param string $filePath
+     *
+     * @throws \SprykerSdk\SyncApi\Exception\OpenApiFileReadException
      *
      * @return \cebe\openapi\spec\OpenApi
      */

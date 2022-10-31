@@ -106,10 +106,13 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
             }
         }
 
-        if (!file_exists($this->getFilePath(
-            $updateOpenApiRequestTransfer->getProjectRootOrFail(),
-            $updateOpenApiRequestTransfer->getOpenApiDocFileOrFail())
-        )) {
+        if (
+            $updateOpenApiRequestTransfer->getOpenApiDocFile()
+            && !file_exists($this->getFilePath(
+                $updateOpenApiRequestTransfer->getProjectRootOrFail(),
+                $updateOpenApiRequestTransfer->getOpenApiDocFileOrFail(),
+            ))
+        ) {
             return $this->createValidationErrorMessage('Provided OpenAPI file does not exist');
         }
 
@@ -118,6 +121,8 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
 
     /**
      * @param \Transfer\UpdateOpenApiRequestTransfer $updateOpenApiRequestTransfer
+     *
+     * @throws \SprykerSdk\SyncApi\Exception\OpenApiFileReadException
      *
      * @return \cebe\openapi\spec\OpenApi
      */

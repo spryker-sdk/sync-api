@@ -168,6 +168,9 @@ class SyncApiFactory
         );
     }
 
+    /**
+     * @return \SprykerSdk\SyncApi\OpenApi\Reader\OpenApiReaderInterface
+     */
     public function createOpenApiReader(): OpenApiReaderInterface
     {
         return new OpenApiReader();
