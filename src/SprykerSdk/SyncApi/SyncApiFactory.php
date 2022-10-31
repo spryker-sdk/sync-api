@@ -23,6 +23,8 @@ use SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface;
 use SprykerSdk\SyncApi\OpenApi\Merger\OpenApiMerger;
 use SprykerSdk\SyncApi\OpenApi\Merger\PathsMerger;
 use SprykerSdk\SyncApi\OpenApi\Merger\ServersMerger;
+use SprykerSdk\SyncApi\OpenApi\Reader\OpenApiReader;
+use SprykerSdk\SyncApi\OpenApi\Reader\OpenApiReaderInterface;
 use SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdater;
 use SprykerSdk\SyncApi\OpenApi\Updater\OpenApiUpdaterInterface;
 use SprykerSdk\SyncApi\OpenApi\Validator\OpenApiValidator;
@@ -151,6 +153,7 @@ class SyncApiFactory
             $this->createMessageBuilder(),
             $this->getConfig(),
             $this->createOpenApiMerger(),
+            $this->createOpenApiReader(),
         );
     }
 
@@ -163,6 +166,11 @@ class SyncApiFactory
             $this->getMergerCollection(),
             $this->createComponentsCleaner(),
         );
+    }
+
+    public function createOpenApiReader(): OpenApiReaderInterface
+    {
+        return new OpenApiReader();
     }
 
     /**
