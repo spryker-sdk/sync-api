@@ -106,13 +106,11 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
             }
         }
 
-        if ($updateOpenApiRequestTransfer->getOpenApiDocFile()) {
-            if (!file_exists($this->getFilePath(
-                $updateOpenApiRequestTransfer->getProjectRootOrFail(),
-                $updateOpenApiRequestTransfer->getOpenApiDocFileOrFail())
-            )) {
-                return $this->createValidationErrorMessage('Provided OpenAPI file does not exist');
-            }
+        if (!file_exists($this->getFilePath(
+            $updateOpenApiRequestTransfer->getProjectRootOrFail(),
+            $updateOpenApiRequestTransfer->getOpenApiDocFileOrFail())
+        )) {
+            return $this->createValidationErrorMessage('Provided OpenAPI file does not exist');
         }
 
         return null;
