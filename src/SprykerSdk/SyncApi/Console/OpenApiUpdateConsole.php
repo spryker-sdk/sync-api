@@ -100,7 +100,7 @@ class OpenApiUpdateConsole extends AbstractConsole
                 static::OPTION_PROJECT_ROOT_SHORT,
                 InputOption::VALUE_OPTIONAL,
                 static::OPTION_PROJECT_ROOT_DESCRIPTION,
-                $this->getConfig()->getProjectRootPath(),
+                 '',
             );
     }
 
