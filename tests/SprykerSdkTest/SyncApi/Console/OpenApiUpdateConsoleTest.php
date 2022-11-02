@@ -39,6 +39,7 @@ class OpenApiUpdateConsoleTest extends Unit
         $commandTester->execute(
             [
                 OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => $this->tester->getValidOpenApiContentsAsJson(),
+                '--' . OpenApiUpdateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -63,6 +64,7 @@ class OpenApiUpdateConsoleTest extends Unit
         $commandTester->execute(
             [
                 OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => $this->tester->getValidOpenApiContentsAsJson(),
+                '--' . OpenApiUpdateConsole::OPTION_PROJECT_ROOT => $this->tester->getRootPath(),
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
@@ -136,7 +138,7 @@ class OpenApiUpdateConsoleTest extends Unit
         // Act
         $commandTester->execute(
             [
-                OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => $this->tester->getOpenApiContentsWithIsMissingReferenceJson(),
+                OpenApiUpdateConsole::ARGUMENT_OPENAPI_DOC => '{"components":null}',
             ],
             [
                 'verbosity' => OutputInterface::VERBOSITY_VERBOSE,

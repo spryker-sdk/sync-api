@@ -10,9 +10,12 @@ namespace SprykerSdk\SyncApi\OpenApi\Updater;
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\Writer;
+use SprykerSdk\SyncApi\Exception\OpenApiFileReadException;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\Message\SyncApiError;
 use SprykerSdk\SyncApi\Message\SyncApiInfo;
+use SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface;
+use SprykerSdk\SyncApi\OpenApi\Reader\OpenApiReaderInterface;
 use SprykerSdk\SyncApi\SyncApiConfig;
 use Throwable;
 use Transfer\OpenApiResponseTransfer;
@@ -31,23 +34,31 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
     protected SyncApiConfig $syncApiConfig;
 
     /**
-     * @var array<\SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface>
+     * @var \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface
      */
-    protected array $mergerCollection;
+    protected MergerInterface $openApiMerger;
+
+    /**
+     * @var \SprykerSdk\SyncApi\OpenApi\Reader\OpenApiReaderInterface
+     */
+    protected OpenApiReaderInterface $openApiReader;
 
     /**
      * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
      * @param \SprykerSdk\SyncApi\SyncApiConfig $syncApiConfig
-     * @param array<\SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface> $mergerCollection
+     * @param \SprykerSdk\SyncApi\OpenApi\Merger\MergerInterface $openApiMerger
+     * @param \SprykerSdk\SyncApi\OpenApi\Reader\OpenApiReaderInterface $openApiReader
      */
     public function __construct(
         MessageBuilderInterface $messageBuilder,
         SyncApiConfig $syncApiConfig,
-        array $mergerCollection
+        MergerInterface $openApiMerger,
+        OpenApiReaderInterface $openApiReader
     ) {
         $this->messageBuilder = $messageBuilder;
         $this->syncApiConfig = $syncApiConfig;
-        $this->mergerCollection = $mergerCollection;
+        $this->openApiMerger = $openApiMerger;
+        $this->openApiReader = $openApiReader;
     }
 
     /**
@@ -58,15 +69,17 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
     public function updateOpenApi(UpdateOpenApiRequestTransfer $updateOpenApiRequestTransfer): OpenApiResponseTransfer
     {
         try {
-            if (!$this->isJsonValid($updateOpenApiRequestTransfer->getOpenApiDocOrFail())) {
-                return $this->createValidationErrorMessage('Provided JSON is invalid');
+            $openApiErrorResponseTransfer = $this->validateSourceOpenApi($updateOpenApiRequestTransfer);
+
+            if ($openApiErrorResponseTransfer) {
+                return $openApiErrorResponseTransfer;
             }
 
-            $sourceOpenApi = Reader::readFromJson($updateOpenApiRequestTransfer->getOpenApiDocOrFail());
+            $sourceOpenApi = $this->getSourceOpenApi($updateOpenApiRequestTransfer);
 
             $syncApiTargetFilepath = $this->getSyncApiTargetFilepath($updateOpenApiRequestTransfer);
 
-            $targetOpenApi = $this->merge($this->getTargetOpenApi($syncApiTargetFilepath), $sourceOpenApi);
+            $targetOpenApi = $this->openApiMerger->merge($this->getTargetOpenApi($syncApiTargetFilepath), $sourceOpenApi);
 
             $this->saveTargetOpenApi($syncApiTargetFilepath, $targetOpenApi);
         } catch (Throwable $throwable) {
@@ -74,6 +87,56 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
         }
 
         return $this->createSuccessResponse($syncApiTargetFilepath);
+    }
+
+    /**
+     * @param \Transfer\UpdateOpenApiRequestTransfer $updateOpenApiRequestTransfer
+     *
+     * @return \Transfer\OpenApiResponseTransfer|null
+     */
+    protected function validateSourceOpenApi(UpdateOpenApiRequestTransfer $updateOpenApiRequestTransfer): ?OpenApiResponseTransfer
+    {
+        if (!$updateOpenApiRequestTransfer->getOpenApiDoc() && !$updateOpenApiRequestTransfer->getOpenApiDocFile()) {
+            return $this->createValidationErrorMessage('No source OpenApi data provided');
+        }
+
+        if ($updateOpenApiRequestTransfer->getOpenApiDoc()) {
+            if (!$this->isJsonValid($updateOpenApiRequestTransfer->getOpenApiDocOrFail())) {
+                return $this->createValidationErrorMessage('Provided JSON data is invalid');
+            }
+        }
+
+        if (
+            $updateOpenApiRequestTransfer->getOpenApiDocFile()
+            && !file_exists($this->getFilePath(
+                $updateOpenApiRequestTransfer->getProjectRootOrFail(),
+                $updateOpenApiRequestTransfer->getOpenApiDocFileOrFail(),
+            ))
+        ) {
+            return $this->createValidationErrorMessage('Provided OpenAPI file does not exist');
+        }
+
+        return null;
+    }
+
+    /**
+     * @param \Transfer\UpdateOpenApiRequestTransfer $updateOpenApiRequestTransfer
+     *
+     * @throws \SprykerSdk\SyncApi\Exception\OpenApiFileReadException
+     *
+     * @return \cebe\openapi\spec\OpenApi
+     */
+    protected function getSourceOpenApi(UpdateOpenApiRequestTransfer $updateOpenApiRequestTransfer): OpenApi
+    {
+        if ($updateOpenApiRequestTransfer->getOpenApiDoc()) {
+            return $this->openApiReader->readOpenApiFromJsonString($updateOpenApiRequestTransfer->getOpenApiDocOrFail());
+        }
+
+        if ($updateOpenApiRequestTransfer->getOpenApiDocFile()) {
+            return $this->openApiReader->readOpenApiFromFile($updateOpenApiRequestTransfer->getOpenApiDocFileOrFail());
+        }
+
+        throw new OpenApiFileReadException('No OpenAPI data provided for update');
     }
 
     /**
@@ -130,22 +193,11 @@ class OpenApiUpdater implements OpenApiUpdaterInterface
      */
     protected function getFilePath(string $rootDirectory, string $fileName): string
     {
-        return $rootDirectory . DIRECTORY_SEPARATOR . $fileName;
-    }
-
-    /**
-     * @param \cebe\openapi\spec\OpenApi $targetOpenApi
-     * @param \cebe\openapi\spec\OpenApi $sourceOpenApi
-     *
-     * @return \cebe\openapi\spec\OpenApi
-     */
-    protected function merge(OpenApi $targetOpenApi, OpenApi $sourceOpenApi): OpenApi
-    {
-        foreach ($this->mergerCollection as $merger) {
-            $targetOpenApi = $merger->merge($targetOpenApi, $sourceOpenApi);
+        if ($rootDirectory === '') {
+            return $fileName;
         }
 
-        return $targetOpenApi;
+        return $rootDirectory . DIRECTORY_SEPARATOR . $fileName;
     }
 
     /**

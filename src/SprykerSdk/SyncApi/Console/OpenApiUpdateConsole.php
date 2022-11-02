@@ -28,6 +28,21 @@ class OpenApiUpdateConsole extends AbstractConsole
     /**
      * @var string
      */
+    public const OPTION_OPEN_API_DOC_FILE = 'openapi-doc-file';
+
+    /**
+     * @var string
+     */
+    public const OPTION_OPEN_API_DOC_FILE_SHORT = 'd';
+
+    /**
+     * @var string
+     */
+    public const OPTION_OPEN_API_DOC_FILE_DESCRIPTION = 'Path to source OpenAPI file. Use this option if you want a provide a source file instead of source JSON. Supports both JSON and YAML files.';
+
+    /**
+     * @var string
+     */
     public const OPTION_OPEN_API_FILE = 'openapi-file';
 
     /**
@@ -64,7 +79,7 @@ class OpenApiUpdateConsole extends AbstractConsole
             ->setDescription('Updates an OpenAPI file specified in options with provided OpenAPI doc')
             ->addArgument(
                 static::ARGUMENT_OPENAPI_DOC,
-                InputArgument::REQUIRED,
+                InputArgument::OPTIONAL,
                 static::ARGUMENT_OPENAPI_DOC_DESCRIPTION,
             )
             ->addOption(
@@ -75,11 +90,17 @@ class OpenApiUpdateConsole extends AbstractConsole
                 $this->getConfig()->getDefaultRelativePathToOpenApiFile(),
             )
             ->addOption(
+                static::OPTION_OPEN_API_DOC_FILE,
+                static::OPTION_OPEN_API_DOC_FILE_SHORT,
+                InputOption::VALUE_OPTIONAL,
+                static::OPTION_OPEN_API_DOC_FILE_DESCRIPTION,
+            )
+            ->addOption(
                 static::OPTION_PROJECT_ROOT,
                 static::OPTION_PROJECT_ROOT_SHORT,
                 InputOption::VALUE_OPTIONAL,
                 static::OPTION_PROJECT_ROOT_DESCRIPTION,
-                $this->getConfig()->getProjectRootPath(),
+                '',
             );
     }
 
@@ -93,6 +114,7 @@ class OpenApiUpdateConsole extends AbstractConsole
     {
         $updateOpenApiRequestTransfer = (new UpdateOpenApiRequestTransfer())
             ->setOpenApiDoc($input->getArgument(static::ARGUMENT_OPENAPI_DOC))
+            ->setOpenApiDocFile($input->getOption(static::OPTION_OPEN_API_DOC_FILE))
             ->setOpenApiFile($input->getOption(static::OPTION_OPEN_API_FILE))
             ->setProjectRoot($input->getOption(static::OPTION_PROJECT_ROOT));
 

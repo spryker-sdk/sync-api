@@ -20,6 +20,11 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
     /**
      * @var string
      */
+    public const OPEN_API_DOC_FILE = 'openApiDocFile';
+
+    /**
+     * @var string
+     */
     public const OPEN_API_DOC = 'openApiDoc';
 
     /**
@@ -31,6 +36,11 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
      * @var string|null
      */
     protected $openApiFile;
+
+    /**
+     * @var string|null
+     */
+    protected $openApiDocFile;
 
     /**
      * @var string|null
@@ -49,6 +59,9 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
         'open_api_file' => 'openApiFile',
         'openApiFile' => 'openApiFile',
         'OpenApiFile' => 'openApiFile',
+        'open_api_doc_file' => 'openApiDocFile',
+        'openApiDocFile' => 'openApiDocFile',
+        'OpenApiDocFile' => 'openApiDocFile',
         'open_api_doc' => 'openApiDoc',
         'openApiDoc' => 'openApiDoc',
         'OpenApiDoc' => 'openApiDoc',
@@ -65,6 +78,18 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
             'type' => 'string',
             'type_shim' => null,
             'name_underscore' => 'open_api_file',
+            'is_collection' => false,
+            'is_transfer' => false,
+            'is_value_object' => false,
+            'rest_request_parameter' => 'no',
+            'is_associative' => false,
+            'is_nullable' => false,
+            'is_strict' => false,
+        ],
+        self::OPEN_API_DOC_FILE => [
+            'type' => 'string',
+            'type_shim' => null,
+            'name_underscore' => 'open_api_doc_file',
             'is_collection' => false,
             'is_transfer' => false,
             'is_value_object' => false,
@@ -168,6 +193,79 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
     public function requireOpenApiFile()
     {
         $this->assertPropertyIsSet(self::OPEN_API_FILE);
+
+        return $this;
+    }
+
+    /**
+     * @module Syncapi
+     *
+     * @param string|null $openApiDocFile
+     *
+     * @return $this
+     */
+    public function setOpenApiDocFile($openApiDocFile)
+    {
+        $this->openApiDocFile = $openApiDocFile;
+        $this->modifiedProperties[self::OPEN_API_DOC_FILE] = true;
+
+        return $this;
+    }
+
+    /**
+     * @module Syncapi
+     *
+     * @return string|null
+     */
+    public function getOpenApiDocFile()
+    {
+        return $this->openApiDocFile;
+    }
+
+    /**
+     * @module Syncapi
+     *
+     * @param string|null $openApiDocFile
+     *
+     * @throws \Spryker\Shared\Kernel\Transfer\Exception\NullValueException
+     *
+     * @return $this
+     */
+    public function setOpenApiDocFileOrFail($openApiDocFile)
+    {
+        if ($openApiDocFile === null) {
+            $this->throwNullValueException(static::OPEN_API_DOC_FILE);
+        }
+
+        return $this->setOpenApiDocFile($openApiDocFile);
+    }
+
+    /**
+     * @module Syncapi
+     *
+     * @throws \Spryker\Shared\Kernel\Transfer\Exception\NullValueException
+     *
+     * @return string
+     */
+    public function getOpenApiDocFileOrFail()
+    {
+        if ($this->openApiDocFile === null) {
+            $this->throwNullValueException(static::OPEN_API_DOC_FILE);
+        }
+
+        return $this->openApiDocFile;
+    }
+
+    /**
+     * @module Syncapi
+     *
+     * @throws \Spryker\Shared\Kernel\Transfer\Exception\RequiredTransferPropertyException
+     *
+     * @return $this
+     */
+    public function requireOpenApiDocFile()
+    {
+        $this->assertPropertyIsSet(self::OPEN_API_DOC_FILE);
 
         return $this;
     }
@@ -333,6 +431,7 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
 
             switch ($normalizedPropertyName) {
                 case 'openApiFile':
+                case 'openApiDocFile':
                 case 'openApiDoc':
                 case 'projectRoot':
                     $this->$normalizedPropertyName = $value;
@@ -455,6 +554,7 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
             }
             switch ($property) {
                 case 'openApiFile':
+                case 'openApiDocFile':
                 case 'openApiDoc':
                 case 'projectRoot':
                     $values[$arrayKey] = $value;
@@ -484,6 +584,7 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
             }
             switch ($property) {
                 case 'openApiFile':
+                case 'openApiDocFile':
                 case 'openApiDoc':
                 case 'projectRoot':
                     $values[$arrayKey] = $value;
@@ -543,6 +644,7 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
     {
         return [
             'openApiFile' => $this->openApiFile,
+            'openApiDocFile' => $this->openApiDocFile,
             'openApiDoc' => $this->openApiDoc,
             'projectRoot' => $this->projectRoot,
         ];
@@ -555,6 +657,7 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
     {
         return [
             'open_api_file' => $this->openApiFile,
+            'open_api_doc_file' => $this->openApiDocFile,
             'open_api_doc' => $this->openApiDoc,
             'project_root' => $this->projectRoot,
         ];
@@ -567,6 +670,7 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
     {
         return [
             'open_api_file' => $this->openApiFile instanceof AbstractTransfer ? $this->openApiFile->toArray(true, false) : $this->openApiFile,
+            'open_api_doc_file' => $this->openApiDocFile instanceof AbstractTransfer ? $this->openApiDocFile->toArray(true, false) : $this->openApiDocFile,
             'open_api_doc' => $this->openApiDoc instanceof AbstractTransfer ? $this->openApiDoc->toArray(true, false) : $this->openApiDoc,
             'project_root' => $this->projectRoot instanceof AbstractTransfer ? $this->projectRoot->toArray(true, false) : $this->projectRoot,
         ];
@@ -579,6 +683,7 @@ class UpdateOpenApiRequestTransfer extends AbstractTransfer
     {
         return [
             'openApiFile' => $this->openApiFile instanceof AbstractTransfer ? $this->openApiFile->toArray(true, true) : $this->openApiFile,
+            'openApiDocFile' => $this->openApiDocFile instanceof AbstractTransfer ? $this->openApiDocFile->toArray(true, true) : $this->openApiDocFile,
             'openApiDoc' => $this->openApiDoc instanceof AbstractTransfer ? $this->openApiDoc->toArray(true, true) : $this->openApiDoc,
             'projectRoot' => $this->projectRoot instanceof AbstractTransfer ? $this->projectRoot->toArray(true, true) : $this->projectRoot,
         ];

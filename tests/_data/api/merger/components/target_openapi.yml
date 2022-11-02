@@ -1,0 +1,26 @@
+openapi: 3.0.0
+components:
+    schemas:
+        AppRegistrationApiRequestExisted:
+            properties:
+                data:
+                    $ref: '#/components/schemas/AppRegistrationApiRequestData'
+        AppRegistrationApiRequestExistedToReplace:
+            properties:
+                data:
+                    $ref: 'REPLACE'
+    parameters:
+        storeReferenceExisted:
+            name: X-Store-Reference-Existed
+            in: header
+            required: true
+            description: 'Reference of the Tenants store.'
+            schema:
+                type: string
+        storeReferenceExistedToReplace:
+            name: X-Store-Reference-Existed
+            in: header
+            required: true
+            description: 'REPLACE'
+            schema:
+                type: string

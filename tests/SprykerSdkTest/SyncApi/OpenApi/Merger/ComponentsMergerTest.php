@@ -16,9 +16,9 @@ use SprykerSdkTest\SyncApi\SyncApiTester;
  * @group SyncApi
  * @goupr OpenApi
  * @group Merger
- * @group PathsMergerTest
+ * @group ComponentsMergerTest
  */
-class PathsMergerTest extends Unit
+class ComponentsMergerTest extends Unit
 {
     /**
      * @var \SprykerSdkTest\SyncApi\SyncApiTester
@@ -28,17 +28,17 @@ class PathsMergerTest extends Unit
     /**
      * @return void
      */
-    public function testPathMergedSuccessfully(): void
+    public function testComponentsMergedSuccessFully(): void
     {
         // Arrange
-        $pathMerger = $this->tester->getFactory()->createPathsMerger();
+        $componentsMerger = $this->tester->getFactory()->createComponentsMerger();
 
-        $targetOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths/target_openapi.yml');
-        $sourceOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths/source_openapi.yml');
-        $expectedOpenApi = $this->tester->loadOpenApiFromYaml('merger/paths/expected_openapi.yml');
+        $targetOpenApi = $this->tester->loadOpenApiFromYaml('merger/components/target_openapi.yml');
+        $sourceOpenApi = $this->tester->loadOpenApiFromYaml('merger/components/source_openapi.yml');
+        $expectedOpenApi = $this->tester->loadOpenApiFromYaml('merger/components/expected_openapi.yml');
 
         // Act
-        $actualOpenApi = $pathMerger->merge($targetOpenApi, $sourceOpenApi);
+        $actualOpenApi = $componentsMerger->merge($targetOpenApi, $sourceOpenApi);
 
         // Assert
         $this->assertSame(Writer::writeToYaml($expectedOpenApi), Writer::writeToYaml($actualOpenApi));
