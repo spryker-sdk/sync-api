@@ -13,37 +13,51 @@ servers:
       description: 'Internal development server'
 
 paths:
-    /: # Without an x-spryker extension defined with a module this should throw an exception
+    /apps:
+        x-spryker:
+            module: CatFace
         post:
             summary: 'Registers an App within the Registry service'
+            x-spryker:
+                module: Hundnase
             requestBody:
                 description: 'Contains all required data to register an App within the Registry service.'
                 required: true
                 content:
-                    application/json:
+                    application/vnd.api+json:
                         schema:
+                            $ref: '#/components/schemas/AppRegistrationApiRequest'
             responses:
                 201:
                     description: 'App is registered.'
                     content:
-                        application/json:
+                        application/vnd.api+json:
                             schema:
                                 $ref: '#/components/schemas/AppRegistrationApiResponse'
                 400:
                     description: 'Invalid request.'
                     content:
-                        application/json:
+                        application/vnd.api+json:
                             schema:
                                 $ref: '#/components/schemas/ApiErrorMessage'
+                500:
+                    description: 'Server error'
+                    content:
+                        # servers may want to report the error directly as simple text if things go very wrong
+                        text/plain:
+                            schema:
+                                type: string
                 default:
                     description: 'Expected response to a bad request.'
                     content:
-                        application/json:
+                        application/vnd.api+json:
                             schema:
                                 $ref: '#/components/schemas/ApiErrorMessage'
 
         get:
             summary: 'Lists all available apps for a given locale.'
+            x-spryker:
+                module: GetCatFace
             parameters:
                 - name: Accept-Language
                   in: header
@@ -170,6 +184,34 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ApiErrorMessage'
 
+        put:
+            summary: 'Upload an image for app'
+            requestBody:
+                description: 'Contains all required data to add image to app.'
+                required: true
+                content:
+                    image/png:
+                        schema:
+                            $ref: '#/components/schemas/AppAddImageRequest'
+            responses:
+                201:
+                    description: 'Image is added.'
+                    content:
+                        application/vnd.api+json:
+                            schema:
+                                $ref: '#/components/schemas/AppAddImageResponse'
+                400:
+                    description: 'Invalid request.'
+                    content:
+                        application/vnd.api+json:
+                            schema:
+                                $ref: '#/components/schemas/ApiErrorMessage'
+                default:
+                    description: 'Expected response to a bad request.'
+                    content:
+                        application/vnd.api+json:
+                            schema:
+                                $ref: '#/components/schemas/ApiErrorMessage'
 
     /apps/{appId}/connect:
         post:
@@ -540,11 +582,6 @@ components:
                 configuration:
                     type: 'string'
                     example: '{"credentials": {"username": "Foo bar"}, "other-data": {}}'
-                categories:
-                    type: array
-                    items:
-                        type: string
-                    example: ['Category A', 'Category B']
         #-----------------------------------------------
 
 
@@ -620,6 +657,24 @@ components:
                     type: string
                 status:
                     type: integer
+
+        ################################################
+        # Add Image to App Request
+        ################################################
+        AppAddImageRequest:
+            properties:
+                type:
+                    type: string
+                    format: binary
+
+        ################################################
+        # Add Image to App Response
+        ################################################
+        AppAddImageResponse:
+            properties:
+                id:
+                    type: string
+                    example: 'UUID_image123'
 
     parameters:
         IncludeTenantApp:

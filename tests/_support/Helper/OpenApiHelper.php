@@ -10,11 +10,8 @@ namespace SprykerSdkTest\Helper;
 use Codeception\Module;
 use Codeception\Stub;
 use Codeception\Stub\Expected;
-use Doctrine\Inflector\InflectorFactory;
 use SprykerSdk\SyncApi\Console\OpenApiCodeGenerateConsole;
-use SprykerSdk\SyncApi\Message\MessageBuilder;
-use SprykerSdk\SyncApi\OpenApi\Builder\OpenApiCodeBuilder;
-use SprykerSdk\SyncApi\SyncApiConfig;
+use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Command\CommandRunner;
 use SprykerSdk\SyncApi\SyncApiFacade;
 use SprykerSdk\SyncApi\SyncApiFactory;
 use Transfer\OpenApiRequestTransfer;
@@ -75,19 +72,14 @@ class OpenApiHelper extends Module
      */
     public function getOpenApiBuilderConsoleMock(): OpenApiCodeGenerateConsole
     {
-        $openApiCodeBuilderStub = Stub::construct(
-            OpenApiCodeBuilder::class,
-            [
-                new SyncApiConfig(),
-                new MessageBuilder(),
-                InflectorFactory::create()->build(),
-            ],
+        $commandRunnerStub = Stub::make(
+            CommandRunner::class,
             [
                 'runProcess' => Expected::atLeastOnce(),
             ],
         );
         $factoryStub = Stub::make(SyncApiFactory::class, [
-            'createOpenApiCodeBuilder' => $openApiCodeBuilderStub,
+            'createCommandRunner' => $commandRunnerStub,
         ]);
         $facade = new SyncApiFacade();
         $facade->setFactory($factoryStub);

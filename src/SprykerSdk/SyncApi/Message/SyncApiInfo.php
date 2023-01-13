@@ -10,6 +10,17 @@ namespace SprykerSdk\SyncApi\Message;
 class SyncApiInfo
 {
     /**
+     * @param string $transferName
+     * @param string $moduleName
+     *
+     * @return string
+     */
+    public static function addedTransfer(string $transferName, string $moduleName): string
+    {
+        return static::format(sprintf('Added "%s" transfer to "%s" module.', $transferName, $moduleName));
+    }
+
+    /**
      * @return string
      */
     public static function openApiSchemaFileIsValid(): string

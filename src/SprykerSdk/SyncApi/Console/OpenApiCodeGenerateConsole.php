@@ -68,7 +68,8 @@ class OpenApiCodeGenerateConsole extends AbstractConsole
         $openApiRequestTransfer
             ->setTargetFile($input->getOption(static::OPTION_OPEN_API_FILE))
             ->setApplicationType($input->getOption(static::APPLICATION_TYPE))
-            ->setOrganization($input->getOption(static::OPTION_ORGANIZATION));
+            ->setOrganization($input->getOption(static::OPTION_ORGANIZATION))
+            ->setIsVerbose($output->isVeryVerbose());
 
         $openApiResponseTransfer = $this->getFacade()->buildFromOpenApi($openApiRequestTransfer);
 
