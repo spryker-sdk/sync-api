@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © 2019-present Spryker Systems GmbH. All rights reserved.
+ * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ */
+
 namespace SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\ArgumentResolver;
 
 use cebe\openapi\spec\Operation;
@@ -10,8 +15,11 @@ class ModuleNameArgumentResolver implements ArgumentResolverInterface
 {
     /**
      * @param string $resource
-     * @param PathItem $pathItem
-     * @param Operation $operation
+     * @param \cebe\openapi\spec\PathItem $pathItem
+     * @param \cebe\openapi\spec\Operation $operation
+     *
+     * @throws \SprykerSdk\SyncApi\Exception\SyncApiModuleNameNotFoundException
+     *
      * @return string
      */
     public function resolve(string $resource, PathItem $pathItem, Operation $operation): string

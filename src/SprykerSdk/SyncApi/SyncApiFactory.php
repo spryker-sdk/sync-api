@@ -87,7 +87,7 @@ class SyncApiFactory
     }
 
     /**
-     * @return ArgumentResolverInterface
+     * @return \SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\ArgumentResolver\ArgumentResolverInterface
      */
     public function createModuleNameArgumentResolver(): ArgumentResolverInterface
     {

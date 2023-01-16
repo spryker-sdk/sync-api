@@ -7,8 +7,6 @@
 
 namespace SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments;
 
-use ReflectionClass;
-
 class TransferArguments implements ArgumentsInterface
 {
     /**
@@ -121,22 +119,22 @@ class TransferArguments implements ArgumentsInterface
             $this->sprykName,
         ];
 
-        if ($this->organization) {
+        if ($this->organization !== null) {
             $arguments[] = '--organization';
             $arguments[] = $this->organization;
         }
 
-        if ($this->moduleName) {
+        if ($this->moduleName !== null) {
             $arguments[] = '--module';
             $arguments[] = $this->moduleName;
         }
 
-        if ($this->transferName) {
+        if ($this->transferName !== null) {
             $arguments[] = '--name';
-            $arguments[] = $this->moduleName;
+            $arguments[] = $this->transferName;
         }
 
-        if ($this->properties) {
+        if ($this->properties !== null) {
             $arguments[] = '--propertyName';
             $arguments[] = implode(',', $this->properties);
         }

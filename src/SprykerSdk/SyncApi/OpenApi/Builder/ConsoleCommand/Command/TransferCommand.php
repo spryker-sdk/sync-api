@@ -14,7 +14,6 @@ use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Doctrine\Inflector\Inflector;
-use SprykerSdk\SyncApi\Exception\SyncApiModuleNameNotFoundException;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\Message\SyncApiError;
 use SprykerSdk\SyncApi\Message\SyncApiInfo;
