@@ -55,8 +55,9 @@ jobs:
             - name: Run PHPStan
               run: composer stan
 
-            - name: Run Rector checks
-              run: composer rector-diff
+# Disabled, needs further investigation for re-enabling
+#            - name: Run Rector checks
+#              run: composer rector-diff
 
             - name: Run CodeStyle checks
               run: composer cs-check

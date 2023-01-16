@@ -34,7 +34,7 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
     /**
      * @var string|null
      */
-    protected ?string $moduleName;
+    protected ?string $module;
 
     /**
      * @var string|null
@@ -131,7 +131,7 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
      */
     public function setModuleName(string $moduleName): void
     {
-        $this->moduleName = $moduleName;
+        $this->module = $moduleName;
     }
 
     /**
@@ -139,7 +139,7 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
      */
     public function getModuleName(): ?string
     {
-        return $this->moduleName;
+        return $this->module;
     }
 
     /**
@@ -185,9 +185,16 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
         $properties = $reflectionClass->getProperties();
 
         foreach ($properties as $property) {
+            $property->setAccessible(true);
             $argumentName = sprintf('--%s', $property->getName());
 
-            if ($property->getValue($this) === null || $property->getName() === 'extensions' || $property->getName() === 'sprykName' || in_array($argumentName, $arguments)) {
+            if (
+                $property->getValue($this) === null ||
+                $property->getName() === 'extensions' ||
+                $property->getName() === 'sprykName' ||
+                $property->getName() === 'sprykMode' ||
+                in_array($argumentName, $arguments)
+            ) {
                 continue;
             }
 
