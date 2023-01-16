@@ -13,6 +13,9 @@ use cebe\openapi\spec\PathItem;
 use Doctrine\Inflector\Inflector;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\Message\SyncApiError;
+use SprykerSdk\SyncApi\Message\SyncApiInfo;
+use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\ArgumentResolver\ArgumentResolverInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\ArgumentResolver\ModuleNameArgumentResolver;
 use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\GlueResourceMethodResponseArguments;
 use SprykerSdk\SyncApi\SyncApiConfig;
 use Transfer\OpenApiRequestTransfer;
@@ -31,9 +34,9 @@ class GlueResourceMethodResponseCommand implements CommandInterface
     protected MessageBuilderInterface $messageBuilder;
 
     /**
-     * @var \Doctrine\Inflector\Inflector
+     * @var ArgumentResolverInterface
      */
-    protected Inflector $inflector;
+    protected ArgumentResolverInterface $moduleNameArgumentResolver;
 
     /**
      * @var \SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Command\CommandRunnerInterface
@@ -41,16 +44,16 @@ class GlueResourceMethodResponseCommand implements CommandInterface
     protected CommandRunnerInterface $commandRunner;
 
     /**
-     * @param \SprykerSdk\SyncApi\SyncApiConfig $config
-     * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
-     * @param \Doctrine\Inflector\Inflector $inflector
-     * @param \SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Command\CommandRunnerInterface $commandRunner
+     * @param SyncApiConfig $config
+     * @param MessageBuilderInterface $messageBuilder
+     * @param ArgumentResolverInterface $moduleNameArgumentResolver
+     * @param CommandRunnerInterface $commandRunner
      */
-    public function __construct(SyncApiConfig $config, MessageBuilderInterface $messageBuilder, Inflector $inflector, CommandRunnerInterface $commandRunner)
+    public function __construct(SyncApiConfig $config, MessageBuilderInterface $messageBuilder, ArgumentResolverInterface $moduleNameArgumentResolver, CommandRunnerInterface $commandRunner)
     {
         $this->config = $config;
         $this->messageBuilder = $messageBuilder;
-        $this->inflector = $inflector;
+        $this->moduleNameArgumentResolver = $moduleNameArgumentResolver;
         $this->commandRunner = $commandRunner;
     }
 
@@ -102,7 +105,7 @@ class GlueResourceMethodResponseCommand implements CommandInterface
             $glueResourceMethodResponseArguments->setResource($path);
             $glueResourceMethodResponseArguments->setExtensions($pathItem->getExtensions());
 
-            $openApiResponseTransfer = $this->getHttpMethodsWithHttpResponseCodes($pathItem, $glueResourceMethodResponseArguments, $openApiRequestTransfer, $openApiResponseTransfer);
+            $openApiResponseTransfer = $this->generateHttpMethodsWithHttpResponseCodes($pathItem, $glueResourceMethodResponseArguments, $openApiRequestTransfer, $openApiResponseTransfer);
         }
 
         return $openApiResponseTransfer;
@@ -116,7 +119,7 @@ class GlueResourceMethodResponseCommand implements CommandInterface
      *
      * @return \Transfer\OpenApiResponseTransfer
      */
-    protected function getHttpMethodsWithHttpResponseCodes(
+    protected function generateHttpMethodsWithHttpResponseCodes(
         PathItem $pathItem,
         GlueResourceMethodResponseArguments $glueResourceMethodResponseArguments,
         OpenApiRequestTransfer $openApiRequestTransfer,
@@ -126,10 +129,13 @@ class GlueResourceMethodResponseCommand implements CommandInterface
 
         /** @var \cebe\openapi\spec\Operation $operation */
         foreach ($httpMethods as $httpMethod => $operation) {
+            $moduleName = $this->moduleNameArgumentResolver->resolve($glueResourceMethodResponseArguments->getResource(), $pathItem, $operation);
+
+            $glueResourceMethodResponseArguments->setModuleName($moduleName);
             $glueResourceMethodResponseArguments->setHttpMethod($httpMethod);
             $glueResourceMethodResponseArguments->setExtensions(array_replace_recursive($glueResourceMethodResponseArguments->getExtensions(), $operation->getExtensions()));
 
-            $openApiResponseTransfer = $this->getHttpResponseCodesForOperationWithApiType($operation, $glueResourceMethodResponseArguments, $openApiRequestTransfer, $openApiResponseTransfer);
+            $openApiResponseTransfer = $this->generateHttpResponseCodesForOperationWithApiType($operation, $glueResourceMethodResponseArguments, $openApiRequestTransfer, $openApiResponseTransfer);
         }
 
         return $openApiResponseTransfer;
@@ -143,7 +149,7 @@ class GlueResourceMethodResponseCommand implements CommandInterface
      *
      * @return \Transfer\OpenApiResponseTransfer
      */
-    protected function getHttpResponseCodesForOperationWithApiType(
+    protected function generateHttpResponseCodesForOperationWithApiType(
         Operation $operation,
         GlueResourceMethodResponseArguments $glueResourceMethodResponseArguments,
         OpenApiRequestTransfer $openApiRequestTransfer,
@@ -189,8 +195,10 @@ class GlueResourceMethodResponseCommand implements CommandInterface
         );
 
         $this->commandRunner->runCommands([
-            $this->createCommandForResourceHttpMethodAndHttpResponseCode($glueResourceMethodResponseArguments),
+            $this->createCommandForResourceHttpMethodAndHttpResponseCode($glueResourceMethodResponseArguments, $openApiRequestTransfer->getIsVerbose()),
         ]);
+
+        $openApiResponseTransfer->addMessage($this->messageBuilder->buildMessage(SyncApiInfo::addedGlueResourceMethodResponse($glueResourceMethodResponseArguments->getResource(), $glueResourceMethodResponseArguments->getModuleName())));
 
         return $openApiResponseTransfer;
     }
@@ -201,10 +209,17 @@ class GlueResourceMethodResponseCommand implements CommandInterface
      * @return array<string>
      */
     protected function createCommandForResourceHttpMethodAndHttpResponseCode(
-        GlueResourceMethodResponseArguments $glueResourceMethodResponseArguments
+        GlueResourceMethodResponseArguments $glueResourceMethodResponseArguments,
+        bool $isVerbose,
     ): array {
         $commandLine = $glueResourceMethodResponseArguments->getConsoleCommandArguments();
         array_unshift($commandLine, $this->config->getSprykRunExecutablePath() . '/vendor/bin/spryk-run');
+
+        $commandLine[] = '-n';
+
+        if ($isVerbose) {
+            $commandLine[] = '-v';
+        }
 
         return $commandLine;
     }

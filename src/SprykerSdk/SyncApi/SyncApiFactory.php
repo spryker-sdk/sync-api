@@ -11,6 +11,8 @@ use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
 use SprykerSdk\SyncApi\Message\MessageBuilder;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\ArgumentResolver\ArgumentResolverInterface;
+use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\ArgumentResolver\ModuleNameArgumentResolver;
 use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Command\CommandInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Command\CommandRunner;
 use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Command\CommandRunnerInterface;
@@ -71,7 +73,7 @@ class SyncApiFactory
     public function getCommandRunner(): array
     {
         return [
-//            $this->createGlueResourceMethodResponseCommandRunner(),
+            $this->createGlueResourceMethodResponseCommandRunner(),
             $this->createTransferCommandRunner(),
         ];
     }
@@ -81,7 +83,15 @@ class SyncApiFactory
      */
     public function createGlueResourceMethodResponseCommandRunner(): CommandInterface
     {
-        return new GlueResourceMethodResponseCommand($this->getConfig(), $this->createMessageBuilder(), $this->getInflector(), $this->createCommandRunner());
+        return new GlueResourceMethodResponseCommand($this->getConfig(), $this->createMessageBuilder(), $this->createModuleNameArgumentResolver(), $this->createCommandRunner());
+    }
+
+    /**
+     * @return ArgumentResolverInterface
+     */
+    public function createModuleNameArgumentResolver(): ArgumentResolverInterface
+    {
+        return new ModuleNameArgumentResolver();
     }
 
     /**
@@ -89,7 +99,7 @@ class SyncApiFactory
      */
     public function createTransferCommandRunner(): CommandInterface
     {
-        return new TransferCommand($this->getConfig(), $this->createMessageBuilder(), $this->getInflector(), $this->createCommandRunner());
+        return new TransferCommand($this->getConfig(), $this->createMessageBuilder(), $this->getInflector(), $this->createModuleNameArgumentResolver(), $this->createCommandRunner());
     }
 
     /**

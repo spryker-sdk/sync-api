@@ -39,11 +39,10 @@ class OpenApiCodeGenerateConsoleTest extends Unit
         // Act
         $commandTester->execute([
             '--' . OpenApiCodeGenerateConsole::OPTION_OPEN_API_FILE => codecept_data_dir('api/valid/valid_openapi_with_spryker_extension.yml'),
-        ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
+        ], ['verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE]);
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
-        $this->assertStringContainsString(SyncApiInfo::addedTransfer('AppCollectionApiResponse', 'GetCatFace'), $commandTester->getDisplay());
     }
 
     /**

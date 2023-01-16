@@ -1,0 +1,75 @@
+openapi: 3.0.0
+info:
+    title: 'API'
+    description: 'API Description'
+    version: 0.2.3
+
+servers:
+    - url: https://glue.demo-spryker.com
+      description: 'Main (production) server'
+    - url: https://glue.staging.demo-spryker.com
+      description: 'Internal staging server for testing'
+
+paths:
+    /: # Without an x-spryker extension defined with a module this should throw an exception
+        post:
+            summary: 'Operation description'
+            requestBody:
+                description: 'Request body description'
+                required: true
+                content:
+                    application/json:
+                        schema:
+            responses:
+                201:
+                    description: '200 Response description.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ApiResponse'
+                400:
+                    description: '400 Response description.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ApiErrorMessage'
+                default:
+                    description: 'Expected response to a bad request.'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ApiErrorMessage'
+
+components:
+    schemas:
+        ApiResponse:
+            properties:
+                data:
+                    $ref: '#/components/schemas/ApiResponseData'
+
+        ApiResponseData:
+            properties:
+                type:
+                    type: string
+                    example: 'type'
+                id:
+                    type: string
+                    example: 'af85a4c2-7b59-4683-ab5f-febe433e9919'
+
+                attributes:
+                    $ref: '#/components/schemas/ApiResponseAttributes'
+
+        ApiResponseAttributes:
+            properties:
+                enum:
+                    type: string
+                    enum: ['value a', 'value b']
+
+        ApiErrorMessage:
+            properties:
+                code:
+                    type: string
+                detail:
+                    type: string
+                status:
+                    type: integer

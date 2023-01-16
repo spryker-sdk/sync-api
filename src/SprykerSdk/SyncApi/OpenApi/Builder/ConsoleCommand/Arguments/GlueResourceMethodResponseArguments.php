@@ -8,6 +8,7 @@
 namespace SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments;
 
 use ReflectionClass;
+use SprykerSdk\SyncApi\Exception\SyncApiModuleNameNotFoundException;
 
 class GlueResourceMethodResponseArguments implements ArgumentsInterface
 {
@@ -30,6 +31,11 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
      * @var string|null
      */
     protected ?string $organization;
+
+    /**
+     * @var string|null
+     */
+    protected ?string $moduleName;
 
     /**
      * @var string|null
@@ -82,6 +88,14 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
     }
 
     /**
+     * @return string
+     */
+    public function getResource(): string
+    {
+        return $this->resource;
+    }
+
+    /**
      * @param string $httpMethod
      *
      * @return void
@@ -109,6 +123,26 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
     public function setOrganization(string $organization): void
     {
         $this->organization = $organization;
+    }
+
+    /**
+     * @param string
+     *
+     * @return void
+     */
+    public function setModuleName(string $moduleName): void
+    {
+        $this->moduleName = $moduleName;
+    }
+
+    /**
+     * @throws \SprykerSdk\SyncApi\Exception\SyncApiModuleNameNotFoundException
+     *
+     * @return string|null
+     */
+    public function getModuleName(): ?string
+    {
+        return $this->moduleName;
     }
 
     /**

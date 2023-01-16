@@ -7,14 +7,17 @@
 
 namespace SprykerSdkTest\Helper;
 
+use cebe\openapi\spec\OpenApi;
 use Codeception\Module;
 use Codeception\Stub;
 use Codeception\Stub\Expected;
 use SprykerSdk\SyncApi\Console\OpenApiCodeGenerateConsole;
 use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Command\CommandRunner;
+use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Command\TransferCommand;
 use SprykerSdk\SyncApi\SyncApiFacade;
 use SprykerSdk\SyncApi\SyncApiFactory;
 use Transfer\OpenApiRequestTransfer;
+use Transfer\OpenApiResponseTransfer;
 use Transfer\OpenApiTransfer;
 
 class OpenApiHelper extends Module
@@ -78,9 +81,52 @@ class OpenApiHelper extends Module
                 'runProcess' => Expected::atLeastOnce(),
             ],
         );
+
         $factoryStub = Stub::make(SyncApiFactory::class, [
             'createCommandRunner' => $commandRunnerStub,
         ]);
+
+        $facade = new SyncApiFacade();
+        $facade->setFactory($factoryStub);
+
+        $buildFromOpenApiConsole = new OpenApiCodeGenerateConsole();
+        $buildFromOpenApiConsole->setFacade($facade);
+
+        return $buildFromOpenApiConsole;
+    }
+
+    /**
+     * Used to test only the GlueResourceMethodResponseCommandRunner.
+     *
+     * @return \SprykerSdk\SyncApi\Console\OpenApiCodeGenerateConsole
+     */
+    public function getOpenApiBuilderGlueResourceMethodResponseConsoleMock(): OpenApiCodeGenerateConsole
+    {
+        $commandRunnerStub = Stub::make(
+            CommandRunner::class,
+            [
+                'runProcess' => Expected::atLeastOnce(),
+            ],
+        );
+        $transferCommandStub = Stub::make(
+            TransferCommand::class,
+            [
+                'build' => function (
+                    string $sprykMode,
+                    OpenApi $openApi,
+                    OpenApiRequestTransfer $openApiRequestTransfer,
+                    OpenApiResponseTransfer $openApiResponseTransfer
+                ) {
+                    return $openApiResponseTransfer;
+                },
+            ],
+        );
+
+        $factoryStub = Stub::make(SyncApiFactory::class, [
+            'createCommandRunner' => $commandRunnerStub,
+            'createTransferCommandRunner' => $transferCommandStub,
+        ]);
+
         $facade = new SyncApiFacade();
         $facade->setFactory($factoryStub);
 

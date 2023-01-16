@@ -10,6 +10,17 @@ namespace SprykerSdk\SyncApi\Message;
 class SyncApiInfo
 {
     /**
+     * @param string $resource
+     * @param string $moduleName
+     *
+     * @return string
+     */
+    public static function addedGlueResourceMethodResponse(string $resource, string $moduleName): string
+    {
+        return static::format(sprintf('Added GlueResourceMethodResponse run for "%s" resource in "%s" module.', $resource, $moduleName));
+    }
+
+    /**
      * @param string $transferName
      * @param string $moduleName
      *

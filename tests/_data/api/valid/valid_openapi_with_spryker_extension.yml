@@ -19,7 +19,7 @@ paths:
         post:
             summary: 'Registers an App within the Registry service'
             x-spryker:
-                module: Hundnase
+                module: DogNose
             requestBody:
                 description: 'Contains all required data to register an App within the Registry service.'
                 required: true

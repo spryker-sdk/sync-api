@@ -18,6 +18,7 @@ use SprykerSdk\SyncApi\Exception\SyncApiModuleNameNotFoundException;
 use SprykerSdk\SyncApi\Message\MessageBuilderInterface;
 use SprykerSdk\SyncApi\Message\SyncApiError;
 use SprykerSdk\SyncApi\Message\SyncApiInfo;
+use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\ArgumentResolver\ArgumentResolverInterface;
 use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\TransferArguments;
 use SprykerSdk\SyncApi\SyncApiConfig;
 use Transfer\OpenApiRequestTransfer;
@@ -41,6 +42,11 @@ class TransferCommand implements CommandInterface
     protected Inflector $inflector;
 
     /**
+     * @var \SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\ArgumentResolver\ArgumentResolverInterface
+     */
+    protected ArgumentResolverInterface $moduleNameArgumentResolver;
+
+    /**
      * @var \SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Command\CommandRunnerInterface
      */
     protected CommandRunnerInterface $commandRunner;
@@ -49,13 +55,20 @@ class TransferCommand implements CommandInterface
      * @param \SprykerSdk\SyncApi\SyncApiConfig $config
      * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
      * @param \Doctrine\Inflector\Inflector $inflector
+     * @param \SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\ArgumentResolver\ArgumentResolverInterface $moduleNameArgumentResolver
      * @param \SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Command\CommandRunnerInterface $commandRunner
      */
-    public function __construct(SyncApiConfig $config, MessageBuilderInterface $messageBuilder, Inflector $inflector, CommandRunnerInterface $commandRunner)
-    {
+    public function __construct(
+        SyncApiConfig $config,
+        MessageBuilderInterface $messageBuilder,
+        Inflector $inflector,
+        ArgumentResolverInterface $moduleNameArgumentResolver,
+        CommandRunnerInterface $commandRunner
+    ) {
         $this->config = $config;
         $this->messageBuilder = $messageBuilder;
         $this->inflector = $inflector;
+        $this->moduleNameArgumentResolver = $moduleNameArgumentResolver;
         $this->commandRunner = $commandRunner;
     }
 
@@ -170,55 +183,14 @@ class TransferCommand implements CommandInterface
         PathItem $pathItem,
         array $transferArgumentsCollection
     ) {
-        $moduleName = $this->getModuleName($path, $operation, $pathItem);
-
-        if (!$moduleName) {
-            return $transferArgumentsCollection;
-        }
+        // TODO find the expected API type and fix the module name, for now we assume we only build BAPI
+        $moduleName = $this->moduleNameArgumentResolver->resolve($path, $pathItem, $operation) . 'BackendApi';
 
         if ($operation->requestBody) {
             $transferArgumentsCollection = $this->addTransferArgumentsForRequestBodyPropertiesFromOperation($sprykMode, $organization, $moduleName, $operation, $transferArgumentsCollection);
         }
 
         return $this->addTransferArgumentsForResponsePropertiesFromOperation($sprykMode, $organization, $moduleName, $operation, $transferArgumentsCollection);
-    }
-
-    /**
-     * @param string $path
-     * @param \cebe\openapi\spec\Operation $operation
-     * @param \cebe\openapi\spec\PathItem $pathItem
-     *
-     * @throws \SprykerSdk\SyncApi\Exception\SyncApiModuleNameNotFoundException
-     *
-     * @return string
-     */
-    protected function getModuleName(string $path, Operation $operation, PathItem $pathItem): string
-    {
-        $pathExtensions = $pathItem->getExtensions();
-        $operationExtensions = $operation->getExtensions();
-
-        $extensions = array_replace_recursive($pathExtensions, $operationExtensions);
-
-        if (isset($extensions['x-spryker']) && isset($extensions['x-spryker']['module'])) {
-            return $extensions['x-spryker']['module'];
-        }
-
-        // @deprecated it is replaced with x-spryker extension
-        if (isset($operation->operationId)) {
-            $operationId = explode('.', $operation->operationId);
-
-            return $this->inflector->classify(current($operationId));
-        }
-
-        $path = trim($path, '/');
-
-        if ($path === '') {
-            throw new SyncApiModuleNameNotFoundException('Could not find a module name to render code to.');
-        }
-
-        $pathFragments = explode('/', trim($path, '/'));
-
-        return ucwords(current($pathFragments)) . 'BackendApi';
     }
 
     /**
@@ -304,10 +276,6 @@ class TransferCommand implements CommandInterface
         foreach ($properties as $key => $schemaOrReferenceObject) {
             if (isset($schemaOrReferenceObject->type) && $schemaOrReferenceObject->type !== 'array') {
                 $requestBodyProperties[$key] = $schemaOrReferenceObject->type;
-            }
-
-            if (isset($schemaOrReferenceObject->items) && $schemaOrReferenceObject->items !== null) {
-                $requestBodyProperties[$key] = $this->generateArrayOfDataType($schemaOrReferenceObject->items);
             }
         }
 
