@@ -20,7 +20,8 @@
         "spryker-sdk/architector": "0.1.x-dev",
         "spryker/code-sniffer": "dev-master",
         "symfony/filesystem": "^4.0 || ^5.3",
-        "symfony/var-dumper": "*"
+        "symfony/var-dumper": "*",
+        "phpstan/phpdoc-parser": "~1.5.1"
     },
     "autoload": {
         "psr-4": {

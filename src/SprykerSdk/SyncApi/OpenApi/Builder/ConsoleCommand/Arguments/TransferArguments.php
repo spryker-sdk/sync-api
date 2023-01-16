@@ -22,17 +22,17 @@ class TransferArguments implements ArgumentsInterface
     /**
      * @var string|null
      */
-    protected ?string $organization;
+    protected ?string $organization = null;
 
     /**
      * @var string|null
      */
-    protected ?string $moduleName;
+    protected ?string $moduleName = null;
 
     /**
      * @var string|null
      */
-    protected ?string $transferName;
+    protected ?string $transferName = null;
 
     /**
      * @var array<string>

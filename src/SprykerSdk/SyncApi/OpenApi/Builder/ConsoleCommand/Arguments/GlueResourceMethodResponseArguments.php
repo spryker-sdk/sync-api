@@ -29,27 +29,27 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
     /**
      * @var string|null
      */
-    protected ?string $organization;
+    protected ?string $organization = null;
 
     /**
      * @var string|null
      */
-    protected ?string $module;
+    protected ?string $module = null;
 
     /**
      * @var string|null
      */
-    protected ?string $resource;
+    protected ?string $resource = null;
 
     /**
      * @var string|null
      */
-    protected ?string $httpMethod;
+    protected ?string $httpMethod = null;
 
     /**
      * @var int|null
      */
-    protected ?int $httpResponseCode;
+    protected ?int $httpResponseCode = null;
 
     /**
      * @var array<string>
@@ -187,14 +187,19 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
         foreach ($properties as $property) {
             $property->setAccessible(true);
             $argumentName = sprintf('--%s', $property->getName());
-
-            if (
-                $property->getValue($this) === null ||
-                $property->getName() === 'extensions' ||
-                $property->getName() === 'sprykName' ||
-                $property->getName() === 'sprykMode' ||
-                in_array($argumentName, $arguments)
-            ) {
+            if ($property->getValue($this) === null) {
+                continue;
+            }
+            if ($property->getName() === 'extensions') {
+                continue;
+            }
+            if ($property->getName() === 'sprykName') {
+                continue;
+            }
+            if ($property->getName() === 'sprykMode') {
+                continue;
+            }
+            if (in_array($argumentName, $arguments)) {
                 continue;
             }
 

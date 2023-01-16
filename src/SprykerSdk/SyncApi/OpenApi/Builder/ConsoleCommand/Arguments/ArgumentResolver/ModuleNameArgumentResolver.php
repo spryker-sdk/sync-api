@@ -33,13 +33,6 @@ class ModuleNameArgumentResolver implements ArgumentResolverInterface
             return $extensions['x-spryker']['module'];
         }
 
-        // @deprecated it is replaced with x-spryker extension
-        if (isset($operation->operationId)) {
-            $operationId = explode('.', $operation->operationId);
-
-            return current($operationId);
-        }
-
         $path = trim($resource, '/');
 
         if ($path === '') {
