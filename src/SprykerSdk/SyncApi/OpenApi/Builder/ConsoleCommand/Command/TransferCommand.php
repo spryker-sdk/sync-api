@@ -208,13 +208,17 @@ class TransferCommand implements CommandInterface
         Operation $operation,
         array $transferArgumentsCollection
     ): array {
-        /** @var \cebe\openapi\spec\RequestBody $mediaType */
+        /** @var \cebe\openapi\spec\MediaType $mediaType */
         foreach ($this->getRequestBodyFromOperation($operation) as $applicationType => $mediaType) {
             if (!$this->acceptApplicationType($applicationType)) {
                 continue;
             }
-            $transferName = $this->getTransferNameFromSchemaOrReference($mediaType->schema);
-            $requestBodyProperties = $this->getRequestBodyPropertiesFromSchemaOrReference($mediaType->schema);
+
+            /** @var \cebe\openapi\spec\Schema $schema */
+            $schema = $mediaType->schema;
+
+            $transferName = $this->getTransferNameFromSchemaOrReference($schema);
+            $requestBodyProperties = $this->getRequestBodyPropertiesFromSchemaOrReference($schema);
             $transferArgumentsCollection = $this->addTransferToCollection($transferArgumentsCollection, $sprykMode, $moduleName, $organization, $transferName, $requestBodyProperties);
         }
 
