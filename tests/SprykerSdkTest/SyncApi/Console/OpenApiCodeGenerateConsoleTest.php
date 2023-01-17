@@ -94,7 +94,7 @@ class OpenApiCodeGenerateConsoleTest extends Unit
         // Act
         $commandTester->execute([
             '--' . OpenApiCodeGenerateConsole::OPTION_OPEN_API_FILE => codecept_data_dir('api/invalid/invalid_openapi.yml'),
-            '--' . OpenApiCodeGenerateConsole::APPLICATION_TYPE => 'backend',
+            '--' . OpenApiCodeGenerateConsole::OPTION_APPLICATION_TYPE => 'backend',
             '--' . OpenApiCodeGenerateConsole::OPTION_ORGANIZATION => 'Spryker',
         ]);
     }
@@ -111,7 +111,7 @@ class OpenApiCodeGenerateConsoleTest extends Unit
         // Act
         $commandTester->execute([
             '--' . OpenApiCodeGenerateConsole::OPTION_OPEN_API_FILE => codecept_data_dir('api/invalid/empty_openapi.yml'),
-            '--' . OpenApiCodeGenerateConsole::APPLICATION_TYPE => 'backend',
+            '--' . OpenApiCodeGenerateConsole::OPTION_APPLICATION_TYPE => 'backend',
             '--' . OpenApiCodeGenerateConsole::OPTION_ORGANIZATION => 'Spryker',
         ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
 

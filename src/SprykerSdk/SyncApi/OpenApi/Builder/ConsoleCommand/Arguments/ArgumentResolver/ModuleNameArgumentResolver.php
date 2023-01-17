@@ -17,12 +17,13 @@ class ModuleNameArgumentResolver implements ArgumentResolverInterface
      * @param string $resource
      * @param \cebe\openapi\spec\PathItem $pathItem
      * @param \cebe\openapi\spec\Operation $operation
+     * @param string $applicationType
      *
      * @throws \SprykerSdk\SyncApi\Exception\SyncApiModuleNameNotFoundException
      *
      * @return string
      */
-    public function resolve(string $resource, PathItem $pathItem, Operation $operation): string
+    public function resolve(string $resource, PathItem $pathItem, Operation $operation, string $applicationType): string
     {
         $pathExtensions = $pathItem->getExtensions();
         $operationExtensions = $operation->getExtensions();
@@ -30,7 +31,7 @@ class ModuleNameArgumentResolver implements ArgumentResolverInterface
         $extensions = array_replace_recursive($pathExtensions, $operationExtensions);
 
         if (isset($extensions['x-spryker']) && isset($extensions['x-spryker']['module'])) {
-            return $extensions['x-spryker']['module'];
+            return $this->ensureApplicationTypeModuleName($extensions['x-spryker']['module'], $applicationType);
         }
 
         $path = trim($resource, '/');
@@ -41,6 +42,49 @@ class ModuleNameArgumentResolver implements ArgumentResolverInterface
 
         $pathFragments = explode('/', trim($path, '/'));
 
-        return ucwords(current($pathFragments));
+        return $this->ensureApplicationTypeModuleName(ucwords(current($pathFragments)), $applicationType);
+    }
+
+    /**
+     * @param string $moduleName
+     * @param string $applicationType
+     *
+     * @return string
+     */
+    protected function ensureApplicationTypeModuleName(string $moduleName, string $applicationType): string
+    {
+        if ($applicationType === 'Backend' || $applicationType === 'backend') {
+            return $this->ensureBackendApiModuleName($moduleName);
+        }
+
+        return $this->ensureStorefrontApiModuleName($moduleName);
+    }
+
+    /**
+     * @param string $moduleName
+     *
+     * @return string
+     */
+    protected function ensureBackendApiModuleName(string $moduleName): string
+    {
+        if (!preg_match('/BackendApi$/', $moduleName)) {
+            return $moduleName . 'BackendApi';
+        }
+
+        return $moduleName;
+    }
+
+    /**
+     * @param string $moduleName
+     *
+     * @return string
+     */
+    protected function ensureStorefrontApiModuleName(string $moduleName): string
+    {
+        if (!preg_match('/StorefrontApi$/', $moduleName)) {
+            return $moduleName . 'StorefrontApi';
+        }
+
+        return $moduleName;
     }
 }

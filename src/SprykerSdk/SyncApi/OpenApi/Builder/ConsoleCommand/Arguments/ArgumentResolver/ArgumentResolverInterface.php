@@ -16,8 +16,9 @@ interface ArgumentResolverInterface
      * @param string $resource
      * @param \cebe\openapi\spec\PathItem $pathItem
      * @param \cebe\openapi\spec\Operation $operation
+     * @param string $applicationType
      *
      * @return string
      */
-    public function resolve(string $resource, PathItem $pathItem, Operation $operation): string;
+    public function resolve(string $resource, PathItem $pathItem, Operation $operation, string $applicationType): string;
 }

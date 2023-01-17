@@ -112,7 +112,7 @@ class TransferCommand implements CommandInterface
             return $openApiResponseTransfer;
         }
 
-        $transferArgumentsCollection = $this->getTransferArgumentsCollection($openApi, $openApiRequestTransfer->getOrganizationOrFail(), $sprykMode);
+        $transferArgumentsCollection = $this->getTransferArgumentsCollection($openApi, $openApiRequestTransfer, $sprykMode);
         $transferCommands = $this->buildTransferCommandsFromTransferArgumentsCollection($transferArgumentsCollection, $openApiRequestTransfer->getIsVerboseOrFail());
         $openApiResponseTransfer = $this->addInfoMessages($openApiResponseTransfer, $transferArgumentsCollection);
 
@@ -123,18 +123,18 @@ class TransferCommand implements CommandInterface
 
     /**
      * @param \cebe\openapi\spec\OpenApi $openApi
-     * @param string $organization
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      * @param string $sprykMode
      *
      * @return array<\SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\TransferArguments>
      */
-    protected function getTransferArgumentsCollection(OpenApi $openApi, string $organization, string $sprykMode): array
+    protected function getTransferArgumentsCollection(OpenApi $openApi, OpenApiRequestTransfer $openApiRequestTransfer, string $sprykMode): array
     {
         $transferArgumentsCollection = [];
 
         /** @var \cebe\openapi\spec\PathItem $pathItem */
         foreach ($openApi->paths->getPaths() as $path => $pathItem) {
-            $transferArgumentsCollection = $this->addTransferArgumentsForPathItem($sprykMode, $organization, $path, $pathItem, $transferArgumentsCollection);
+            $transferArgumentsCollection = $this->addTransferArgumentsForPathItem($sprykMode, $openApiRequestTransfer, $path, $pathItem, $transferArgumentsCollection);
         }
 
         return $transferArgumentsCollection;
@@ -142,7 +142,7 @@ class TransferCommand implements CommandInterface
 
     /**
      * @param string $sprykMode
-     * @param string $organization
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      * @param string $path
      * @param \cebe\openapi\spec\PathItem $pathItem
      * @param array $transferArgumentsCollection
@@ -151,14 +151,14 @@ class TransferCommand implements CommandInterface
      */
     protected function addTransferArgumentsForPathItem(
         string $sprykMode,
-        string $organization,
+        OpenApiRequestTransfer $openApiRequestTransfer,
         string $path,
         PathItem $pathItem,
         array $transferArgumentsCollection
     ): array {
         /** @var \cebe\openapi\spec\Operation $operation */
         foreach ($pathItem->getOperations() as $operation) {
-            $transferArgumentsCollection = $this->addTransferArgumentsForOperation($sprykMode, $organization, $path, $operation, $pathItem, $transferArgumentsCollection);
+            $transferArgumentsCollection = $this->addTransferArgumentsForOperation($sprykMode, $openApiRequestTransfer, $path, $operation, $pathItem, $transferArgumentsCollection);
         }
 
         return $transferArgumentsCollection;
@@ -166,7 +166,7 @@ class TransferCommand implements CommandInterface
 
     /**
      * @param string $sprykMode
-     * @param string $organization
+     * @param \Transfer\OpenApiRequestTransfer $openApiRequestTransfer
      * @param string $path
      * @param \cebe\openapi\spec\Operation $operation
      * @param \cebe\openapi\spec\PathItem $pathItem
@@ -176,13 +176,14 @@ class TransferCommand implements CommandInterface
      */
     protected function addTransferArgumentsForOperation(
         string $sprykMode,
-        string $organization,
+        OpenApiRequestTransfer $openApiRequestTransfer,
         string $path,
         Operation $operation,
         PathItem $pathItem,
         array $transferArgumentsCollection
     ) {
-        $moduleName = $this->moduleNameArgumentResolver->resolve($path, $pathItem, $operation);
+        $organization = $openApiRequestTransfer->getOrganizationOrFail();
+        $moduleName = $this->moduleNameArgumentResolver->resolve($path, $pathItem, $operation, $openApiRequestTransfer->getApplicationTypeOrFail());
 
         if ($operation->requestBody) {
             $transferArgumentsCollection = $this->addTransferArgumentsForRequestBodyPropertiesFromOperation($sprykMode, $organization, $moduleName, $operation, $transferArgumentsCollection);

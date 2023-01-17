@@ -62,7 +62,7 @@ class OpenApiCodeGenerateGlueResourceMethodResponseConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
-        $this->assertStringContainsString(SyncApiInfo::addedGlueResourceMethodResponse('/', 'CatFace', 'post', '201'), $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiInfo::addedGlueResourceMethodResponse('/', 'CatFaceBackendApi', 'post', '201'), $commandTester->getDisplay());
     }
 
     /**
@@ -81,6 +81,6 @@ class OpenApiCodeGenerateGlueResourceMethodResponseConsoleTest extends Unit
 
         // Assert
         $this->assertSame(AbstractConsole::CODE_SUCCESS, $commandTester->getStatusCode());
-        $this->assertStringContainsString(SyncApiInfo::addedGlueResourceMethodResponse('/', 'DogNose', 'post', '201'), $commandTester->getDisplay());
+        $this->assertStringContainsString(SyncApiInfo::addedGlueResourceMethodResponse('/', 'DogNoseBackendApi', 'post', '201'), $commandTester->getDisplay());
     }
 }

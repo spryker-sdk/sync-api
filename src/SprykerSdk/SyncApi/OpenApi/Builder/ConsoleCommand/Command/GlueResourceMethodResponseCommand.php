@@ -131,7 +131,7 @@ class GlueResourceMethodResponseCommand implements CommandInterface
 
         /** @var \cebe\openapi\spec\Operation $operation */
         foreach ($httpMethods as $httpMethod => $operation) {
-            $moduleName = $this->moduleNameArgumentResolver->resolve((string)$glueResourceMethodResponseArguments->getResource(), $pathItem, $operation);
+            $moduleName = $this->moduleNameArgumentResolver->resolve((string)$glueResourceMethodResponseArguments->getResource(), $pathItem, $operation, $openApiRequestTransfer->getApplicationTypeOrFail());
 
             $glueResourceMethodResponseArguments->setModuleName($moduleName);
             $glueResourceMethodResponseArguments->setHttpMethod($httpMethod);
