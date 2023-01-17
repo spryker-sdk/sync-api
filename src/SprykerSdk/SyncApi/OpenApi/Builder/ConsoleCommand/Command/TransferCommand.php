@@ -210,9 +210,6 @@ class TransferCommand implements CommandInterface
     ): array {
         /** @var \cebe\openapi\spec\RequestBody $mediaType */
         foreach ($this->getRequestBodyFromOperation($operation) as $applicationType => $mediaType) {
-            if (!isset($mediaType->schema)) {
-                continue;
-            }
             if (!$this->acceptApplicationType($applicationType)) {
                 continue;
             }
