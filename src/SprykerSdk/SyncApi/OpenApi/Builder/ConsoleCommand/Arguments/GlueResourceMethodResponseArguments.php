@@ -14,7 +14,7 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
     /**
      * @var string
      */
-    protected string $sprykName = 'AddGlueResourceMethodResponse';
+    public const SPRYK_NAME = 'AddGlueResourceMethodResponse';
 
     /**
      * @var string
@@ -105,6 +105,14 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
     }
 
     /**
+     * @return string|null
+     */
+    public function getHttpMethod(): ?string
+    {
+        return $this->httpMethod;
+    }
+
+    /**
      * @param int $httpResponseCode
      *
      * @return void
@@ -112,6 +120,14 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
     public function setHttpResponseCode(int $httpResponseCode): void
     {
         $this->httpResponseCode = $httpResponseCode;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getHttpResponseCode(): ?int
+    {
+        return $this->httpResponseCode;
     }
 
     /**
@@ -166,7 +182,7 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
     public function getConsoleCommandArguments(): array
     {
         $arguments = [
-            $this->sprykName,
+            static::SPRYK_NAME,
         ];
 
         // Add arguments from extensions first
@@ -191,9 +207,6 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
                 continue;
             }
             if ($property->getName() === 'extensions') {
-                continue;
-            }
-            if ($property->getName() === 'sprykName') {
                 continue;
             }
             if ($property->getName() === 'sprykMode') {

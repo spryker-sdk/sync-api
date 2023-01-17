@@ -200,7 +200,14 @@ class GlueResourceMethodResponseCommand implements CommandInterface
             $this->createCommandForResourceHttpMethodAndHttpResponseCode($glueResourceMethodResponseArguments, (bool)$openApiRequestTransfer->getIsVerbose()),
         ]);
 
-        $openApiResponseTransfer->addMessage($this->messageBuilder->buildMessage(SyncApiInfo::addedGlueResourceMethodResponse((string)$glueResourceMethodResponseArguments->getResource(), (string)$glueResourceMethodResponseArguments->getModuleName())));
+        $openApiResponseTransfer->addMessage(
+            $this->messageBuilder->buildMessage(SyncApiInfo::addedGlueResourceMethodResponse(
+                (string)$glueResourceMethodResponseArguments->getResource(),
+                (string)$glueResourceMethodResponseArguments->getModuleName(),
+                (string)$glueResourceMethodResponseArguments->getHttpMethod(),
+                (string)$glueResourceMethodResponseArguments->getHttpResponseCode(),
+            )),
+        );
 
         return $openApiResponseTransfer;
     }

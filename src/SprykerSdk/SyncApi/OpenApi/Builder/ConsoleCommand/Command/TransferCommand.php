@@ -182,8 +182,7 @@ class TransferCommand implements CommandInterface
         PathItem $pathItem,
         array $transferArgumentsCollection
     ) {
-        // TODO find the expected API type and fix the module name, for now we assume we only build BAPI
-        $moduleName = $this->moduleNameArgumentResolver->resolve($path, $pathItem, $operation) . 'BackendApi';
+        $moduleName = $this->moduleNameArgumentResolver->resolve($path, $pathItem, $operation);
 
         if ($operation->requestBody) {
             $transferArgumentsCollection = $this->addTransferArgumentsForRequestBodyPropertiesFromOperation($sprykMode, $organization, $moduleName, $operation, $transferArgumentsCollection);
@@ -209,22 +208,39 @@ class TransferCommand implements CommandInterface
         array $transferArgumentsCollection
     ): array {
         /** @var \cebe\openapi\spec\RequestBody $mediaType */
-        foreach ($this->getRequestBodyFromOperation($operation) as $mediaType) {
-            if (isset($mediaType->schema)) {
-                $transferArguments = new TransferArguments();
-                $transferArguments->setSprykMode($sprykMode);
-                $transferArguments->setModuleName($moduleName);
-                $transferArguments->setOrganization($organization);
-                $transferArguments->setTransferName($this->getTransferNameFromSchemaOrReference($mediaType->schema));
-                $transferArguments->setProperties($this->propertiesToTransferArgumentsProperties(
-                    $this->getRequestBodyPropertiesFromSchemaOrReference($mediaType->schema),
-                ));
-
-                $transferArgumentsCollection[] = $transferArguments;
+        foreach ($this->getRequestBodyFromOperation($operation) as $applicationType => $mediaType) {
+            if (!isset($mediaType->schema)) {
+                continue;
             }
+            if (!$this->acceptApplicationType($applicationType)) {
+                continue;
+            }
+            $transferName = $this->getTransferNameFromSchemaOrReference($mediaType->schema);
+            $requestBodyProperties = $this->getRequestBodyPropertiesFromSchemaOrReference($mediaType->schema);
+            $transferArgumentsCollection = $this->addTransferToCollection($transferArgumentsCollection, $sprykMode, $moduleName, $organization, $transferName, $requestBodyProperties);
         }
 
         return $transferArgumentsCollection;
+    }
+
+    /**
+     * @param string $applicationType
+     *
+     * @return bool
+     */
+    protected function acceptApplicationType(string $applicationType): bool
+    {
+        if (
+            in_array($applicationType, [
+            'application/json',
+            'application/vnd.api+json',
+            'application/xml',
+            ])
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -288,6 +304,10 @@ class TransferCommand implements CommandInterface
      */
     protected function getTransferNameFromSchemaOrReference($schemaOrReference): string
     {
+        if (isset($schemaOrReference->type) && isset($schemaOrReference->items) && $schemaOrReference->type === 'array') {
+            return $this->getTransferNameFromSchemaOrReference($schemaOrReference->items);
+        }
+
         $referencePathName = '';
 
         if ($schemaOrReference->getDocumentPosition()) {
@@ -351,19 +371,56 @@ class TransferCommand implements CommandInterface
         array $transferArgumentsCollection
     ): array {
         foreach ($contents as $response) {
-            $responseProperties = $this->getResponseProperties($response);
-
-            if ($responseProperties) {
-                $transferArguments = new TransferArguments();
-                $transferArguments->setSprykMode($sprykMode);
-                $transferArguments->setModuleName($moduleName);
-                $transferArguments->setOrganization($organization);
-                $transferArguments->setTransferName($this->getTransferNameFromSchemaOrReference($response->schema));
-                $transferArguments->setProperties($this->propertiesToTransferArgumentsProperties($responseProperties));
-
-                $transferArgumentsCollection[] = $transferArguments;
-            }
+            $transferName = $this->getTransferNameFromSchemaOrReference($response->schema);
+            $responseProperties = (array)$this->getResponseProperties($response);
+            $transferArgumentsCollection = $this->addTransferToCollection($transferArgumentsCollection, $sprykMode, $moduleName, $organization, $transferName, $responseProperties);
         }
+
+        return $transferArgumentsCollection;
+    }
+
+    /**
+     * @param array<\SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\TransferArguments> $transferArgumentsCollection
+     * @param string $sprykMode
+     * @param string $moduleName
+     * @param string $organization
+     * @param string $transferName
+     * @param array<string> $properties
+     *
+     * @return array<\SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\TransferArguments>
+     */
+    protected function addTransferToCollection(
+        array $transferArgumentsCollection,
+        string $sprykMode,
+        string $moduleName,
+        string $organization,
+        string $transferName,
+        array $properties
+    ): array {
+        if (count($properties) === 0) {
+            return $transferArgumentsCollection;
+        }
+
+        $transferArgumentsProperties = $this->propertiesToTransferArgumentsProperties($properties);
+
+        $transferKey = sprintf('%s.%s', $transferName, $moduleName);
+
+        if (isset($transferArgumentsCollection[$transferKey])) {
+            /** @var \SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\TransferArguments $transferArguments */
+            $transferArguments = $transferArgumentsCollection[$transferKey];
+            $transferArguments->setProperties($transferArguments->getProperties() + $transferArgumentsProperties);
+            $transferArgumentsCollection[$transferKey] = $transferArguments;
+
+            return $transferArgumentsCollection;
+        }
+
+        $transferArguments = new TransferArguments();
+        $transferArguments->setSprykMode($sprykMode);
+        $transferArguments->setModuleName($moduleName);
+        $transferArguments->setOrganization($organization);
+        $transferArguments->setTransferName($transferName);
+        $transferArguments->setProperties($transferArgumentsProperties);
+        $transferArgumentsCollection[$transferKey] = $transferArguments;
 
         return $transferArgumentsCollection;
     }

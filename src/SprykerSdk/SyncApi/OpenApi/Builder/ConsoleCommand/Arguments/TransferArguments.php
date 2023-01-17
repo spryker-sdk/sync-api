@@ -12,7 +12,7 @@ class TransferArguments implements ArgumentsInterface
     /**
      * @var string
      */
-    protected string $sprykName = 'AddSharedTransferProperty';
+    public const SPRYK_NAME = 'AddSharedTransferProperty';
 
     /**
      * @var string
@@ -101,7 +101,7 @@ class TransferArguments implements ArgumentsInterface
     }
 
     /**
-     * @param array $properties
+     * @param array<string> $properties
      *
      * @return void
      */
@@ -113,10 +113,18 @@ class TransferArguments implements ArgumentsInterface
     /**
      * @return array<string>
      */
+    public function getProperties(): array
+    {
+        return $this->properties;
+    }
+
+    /**
+     * @return array<string>
+     */
     public function getConsoleCommandArguments(): array
     {
         $arguments = [
-            $this->sprykName,
+            static::SPRYK_NAME,
         ];
 
         if ($this->organization !== null) {

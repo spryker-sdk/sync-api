@@ -9,7 +9,6 @@ namespace SprykerSdkTest\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments;
 
 use Codeception\Test\Unit;
 use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\GlueResourceMethodResponseArguments;
-use SprykerSdk\SyncApi\SyncApiConfig;
 use SprykerSdkTest\SyncApi\SyncApiTester;
 
 /**
