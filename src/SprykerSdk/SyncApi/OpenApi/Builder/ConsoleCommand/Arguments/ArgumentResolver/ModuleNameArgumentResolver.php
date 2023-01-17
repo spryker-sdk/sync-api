@@ -31,7 +31,7 @@ class ModuleNameArgumentResolver implements ArgumentResolverInterface
         $extensions = array_replace_recursive($pathExtensions, $operationExtensions);
 
         if (isset($extensions['x-spryker']) && isset($extensions['x-spryker']['module'])) {
-            return $this->ensureApplicationTypeModuleName($extensions['x-spryker']['module'], $applicationType);
+            return $this->toModuleName($extensions['x-spryker']['module'], $applicationType);
         }
 
         $path = trim($resource, '/');
@@ -40,9 +40,25 @@ class ModuleNameArgumentResolver implements ArgumentResolverInterface
             throw new SyncApiModuleNameNotFoundException('Could not resolve a module name to render the code to.');
         }
 
-        $pathFragments = explode('/', trim($path, '/'));
+        return $this->toModuleName($path, $applicationType);
+    }
 
-        return $this->ensureApplicationTypeModuleName(ucwords(current($pathFragments)), $applicationType);
+    /**
+     * @param string $moduleNameCandidate
+     * @param string $applicationType
+     *
+     * @return string
+     */
+    protected function toModuleName(string $moduleNameCandidate, string $applicationType): string
+    {
+        $pathFragments = explode('/', trim($moduleNameCandidate, '/'));
+        $moduleNameName = current($pathFragments);
+
+        $moduleNameName = str_replace(['-', '_'], ' ', $moduleNameName);
+        $moduleNameName = ucwords($moduleNameName);
+        $moduleNameName = implode('', explode(' ', $moduleNameName));
+
+        return $this->ensureApplicationTypeModuleName($moduleNameName, $applicationType);
     }
 
     /**
