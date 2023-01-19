@@ -91,56 +91,6 @@ class SyncApiError
     }
 
     /**
-     * @param string $resource
-     * @param string $path
-     *
-     * @return string
-     */
-    public static function canNotHandleResourcesWithPlaceholder(string $resource, string $path): string
-    {
-        return static::format(
-            sprintf(
-                '%s: Can\'t handle resources with placeholder at the moment. Resource "%s" from your "%s" schema file can\'t be used to auto generate code.',
-                static::CODE_GENERATION_ERROR_PREFIX,
-                $resource,
-                $path,
-            ),
-        );
-    }
-
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    public static function canNotExtractAControllerNameForPath(string $path): string
-    {
-        return static::format(
-            sprintf(
-                '%s: Can\'t extract a controller name from path "%s".',
-                static::CODE_GENERATION_ERROR_PREFIX,
-                $path,
-            ),
-        );
-    }
-
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    public static function canNotExtractAModuleNameForPath(string $path): string
-    {
-        return static::format(
-            sprintf(
-                '%s: Can\'t extract a module name from path "%s".',
-                static::CODE_GENERATION_ERROR_PREFIX,
-                $path,
-            ),
-        );
-    }
-
-    /**
      * @param string $path
      *
      * @return string

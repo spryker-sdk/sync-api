@@ -41,6 +41,11 @@ class OpenApiRequestTransfer extends AbstractTransfer
     public const PROJECT_ROOT = 'projectRoot';
 
     /**
+     * @var string
+     */
+    public const IS_VERBOSE = 'isVerbose';
+
+    /**
      * @var string|null
      */
     protected $targetFile;
@@ -66,6 +71,11 @@ class OpenApiRequestTransfer extends AbstractTransfer
     protected $projectRoot;
 
     /**
+     * @var bool|null
+     */
+    protected $isVerbose;
+
+    /**
      * @var array<string, string>
      */
     protected $transferPropertyNameMap = [
@@ -83,6 +93,9 @@ class OpenApiRequestTransfer extends AbstractTransfer
         'project_root' => 'projectRoot',
         'projectRoot' => 'projectRoot',
         'ProjectRoot' => 'projectRoot',
+        'is_verbose' => 'isVerbose',
+        'isVerbose' => 'isVerbose',
+        'IsVerbose' => 'isVerbose',
     ];
 
     /**
@@ -141,6 +154,18 @@ class OpenApiRequestTransfer extends AbstractTransfer
             'type' => 'string',
             'type_shim' => null,
             'name_underscore' => 'project_root',
+            'is_collection' => false,
+            'is_transfer' => false,
+            'is_value_object' => false,
+            'rest_request_parameter' => 'no',
+            'is_associative' => false,
+            'is_nullable' => false,
+            'is_strict' => false,
+        ],
+        self::IS_VERBOSE => [
+            'type' => 'bool',
+            'type_shim' => null,
+            'name_underscore' => 'is_verbose',
             'is_collection' => false,
             'is_transfer' => false,
             'is_value_object' => false,
@@ -478,6 +503,73 @@ class OpenApiRequestTransfer extends AbstractTransfer
     public function requireProjectRoot()
     {
         $this->assertPropertyIsSet(self::PROJECT_ROOT);
+
+        return $this;
+    }
+
+    /**
+     * @module SyncApi
+     *
+     * @param bool $isVerbose
+     *
+     * @return $this
+     */
+    public function setIsVerbose(bool $isVerbose)
+    {
+        $this->isVerbose = $isVerbose;
+        $this->modifiedProperties[self::IS_VERBOSE] = true;
+
+        return $this;
+    }
+
+    /**
+     * @module SyncApi
+     *
+     * @return bool|null
+     */
+    public function getIsVerbose()
+    {
+        return $this->isVerbose;
+    }
+
+    /**
+     * @module SyncApi
+     *
+     * @param bool|null $isVerbose
+     *
+     * @return $this
+     */
+    public function setIsVerboseOrFail($isVerbose)
+    {
+        if ($isVerbose === null) {
+            $this->throwNullValueException(static::IS_VERBOSE);
+        }
+
+        return $this->setIsVerbose($isVerbose);
+    }
+
+    /**
+     * @module SyncApi
+     *
+     * @return bool
+     */
+    public function getIsVerboseOrFail()
+    {
+        if ($this->isVerbose === null) {
+            $this->throwNullValueException(static::IS_VERBOSE);
+        }
+
+        return $this->isVerbose;
+    }
+
+    /**
+     * @module SyncApi
+     *
+     * @return $this
+     */
+    public function requireIsVerbose()
+    {
+        $this->assertPropertyIsSet(self::IS_VERBOSE);
 
         return $this;
     }

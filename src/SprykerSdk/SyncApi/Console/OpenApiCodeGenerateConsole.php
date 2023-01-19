@@ -27,12 +27,12 @@ class OpenApiCodeGenerateConsole extends AbstractConsole
     /**
      * @var string
      */
-    public const APPLICATION_TYPE = 'application-type';
+    public const OPTION_APPLICATION_TYPE = 'application-type';
 
     /**
      * @var string
      */
-    public const APPLICATION_TYPE_SHORT = 't';
+    public const OPTION_APPLICATION_TYPE_SHORT = 't';
 
     /**
      * @var string
@@ -52,7 +52,7 @@ class OpenApiCodeGenerateConsole extends AbstractConsole
         $this->setName('code:openapi:generate')
             ->setDescription('Generates code from an OpenAPI file definition.')
             ->addOption(static::OPTION_OPEN_API_FILE, static::OPTION_OPEN_API_FILE_SHORT, InputOption::VALUE_REQUIRED, '', $this->getConfig()->getDefaultRelativePathToOpenApiFile())
-            ->addOption(static::APPLICATION_TYPE, static::APPLICATION_TYPE_SHORT, InputOption::VALUE_REQUIRED, '', 'backend')
+            ->addOption(static::OPTION_APPLICATION_TYPE, static::OPTION_APPLICATION_TYPE_SHORT, InputOption::VALUE_REQUIRED, '', 'backend')
             ->addOption(static::OPTION_ORGANIZATION, static::OPTION_ORGANIZATION_SHORT, InputOption::VALUE_REQUIRED, 'Namespace that should be used for the code builder. When set to Spryker code will be generated in the core modules.', 'App');
     }
 
@@ -67,8 +67,9 @@ class OpenApiCodeGenerateConsole extends AbstractConsole
         $openApiRequestTransfer = new OpenApiRequestTransfer();
         $openApiRequestTransfer
             ->setTargetFile($input->getOption(static::OPTION_OPEN_API_FILE))
-            ->setApplicationType($input->getOption(static::APPLICATION_TYPE))
-            ->setOrganization($input->getOption(static::OPTION_ORGANIZATION));
+            ->setApplicationType($input->getOption(static::OPTION_APPLICATION_TYPE))
+            ->setOrganization($input->getOption(static::OPTION_ORGANIZATION))
+            ->setIsVerbose($output->isVeryVerbose());
 
         $openApiResponseTransfer = $this->getFacade()->buildFromOpenApi($openApiRequestTransfer);
 

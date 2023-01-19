@@ -7,8 +7,35 @@
 
 namespace SprykerSdk\SyncApi\Message;
 
+use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\GlueResourceMethodResponseArguments;
+use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\TransferArguments;
+
 class SyncApiInfo
 {
+    /**
+     * @param string $resource
+     * @param string $moduleName
+     * @param string $httpMethod
+     * @param string $httpResponseCode
+     *
+     * @return string
+     */
+    public static function addedGlueResourceMethodResponse(string $resource, string $moduleName, string $httpMethod, string $httpResponseCode): string
+    {
+        return static::format(sprintf('Added "%s" run for "[%s] %s %s" resource in "%s" module.', GlueResourceMethodResponseArguments::SPRYK_NAME, strtoupper($httpMethod), $resource, $httpResponseCode, $moduleName));
+    }
+
+    /**
+     * @param string $transferName
+     * @param string $moduleName
+     *
+     * @return string
+     */
+    public static function addedTransfer(string $transferName, string $moduleName): string
+    {
+        return static::format(sprintf('Added "%s" run for "%s" transfer in "%s" module.', TransferArguments::SPRYK_NAME, $transferName, $moduleName));
+    }
+
     /**
      * @return string
      */
