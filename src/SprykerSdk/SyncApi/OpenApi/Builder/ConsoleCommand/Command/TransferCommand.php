@@ -26,7 +26,7 @@ use Transfer\OpenApiResponseTransfer;
 class TransferCommand implements CommandInterface
 {
     /**
-     * @var string
+     * @var int
      */
     protected const POSITION_OF_TRANSFER_NAME_IN_PATH = 2;
 
@@ -224,10 +224,6 @@ class TransferCommand implements CommandInterface
 
             $transferName = $this->getTransferNameFromSchemaOrReference($schema);
 
-            if (empty($transferName)) {
-                continue;
-            }
-
             $requestBodyProperties = $this->getRequestBodyPropertiesFromSchemaOrReference($schema);
             $transferArgumentsCollection = $this->addTransferToCollection($transferArgumentsCollection, $sprykMode, $moduleName, $organization, $transferName, $requestBodyProperties);
         }
@@ -310,7 +306,7 @@ class TransferCommand implements CommandInterface
     }
 
     /**
-     * @param \cebe\openapi\spec\Schema|\cebe\openapi\spec\Reference $schemaOrReference
+     * @param \cebe\openapi\spec\Schema|\cebe\openapi\spec\Reference|null $schemaOrReference
      *
      * @return string
      */
@@ -348,7 +344,7 @@ class TransferCommand implements CommandInterface
         array $transferArgumentsCollection
     ): array {
         /** @var \cebe\openapi\spec\Response|\cebe\openapi\spec\Reference $response */
-        foreach ($this->getResponsesFromOperation($operation) as $responseCode => $response) {
+        foreach ($this->getResponsesFromOperation($operation) as $response) {
             if (isset($response->content) && !empty($response->content)) {
                 $transferArgumentsCollection = $this->getPropertiesFromOperationContent($sprykMode, $organization, $moduleName, $response->content, $transferArgumentsCollection);
             }
@@ -385,10 +381,6 @@ class TransferCommand implements CommandInterface
     ): array {
         foreach ($contents as $response) {
             $transferName = $this->getTransferNameFromSchemaOrReference($response->schema);
-
-            if (empty($transferName)) {
-                continue;
-            }
 
             $responseProperties = (array)$this->getResponseProperties($response);
             $transferArgumentsCollection = $this->addTransferToCollection($transferArgumentsCollection, $sprykMode, $moduleName, $organization, $transferName, $responseProperties);

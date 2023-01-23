@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © 2019-present Spryker Systems GmbH. All rights reserved.
+ * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ */
+
 namespace SprykerSdkTest\SyncApi\Message;
 
 use Codeception\Test\Unit;
@@ -10,7 +15,11 @@ use SprykerSdk\SyncApi\Message\SyncApiMessageFormatter;
  */
 class SyncApiMessageFormatterTest extends Unit
 {
+    /**
+     * @var string
+     */
     protected const MESSAGE = 'The text "placeholder" rest of the text';
+
     /**
      * @return void
      */
