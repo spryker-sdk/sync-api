@@ -220,6 +220,9 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
             $arguments[] = $property->getValue($this);
         }
 
+        $arguments[] = '--mode';
+        $arguments[] = $this->sprykMode;
+
         return $arguments;
     }
 }

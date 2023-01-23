@@ -1,0 +1,30 @@
+{
+    "source": {
+        "directories": [
+            "src/SprykerSdk"
+        ]
+    },
+    "timeout": 30,
+    "logs": {
+        "html": "tests/_output/infection.html"
+    },
+    "tmpDir": "./tests/_data/mutations",
+    "mutators": {
+        "@default": true,
+        "@function_signature": false,
+        "CastString": {
+            "ignore": [
+                "SprykerSdk\\SyncApi\\SyncApiConfig::getProjectRootPath::35",
+                "SprykerSdk\\SyncApi\\SyncApiConfig::getSprykRunExecutablePath::50",
+                "SprykerSdk\\SyncApi\\Message\\SyncApiInfo::format",
+                "SprykerSdk\\SyncApi\\Message\\SyncApiError::format",
+            ],
+        },
+        "DecrementInteger": {
+            "ignore": [
+                "SprykerSdk\\SyncApi\\OpenApi\\Validator\\OpenApiValidator::validate",
+            ],
+        },
+    },
+    "testFramework":"codeception"
+}

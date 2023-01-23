@@ -147,6 +147,11 @@ class TransferArguments implements ArgumentsInterface
             $arguments[] = implode(',', $this->properties);
         }
 
+        if ($this->sprykMode !== null) {
+            $arguments[] = '--mode';
+            $arguments[] = $this->sprykMode;
+        }
+
         return $arguments;
     }
 }
