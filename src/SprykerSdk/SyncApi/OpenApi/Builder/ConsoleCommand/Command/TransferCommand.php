@@ -26,6 +26,11 @@ use Transfer\OpenApiResponseTransfer;
 class TransferCommand implements CommandInterface
 {
     /**
+     * @var int
+     */
+    protected const POSITION_OF_TRANSFER_NAME_IN_PATH = 2;
+
+    /**
      * @var \SprykerSdk\SyncApi\SyncApiConfig
      */
     protected SyncApiConfig $config;
@@ -218,6 +223,7 @@ class TransferCommand implements CommandInterface
             $schema = $mediaType->schema;
 
             $transferName = $this->getTransferNameFromSchemaOrReference($schema);
+
             $requestBodyProperties = $this->getRequestBodyPropertiesFromSchemaOrReference($schema);
             $transferArgumentsCollection = $this->addTransferToCollection($transferArgumentsCollection, $sprykMode, $moduleName, $organization, $transferName, $requestBodyProperties);
         }
@@ -300,7 +306,7 @@ class TransferCommand implements CommandInterface
     }
 
     /**
-     * @param \cebe\openapi\spec\Schema|\cebe\openapi\spec\Reference $schemaOrReference
+     * @param \cebe\openapi\spec\Schema|\cebe\openapi\spec\Reference|null $schemaOrReference
      *
      * @return string
      */
@@ -312,9 +318,10 @@ class TransferCommand implements CommandInterface
 
         $referencePathName = '';
 
-        if ($schemaOrReference->getDocumentPosition()) {
+        if ($schemaOrReference && $schemaOrReference->getDocumentPosition()) {
             $referencePath = $schemaOrReference->getDocumentPosition()->getPath();
-            $referencePathName = end($referencePath);
+
+            $referencePathName = $referencePath[static::POSITION_OF_TRANSFER_NAME_IN_PATH];
         }
 
         return $referencePathName;
@@ -336,10 +343,10 @@ class TransferCommand implements CommandInterface
         Operation $operation,
         array $transferArgumentsCollection
     ): array {
-        /** @var \cebe\openapi\spec\Response|\cebe\openapi\spec\Reference $content */
-        foreach ($this->getResponsesFromOperation($operation) as $content) {
-            if (isset($content->content) && !empty($content->content)) {
-                $transferArgumentsCollection = $this->getPropertiesFromOperationContent($sprykMode, $organization, $moduleName, $content->content, $transferArgumentsCollection);
+        /** @var \cebe\openapi\spec\Response|\cebe\openapi\spec\Reference $response */
+        foreach ($this->getResponsesFromOperation($operation) as $response) {
+            if (isset($response->content) && !empty($response->content)) {
+                $transferArgumentsCollection = $this->getPropertiesFromOperationContent($sprykMode, $organization, $moduleName, $response->content, $transferArgumentsCollection);
             }
         }
 
@@ -374,6 +381,7 @@ class TransferCommand implements CommandInterface
     ): array {
         foreach ($contents as $response) {
             $transferName = $this->getTransferNameFromSchemaOrReference($response->schema);
+
             $responseProperties = (array)$this->getResponseProperties($response);
             $transferArgumentsCollection = $this->addTransferToCollection($transferArgumentsCollection, $sprykMode, $moduleName, $organization, $transferName, $responseProperties);
         }
