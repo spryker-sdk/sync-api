@@ -45,6 +45,6 @@ class SyncApiMessageFormatterTest extends Unit
      */
     protected function supportsColoring(): bool
     {
-        return getenv('TERM') === 'xterm-color' || getenv('TERM') === 'xterm-256color';
+        return getenv('TERM') === 'xterm-color' || getenv('TERM') === 'xterm-256color' || strtolower(substr(PHP_OS, 0, 3)) !== 'win';
     }
 }
