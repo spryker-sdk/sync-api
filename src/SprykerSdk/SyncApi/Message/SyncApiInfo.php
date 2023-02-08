@@ -22,7 +22,7 @@ class SyncApiInfo
      */
     public static function addedGlueResourceMethodResponse(string $resource, string $moduleName, string $httpMethod, string $httpResponseCode): string
     {
-        return static::format(sprintf('Added "%s" run for "[%s] %s %s" resource in "%s" module.', GlueResourceMethodResponseArguments::SPRYK_NAME, strtoupper($httpMethod), $resource, $httpResponseCode, $moduleName));
+        return SyncApiMessageFormatter::format(sprintf('Added "%s" run for "[%s] %s %s" resource in "%s" module.', GlueResourceMethodResponseArguments::SPRYK_NAME, strtoupper($httpMethod), $resource, $httpResponseCode, $moduleName));
     }
 
     /**
@@ -33,7 +33,7 @@ class SyncApiInfo
      */
     public static function addedTransfer(string $transferName, string $moduleName): string
     {
-        return static::format(sprintf('Added "%s" run for "%s" transfer in "%s" module.', TransferArguments::SPRYK_NAME, $transferName, $moduleName));
+        return SyncApiMessageFormatter::format(sprintf('Added "%s" run for "%s" transfer in "%s" module.', TransferArguments::SPRYK_NAME, $transferName, $moduleName));
     }
 
     /**
@@ -41,7 +41,7 @@ class SyncApiInfo
      */
     public static function openApiSchemaFileIsValid(): string
     {
-        return static::format('Open API file doesn\'t contain any errors.');
+        return SyncApiMessageFormatter::format('Open API file doesn\'t contain any errors.');
     }
 
     /**
@@ -49,7 +49,7 @@ class SyncApiInfo
      */
     public static function generatedCodeFromOpenApiSchema(): string
     {
-        return static::format('Successfully generated code to work with synchronous API.');
+        return SyncApiMessageFormatter::format('Successfully generated code to work with synchronous API.');
     }
 
     /**
@@ -59,26 +59,6 @@ class SyncApiInfo
      */
     public static function openApiFileCreated(string $fileName): string
     {
-        return static::format(sprintf('Successfully created "%s".', $fileName));
-    }
-
-    /**
-     * Colorize output in CLI on Linux machines.
-     *
-     * Info text will be in green, everything in double quotes will be yellow, and quotes will be removed.
-     *
-     * @param string $message
-     *
-     * @return string
-     */
-    protected static function format(string $message): string
-    {
-        if (PHP_SAPI === PHP_SAPI && stripos(PHP_OS, 'WIN') === false) {
-            $message = "\033[32m" . preg_replace_callback('/"(.+?)"/', function (array $matches) {
-                return sprintf("\033[0m\033[33m%s\033[0m\033[32m", $matches[1]);
-            }, $message);
-        }
-
-        return $message;
+        return SyncApiMessageFormatter::format(sprintf('Successfully created "%s".', $fileName));
     }
 }

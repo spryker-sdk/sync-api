@@ -33,7 +33,7 @@ class SyncApiMessageFormatterTest extends Unit
      */
     protected function getExpectedFormattedMessage(): string
     {
-        if ($this->isWindows()) {
+        if (!$this->supportsColoring()) {
             return static::MESSAGE;
         }
 
@@ -43,8 +43,8 @@ class SyncApiMessageFormatterTest extends Unit
     /**
      * @return bool
      */
-    protected function isWindows(): bool
+    protected function supportsColoring(): bool
     {
-        return strtolower(substr(PHP_OS, 0, 3)) === 'win';
+        return getenv('TERM') === 'xterm-color' || getenv('TERM') === 'xterm-256color';
     }
 }
