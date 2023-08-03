@@ -14,6 +14,7 @@
     },
     "require-dev": {
         "codeception/codeception": "*",
+        "codeception/stub": "^4.1.0",
         "codeception/module-asserts": "*",
         "mikey179/vfsstream": "^1.6",
         "spryker-sdk/architector": "0.1.x-dev",

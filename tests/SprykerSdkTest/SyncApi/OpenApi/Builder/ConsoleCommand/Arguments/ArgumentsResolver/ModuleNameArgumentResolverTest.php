@@ -9,8 +9,8 @@ namespace SprykerSdkTest\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\Argume
 
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\PathItem;
+use Codeception\Stub;
 use Codeception\Test\Unit;
-use Codeception\Util\Stub;
 use SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Arguments\ArgumentResolver\ModuleNameArgumentResolver;
 
 /**

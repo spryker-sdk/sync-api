@@ -13,7 +13,7 @@ coverage:
 suites:
     AsyncApi:
         path: SprykerSdkTest/SyncApi
-        class_name: SyncApiTester
+        actor: SyncApiTester
         modules:
             enabled:
                 - \SprykerSdkTest\Helper\SyncApiHelper
