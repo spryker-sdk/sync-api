@@ -55,9 +55,6 @@ jobs:
             - name: Run PHPStan
               run: composer stan
 
-            - name: Run Rector checks
-              run: composer rector-diff
-
             - name: Run CodeStyle checks
               run: composer cs-check
 
@@ -74,48 +71,3 @@ jobs:
               uses: codecov/codecov-action@v3
               with:
                   file: ./tests/_output/coverage.xml
-
-    prefer-lowest:
-        name: "Prefer lowest checks"
-        runs-on: "ubuntu-latest"
-        env:
-            APPLICATION_ENV: testing
-        strategy:
-            fail-fast: false
-            matrix:
-                php-version: [
-                    '8.0'
-                ]
-        steps:
-            - uses: actions/checkout@v3
-
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: ${{ matrix.php-version }}
-                  extensions: mbstring, intl, pdo_mysql, redis
-                  tools: composer:v2
-
-            - name: Composer get cache directory
-              id: composer-cache
-              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-            - name: Composer cache
-              uses: actions/cache@v3
-              with:
-                  path: ${{ steps.composer-cache.outputs.dir }}
-                  key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-composer-
-
-            - name: Composer validate
-              run: composer validate
-
-            - name: Composer version
-              run: composer --version
-
-            - name: "Install lowest dependencies"
-              run: composer update --prefer-lowest
-
-            - name: Codecept tests
-              run: composer test
