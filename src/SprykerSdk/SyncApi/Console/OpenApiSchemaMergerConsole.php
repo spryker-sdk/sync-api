@@ -19,7 +19,7 @@ use Symfony\Component\Yaml\Yaml;
  * @method \App\Zed\Payone\Communication\PayoneCommunicationFactory getFactory()
  * @method \App\Zed\Payone\Persistence\PayoneRepositoryInterface getRepository()
  */
-class OpenApiSchemaMergeConsole extends Console
+class OpenApiSchemaMergerConsole extends Console
 {
     /**
      * @var string
