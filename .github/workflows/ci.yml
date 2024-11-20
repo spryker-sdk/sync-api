@@ -18,11 +18,10 @@ jobs:
             fail-fast: false
             matrix:
                 php-version: [
-                    '8.0',
-                    '8.1'
+                    '8.2'
                 ]
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
@@ -36,7 +35,7 @@ jobs:
               run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
             - name: Composer cache
-              uses: actions/cache@v3
+              uses: actions/cache@v4
               with:
                   path: ${{ steps.composer-cache.outputs.dir }}
                   key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -59,15 +58,15 @@ jobs:
               run: composer cs-check
 
             - name: Codecept tests
-              if: ${{ matrix.php-version == '8.0' }}
+              if: ${{ matrix.php-version == '8.2' }}
               run: composer test
 
             - name: Codecept tests with coverage
-              if: ${{ matrix.php-version == '8.1' }}
+              if: ${{ matrix.php-version == '8.2' }}
               run: composer test-cover
 
             - name: Code Coverage Report
-              if: success() && matrix.php-version == '8.1'
+              if: success() && matrix.php-version == '8.2'
               uses: codecov/codecov-action@v3
               with:
                   file: ./tests/_output/coverage.xml
