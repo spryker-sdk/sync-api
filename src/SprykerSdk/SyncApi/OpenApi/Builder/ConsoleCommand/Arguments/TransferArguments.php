@@ -40,7 +40,7 @@ class TransferArguments implements ArgumentsInterface
     protected array $properties = [];
 
     /**
-     * @var array<string, string|array>
+     * @var array<string, string|array<string, string>>
      */
     protected array $extensions = [];
 

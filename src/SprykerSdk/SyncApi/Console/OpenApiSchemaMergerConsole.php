@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright © 2021-present Spryker Systems GmbH. All rights reserved.
+ * Copyright © 2019-present Spryker Systems GmbH. All rights reserved.
  * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  */
 
@@ -9,19 +9,13 @@ namespace SprykerSdk\SyncApi\Console;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\Writer;
-use Spryker\Zed\Kernel\Communication\Console\Console;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- * @method \App\Zed\Payone\Business\PayoneFacadeInterface getFacade()
- * @method \App\Zed\Payone\Communication\PayoneCommunicationFactory getFactory()
- * @method \App\Zed\Payone\Persistence\PayoneRepositoryInterface getRepository()
- */
-class OpenApiSchemaMergerConsole extends Console
+class OpenApiSchemaMergerConsole extends AbstractConsole
 {
     /**
      * @var string
@@ -86,6 +80,12 @@ class OpenApiSchemaMergerConsole extends Console
         return static::CODE_SUCCESS;
     }
 
+    /**
+     * @param array $array1
+     * @param array $array2
+     *
+     * @return array
+     */
     protected function recursiveMerge(array $array1, array $array2): array
     {
         foreach ($array2 as $key => $value) {

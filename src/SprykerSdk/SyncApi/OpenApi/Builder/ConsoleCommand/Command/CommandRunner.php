@@ -23,7 +23,7 @@ class CommandRunner implements CommandRunnerInterface
     }
 
     /**
-     * @param array<array> $commands
+     * @param array<array<string, string>> $commands
      *
      * @return void
      */
@@ -37,7 +37,7 @@ class CommandRunner implements CommandRunnerInterface
     /**
      * @codeCoverageIgnore
      *
-     * @param array $command
+     * @param array<string, string> $command
      *
      * @return void
      */

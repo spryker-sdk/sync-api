@@ -10,7 +10,7 @@ namespace SprykerSdk\SyncApi\OpenApi\Builder\ConsoleCommand\Command;
 interface CommandRunnerInterface
 {
     /**
-     * @param array<array> $commands
+     * @param array<array<string, string>> $commands
      *
      * @return void
      */

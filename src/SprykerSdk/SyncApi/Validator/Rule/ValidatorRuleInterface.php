@@ -12,10 +12,10 @@ use Transfer\ValidateResponseTransfer;
 interface ValidatorRuleInterface
 {
     /**
-     * @param array $data
+     * @param array<string, string> $data
      * @param string $fileName
      * @param \Transfer\ValidateResponseTransfer $validateResponseTransfer
-     * @param array|null $context
+     * @param array<string, string>|null $context
      *
      * @return \Transfer\ValidateResponseTransfer
      */

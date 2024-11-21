@@ -52,7 +52,7 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
     protected ?int $httpResponseCode = null;
 
     /**
-     * @var array<string>
+     * @var array<string, array<string, string>>
      */
     protected array $extensions = [];
 
@@ -159,7 +159,7 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
     }
 
     /**
-     * @param array $extensions
+     * @param array<string, array<string, string>> $extensions
      *
      * @return void
      */
@@ -169,7 +169,7 @@ class GlueResourceMethodResponseArguments implements ArgumentsInterface
     }
 
     /**
-     * @return array
+     * @return array<string, array<string, string>>
      */
     public function getExtensions(): array
     {
