@@ -4,24 +4,24 @@
     "description": "SDK for SyncAPI.",
     "license": "proprietary",
     "require": {
-        "php": ">=8.0",
+        "php": ">=8.2",
         "cebe/php-openapi": "^1.6",
         "doctrine/inflector": "^1.4.0 || ^2.0",
         "spryker-sdk/spryk": "^0.4.0 || ^0.5.0",
         "symfony/console": "^4.0.0 || ^5.3 || ^6.0",
         "symfony/finder": "^4.0.0 || ^5.3 || ^6.0",
-        "symfony/process": "^4.0.0 || ^5.4 || ^6"
+        "symfony/process": "^4.0.0 || ^5.4 || ^6.0"
     },
     "require-dev": {
         "codeception/codeception": "*",
-        "codeception/stub": "^4.1.0",
         "codeception/module-asserts": "*",
+        "codeception/stub": "^4.1.0",
         "mikey179/vfsstream": "^1.6",
-        "spryker-sdk/architector": "0.1.x-dev",
+        "phpstan/phpstan": "^2.0",
+        "rector/rector": "dev-main",
         "spryker/code-sniffer": "dev-master",
         "symfony/filesystem": "^4.0 || ^5.3",
-        "symfony/var-dumper": "*",
-        "phpstan/phpdoc-parser": "~1.5.1"
+        "symfony/var-dumper": "*"
     },
     "autoload": {
         "psr-4": {
@@ -46,9 +46,6 @@
         }
     },
     "config": {
-        "platform": {
-            "php": "8.0.19"
-        },
         "sort-packages": true,
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
@@ -56,13 +53,13 @@
         }
     },
     "scripts": {
-        "cs-check": "phpcs --colors -p -s --extensions=php --standard=vendor/spryker/code-sniffer/Spryker/ruleset.xml src/SprykerSdk/ tests/",
-        "cs-fix": "phpcbf --colors -p --extensions=php --standard=vendor/spryker/code-sniffer/Spryker/ruleset.xml src/SprykerSdk/ tests/",
+        "cs-check": "phpcs --colors -p",
+        "cs-fix": "phpcbf --colors -p",
         "stan": "phpstan analyze -l 8 src/SprykerSdk/",
         "test": "codecept build && codecept run",
         "test-cover": "codecept build && codecept run --coverage-xml",
-        "rector": "vendor/bin/rector process src/SprykerSdk/ --config architector.php --ansi",
-        "rector-diff": "vendor/bin/rector process src/SprykerSdk/ --config architector.php --ansi --dry-run",
+        "rector": "vendor/bin/rector process src/SprykerSdk/ --ansi",
+        "rector-diff": "vendor/bin/rector process src/SprykerSdk/ --ansi --dry-run",
         "local-ci": "composer cs-fix && composer cs-check && composer stan && composer rector-diff && composer test"
     }
 }

@@ -22,16 +22,12 @@ defined('APPLICATION_ROOT_DIR') || define('APPLICATION_ROOT_DIR', __DIR__);
 return static function (RectorConfig $rectorConfig) {
     $rectorConfig->import(SetList::DEAD_CODE);
     $rectorConfig->import(SetList::EARLY_RETURN);
-    $rectorConfig->import(SetList::PHP_74);
+    $rectorConfig->import(SetList::PHP_82);
 
-    $rectorConfig->parameters()->set(Option::SKIP, [
-        ChangeAndIfToEarlyReturnRector::class,
-        ChangeOrIfReturnToEarlyReturnRector::class,
-        ClosureToArrowFunctionRector::class,
+    $rectorConfig->skip([
         RemoveUselessParamTagRector::class,
         RemoveUnusedPromotedPropertyRector::class,
         RemoveUselessReturnTagRector::class,
         RemoveUselessVarTagRector::class,
-        ReturnBinaryAndToEarlyReturnRector::class,
     ]);
 };

@@ -15,7 +15,7 @@ use Transfer\ValidateResponseTransfer;
 class OpenApiHttpMethodInPathValidatorRule implements ValidatorRuleInterface
 {
     /**
-     * @var array
+     * @var array<int, string>
      */
     protected const HTTP_METHODS = [
         'get',

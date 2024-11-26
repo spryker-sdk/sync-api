@@ -131,7 +131,7 @@ class SyncApiFactory
     }
 
     /**
-     * @return array
+     * @return array<\SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface>
      */
     public function getValidatorRules(): array
     {

@@ -31,7 +31,7 @@ abstract class AbstractValidator implements ValidatorInterface
     /**
      * @param \SprykerSdk\SyncApi\SyncApiConfig $config
      * @param \SprykerSdk\SyncApi\Message\MessageBuilderInterface $messageBuilder
-     * @param array $fileValidators
+     * @param array<\SprykerSdk\SyncApi\Validator\Rule\ValidatorRuleInterface> $fileValidators
      */
     public function __construct(SyncApiConfig $config, MessageBuilderInterface $messageBuilder, array $fileValidators = [])
     {
@@ -41,10 +41,10 @@ abstract class AbstractValidator implements ValidatorInterface
     }
 
     /**
-     * @param array $fileData
+     * @param array<string> $fileData
      * @param string $fileName
      * @param \Transfer\ValidateResponseTransfer $validateResponseTransfer
-     * @param array|null $context
+     * @param array<string, string>|null $context
      *
      * @return \Transfer\ValidateResponseTransfer
      */

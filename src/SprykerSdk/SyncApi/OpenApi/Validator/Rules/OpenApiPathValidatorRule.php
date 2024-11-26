@@ -30,10 +30,10 @@ class OpenApiPathValidatorRule implements ValidatorRuleInterface
     /**
      * Validates the schema for existence of paths.
      *
-     * @param array $openApi
+     * @param array<string, string|array<string, string>> $openApi
      * @param string $openApiFileName
      * @param \Transfer\ValidateResponseTransfer $validateResponseTransfer
-     * @param array|null $context
+     * @param array<string, string>|null $context
      *
      * @return \Transfer\ValidateResponseTransfer
      */
@@ -47,7 +47,7 @@ class OpenApiPathValidatorRule implements ValidatorRuleInterface
     }
 
     /**
-     * @param array $openApi
+     * @param array<string, string|array<string, string>> $openApi
      * @param string $openApiFileName
      * @param \Transfer\ValidateResponseTransfer $validateResponseTransfer
      *
