@@ -44,7 +44,7 @@ class SyncApiConfig
     public function getSprykRunExecutablePath(): string
     {
         if (getenv('INSTALLED_ROOT_DIRECTORY')) {
-            return getenv('INSTALLED_ROOT_DIRECTORY');
+            return (string)getenv('INSTALLED_ROOT_DIRECTORY');
         }
 
         return (string)getcwd();
