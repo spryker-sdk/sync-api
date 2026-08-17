@@ -37,6 +37,17 @@ class AbstractConsole extends Command
     protected ?SyncApiFacadeInterface $facade = null;
 
     /**
+     * @param string|null $name
+     * @param \SprykerSdk\SyncApi\SyncApiConfig|null $config
+     */
+    public function __construct(?string $name = null, ?SyncApiConfig $config = null)
+    {
+        parent::__construct($name);
+
+        $this->config = $config;
+    }
+
+    /**
      * @return \SprykerSdk\SyncApi\SyncApiConfig
      */
     protected function getConfig(): SyncApiConfig
